@@ -35,7 +35,9 @@
         #toast.show { visibility: visible; opacity: 1; bottom: 110px; }
 
         /* Calculator Specific */
-        #jpyInput, #twdOutput { font-weight: 900; }
+        #jpyInput, #twdOutput, #rateInput { font-weight: 900; }
+        /* 移除 rateInput 的預設邊框，讓它看起來像文字 */
+        #rateInput { border-bottom: 2px dashed #ca8a04; color: #ca8a04; width: 100px; text-align: center; }
     </style>
 </head>
 <body class="h-screen flex flex-col text-gray-800 overflow-hidden relative">
@@ -93,9 +95,9 @@
 <script>
     // ================= DATA (資料庫) =================
     
-    // 從 Google 搜尋工具取得的即時匯率
-    const REALTIME_EXCHANGE_RATE = 0.2009; // JPY 1 -> TWD 0.2009 (from 2025-11-28 search)
-    const EXCHANGE_RATE_DATE = "2025/11/28";
+    // ⚠️ 這裡改為讀取「儲存的匯率」，如果沒有就用預設值 0.21
+    let savedRate = localStorage.getItem('user_rate');
+    let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
 
     const bgImages = {
         D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
@@ -107,11 +109,11 @@
         D7: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000&fit=crop",
         SHOP: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000&fit=crop",
         TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
-        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop", // 氣球
-        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop" // 購物計算
+        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop",
+        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop"
     };
 
-    // 行程資料 (含 MapCode) - 保持 V6.0 資料不變
+    // 行程資料 (含 MapCode)
     const itineraryDB = [
         { day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, events: [
             { time: "13:15", title: "星宇 JX302 起飛", icon: "fa-plane-departure", note: "給奎奎吃軟糖平衡耳壓", map: "台中國際機場" },
@@ -170,7 +172,7 @@
         ]}
     ];
 
-    // 清單資料 - 保持 V6.0 資料不變
+    // 清單資料
     const checklistDB = [
         { id: "pack", title: "🎒 行前打包 (完整)", items: [
             { text: "護照 (全家3本)", sub: "效期需 > 2026/10" },
@@ -209,7 +211,7 @@
         ] }
     ];
 
-    // 成就資料 - 保持 V6.0 資料不變
+    // 成就資料
     const missionsDB = [
         { id: "m1", title: "我是船長", desc: "在玻璃船找到尼莫", icon: "fa-fish" },
         { id: "m2", title: "海洋霸主", desc: "跟大鯨鯊拍合照", icon: "fa-camera" },
@@ -219,12 +221,8 @@
         { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying" }
     ];
 
-    // 工具資料 (新增 calc 分頁)
+    // 工具資料 (drive, jp, sos)
     const toolsDB = {
-        calc: {
-            rate: REALTIME_EXCHANGE_RATE,
-            date: EXCHANGE_RATE_DATE
-        },
         drive: [
             { title: "右駕口訣", content: "左轉小彎、右轉大彎<br>雨刷在左、方向燈在右", color: "bg-blue-50 text-blue-800" },
             { title: "加油金句", content: "Regular 滿油 (紅槍)<br>レギュラー満タン<br>(Regyuraa mantan)", color: "bg-orange-50 text-orange-800" },
@@ -269,9 +267,9 @@
     let activeTab = 'itinerary';
     let currentDayIdx = 0;
     let currentChecklistFilter = 'pack';
-    let currentToolFilter = 'drive'; // 預設工具頁為 'drive'
+    let currentToolFilter = 'drive';
 
-    // 天氣與GPS - 保持 V6.0 邏輯不變
+    // 天氣與GPS
     function initWeather() {
         const weatherIcon = document.getElementById('weather-icon');
         const weatherTemp = document.getElementById('weather-temp');
@@ -319,7 +317,7 @@
         }
     }
 
-    // 倒數計時 (2026/3/28) - 保持 V6.0 邏輯不變
+    // 倒數計時 (2026/3/28)
     function updateCountdown() {
         const tripDate = new Date('2026-03-28T13:15:00').getTime();
         const now = new Date().getTime();
@@ -335,7 +333,7 @@
     }
 
     function init() {
-        switchTab('itinerary', false); // 預設載入行程
+        switchTab('itinerary', false);
         updateCountdown();
         setInterval(updateCountdown, 60000);
         initWeather();
@@ -388,7 +386,6 @@
                 </div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
         } else if (activeTab === 'tools') {
-            // V7.0 新增 calc (匯率)
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
                     <button onclick="currentToolFilter='calc'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
@@ -414,7 +411,6 @@
         const main = document.getElementById('main-scroll');
         
         if (activeTab === 'itinerary') {
-            // V6.0 行程渲染邏輯不變
             const d = itineraryDB[currentDayIdx];
             main.innerHTML = `
                 <div class="animate-slide-up">
@@ -456,7 +452,6 @@
                     <div class="h-12"></div>
                 </div>`;
         } else if (activeTab === 'checklist') {
-            // V6.0 清單渲染邏輯不變
             const list = checklistDB.find(c => c.id === currentChecklistFilter);
             main.innerHTML = `
                 <div class="animate-slide-up glass-card rounded-3xl p-6 min-h-[60vh]">
@@ -488,7 +483,6 @@
                     </button>
                 </div>`;
         } else if (activeTab === 'missions') {
-            // V6.0 成就渲染邏輯不變
             main.innerHTML = `
                 <div class="animate-slide-up grid grid-cols-2 gap-4">
                     ${missionsDB.map(m => {
@@ -510,15 +504,15 @@
             `;
         } else if (activeTab === 'tools') {
             if (currentToolFilter === 'calc') {
-                // V7.0 匯率計算機
+                // V7.1 更新：讓匯率變成可編輯的 Input
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
                         <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300">
-                            <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">即時匯率換算器 (JPY ➔ TWD)</h3>
-                            <div class="text-xl font-bold text-gray-500 mb-4">
-                                1 JPY = <span class="text-yellow-600 text-3xl font-black">${toolsDB.calc.rate}</span> TWD
+                            <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器 (可點擊修改)</h3>
+                            <div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">
+                                1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" oninput="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD
                             </div>
-                            <p class="text-xs text-gray-400 mb-6">資料更新於 ${toolsDB.calc.date}</p>
+                            <p class="text-xs text-gray-400 mb-6"><i class="fas fa-save mr-1"></i>系統會自動記住您輸入的匯率</p>
 
                             <div class="flex flex-col gap-4">
                                 <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
@@ -538,16 +532,12 @@
                         </div>
                         <div class="h-12"></div>
                     </div>`;
-                // 立即綁定計算事件
                 setTimeout(() => {
                     const jpyInput = document.getElementById('jpyInput');
-                    if (jpyInput) {
-                        jpyInput.focus();
-                    }
+                    if (jpyInput) jpyInput.focus();
                 }, 100);
 
             } else if (currentToolFilter === 'drive') {
-                // V7.0 新增 "找餐廳"
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
                         <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4">
@@ -578,7 +568,6 @@
                         `).join('')}
                     </div>`;
             } else if (currentToolFilter === 'jp') {
-                // V6.0 日語渲染邏輯不變
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-8">
                         ${toolsDB.jp.map(cat => `
@@ -597,7 +586,6 @@
                         `).join('')}
                     </div>`;
             } else if (currentToolFilter === 'sos') {
-                // V6.0 緊急聯絡渲染邏輯不變
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-3">
                         ${toolsDB.sos.map(s => `
@@ -639,7 +627,6 @@
                 renderContent();
             }
         } else {
-            // 放煙火音效(可選)或震動
             if(navigator.vibrate) navigator.vibrate(200);
             localStorage.setItem(id, '1');
             showToast("🎉 任務達成！太棒了！");
@@ -653,7 +640,15 @@
         });
     }
 
-    // 匯率計算邏輯
+    // 匯率計算功能 (V7.1 改版)
+    window.updateRate = (val) => {
+        if(val && val > 0) {
+            CURRENT_RATE = parseFloat(val);
+            localStorage.setItem('user_rate', val); // 存入 localStorage
+            convertCurrency(); // 立即重新計算
+        }
+    }
+
     window.convertCurrency = () => {
         const jpyInput = document.getElementById('jpyInput');
         const twdOutput = document.getElementById('twdOutput');
@@ -664,17 +659,12 @@
             return;
         }
 
-        const twd = jpy * REALTIME_EXCHANGE_RATE;
-        // 顯示為整數或小數點後兩位
+        const twd = jpy * CURRENT_RATE;
         twdOutput.innerText = twd.toFixed(twd % 1 !== 0 ? 2 : 0).toLocaleString('en-US');
     }
 
-    // Quick Search 邏輯 (使用 Google Maps URL Scheme)
+    // Quick Search
     window.quickSearch = (query) => {
-        // 使用 Google Maps 的 'search' URL 語法，`q` 是查詢字串
-        // 網頁版連結為 `https://www.google.com/maps/search/?api=1&query=`
-        // 加上 `&query_place_id=current_place` 可以優先使用目前位置
-        // 由於我們不能保證用戶有 Google Maps App，所以使用 Web URL。
         const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}&query_place_id=current_place`;
         window.open(url, '_system');
         showToast(`正在搜尋附近的「${query}」...`);
