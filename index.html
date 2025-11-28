@@ -27,6 +27,9 @@
         .tab-active { background: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); transform: scale(1.05); }
         .tab-inactive { background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255,255,255,0.1); }
         
+        /* Checkbox & Progress */
+        .custom-checkbox:checked + div { background-color: #2563eb; border-color: #2563eb; }
+        
         /* Toast Notification */
         #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: rgba(30, 41, 59, 0.9); color: #fff; text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 100px; font-size: 14px; backdrop-filter: blur(5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast.show { visibility: visible; opacity: 1; bottom: 110px; }
@@ -90,8 +93,12 @@
 
 <script>
     // ================= DATA (資料庫) =================
+    // 匯率
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
+    
+    // V8.0 新增：記帳資料 (讀取舊資料，若無則為空陣列)
+    let expenses = JSON.parse(localStorage.getItem('trip_expenses')) || [];
 
     const bgImages = {
         D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
@@ -317,7 +324,6 @@
     }
 
     function init() {
-        // ★ 關鍵修復：這裡參數不傳入 false，讓它預設為 true (進行渲染)
         switchTab('itinerary');
         updateCountdown();
         setInterval(updateCountdown, 60000);
@@ -376,7 +382,7 @@
         } else if (activeTab === 'tools') {
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
-                    <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
+                    <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率/記帳</button>
                     <button id="btn-tool-drive" onclick="switchTool('drive')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
                     <button id="btn-tool-jp" onclick="switchTool('jp')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
                     <button id="btn-tool-sos" onclick="switchTool('sos')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
@@ -451,7 +457,6 @@
                         ${list.items.map((item, i) => {
                             const key = `chk_${currentChecklistFilter}_${i}`;
                             const isChecked = localStorage.getItem(key) === '1';
-                            // 文字樣式
                             const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700';
                             
                             return `
@@ -495,33 +500,82 @@
             `;
         } else if (activeTab === 'tools') {
             if (currentToolFilter === 'calc') {
+                // V8.0 記帳本整合
+                
+                // 計算總額
+                let totalJPY = expenses.reduce((sum, item) => sum + item.price, 0);
+                let totalTWD = Math.round(totalJPY * CURRENT_RATE);
+
+                let expenseListHTML = '';
+                if(expenses.length === 0) {
+                    expenseListHTML = `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>`;
+                } else {
+                    expenseListHTML = expenses.map((item, idx) => `
+                        <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-2">
+                            <div class="flex-1">
+                                <div class="font-bold text-gray-700">${item.name}</div>
+                                <div class="text-xs text-gray-400">¥${item.price.toLocaleString()} x ${CURRENT_RATE} ≈ $${Math.round(item.price * CURRENT_RATE).toLocaleString()}</div>
+                            </div>
+                            <button onclick="deleteExpense(${idx})" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center active:scale-90">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
-                        <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300">
-                            <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器 (可點擊修改)</h3>
+                        <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative">
+                            <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器 (可修改)</h3>
                             <div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">
                                 1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" oninput="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD
                             </div>
-                            <p class="text-xs text-gray-400 mb-6"><i class="fas fa-save mr-1"></i>系統會自動記住您輸入的匯率</p>
 
                             <div class="flex flex-col gap-4">
-                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative">
                                     <label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label>
-                                    <input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額 (¥)"
-                                        class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2">
+                                    <input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額"
+                                        class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black">
                                 </div>
-                                
-                                <i class="fas fa-arrow-down text-3xl text-blue-500 animate-bounce"></i>
-
+                                <i class="fas fa-arrow-down text-3xl text-blue-500 animate-bounce absolute left-1/2 -translate-x-1/2 top-[52%] z-10 drop-shadow-sm"></i>
                                 <div class="bg-green-50 p-4 rounded-xl border border-green-100">
                                     <label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label>
-                                    <div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2">0</div>
+                                    <div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div>
                                 </div>
                             </div>
-                            
                         </div>
-                        <div class="h-12"></div>
-                    </div>`;
+
+                        <div class="flex items-center gap-2 text-gray-300 py-2">
+                            <div class="h-px bg-gray-200 flex-1"></div>
+                            <span class="text-xs font-bold">敗家記帳本</span>
+                            <div class="h-px bg-gray-200 flex-1"></div>
+                        </div>
+
+                        <div class="glass-card rounded-3xl p-4">
+                            <div class="flex gap-2 mb-3">
+                                <input id="exName" type="text" placeholder="品項 (如: 吹風機)" class="flex-[2] bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-blue-500">
+                                <input id="exPrice" type="number" placeholder="¥ 金額" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-blue-500">
+                            </div>
+                            <button onclick="addExpense()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform">
+                                <i class="fas fa-plus-circle mr-2"></i> 記一筆
+                            </button>
+                        </div>
+
+                        <div class="pb-24">
+                            ${expenseListHTML}
+                        </div>
+                    </div>
+                    
+                    <div class="fixed bottom-[95px] left-4 right-4 bg-gray-900/90 backdrop-blur text-white p-4 rounded-2xl shadow-2xl flex justify-between items-center z-40 border border-white/10 animate-slide-up">
+                        <div class="text-xs text-gray-400">累積消費</div>
+                        <div class="text-right">
+                            <div class="text-xl font-black text-yellow-400">¥${totalJPY.toLocaleString()}</div>
+                            <div class="text-xs text-gray-300">≈ NT$ ${totalTWD.toLocaleString()}</div>
+                        </div>
+                    </div>
+                    `;
+                
+                // Focus logic
                 setTimeout(() => {
                     const jpyInput = document.getElementById('jpyInput');
                     if (jpyInput) jpyInput.focus();
@@ -645,7 +699,7 @@
         if (val === '1') localStorage.removeItem(key);
         else localStorage.setItem(key, '1');
         
-        renderContent(); // 關鍵！通知畫面更新
+        renderContent(); 
     }
     
     window.resetChecklist = (id) => {
@@ -682,6 +736,7 @@
             CURRENT_RATE = parseFloat(val);
             localStorage.setItem('user_rate', val); 
             convertCurrency(); 
+            renderContent(); // 更新匯率後，下方的記帳金額也要重算
         }
     }
 
@@ -697,6 +752,31 @@
 
         const twd = jpy * CURRENT_RATE;
         twdOutput.innerText = twd.toFixed(twd % 1 !== 0 ? 2 : 0).toLocaleString('en-US');
+    }
+
+    // V8.0 記帳邏輯
+    window.addExpense = () => {
+        const name = document.getElementById('exName').value;
+        const price = document.getElementById('exPrice').value;
+
+        if(!name || !price) {
+            showToast("⚠️ 請輸入名稱和金額");
+            return;
+        }
+
+        expenses.unshift({ name: name, price: parseInt(price) }); // 加到最前面
+        localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+        
+        showToast("💰 已記錄！");
+        renderContent();
+    }
+
+    window.deleteExpense = (index) => {
+        if(confirm("確定要刪除這筆紀錄嗎？")) {
+            expenses.splice(index, 1);
+            localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+            renderContent();
+        }
     }
 
     window.quickSearch = (query) => {
