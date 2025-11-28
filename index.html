@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v4.0</title>
+    <title>奎奎全家沖繩遊 🦕 v5.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -29,6 +29,14 @@
             70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
+
+        /* 音波動畫 */
+        .playing-wave { display: inline-flex; align-items: center; gap: 2px; height: 12px; }
+        .playing-wave span { width: 3px; background: #3b82f6; animation: wave 0.8s infinite ease-in-out; border-radius: 2px; }
+        .playing-wave span:nth-child(1) { height: 40%; animation-delay: 0s; }
+        .playing-wave span:nth-child(2) { height: 100%; animation-delay: 0.1s; }
+        .playing-wave span:nth-child(3) { height: 60%; animation-delay: 0.2s; }
+        @keyframes wave { 0%, 100% { height: 40%; } 50% { height: 100%; } }
 
         /* iPhone 安全區域適配 */
         .pt-safe-top { padding-top: env(safe-area-inset-top); }
@@ -432,13 +440,10 @@
     // ================= SMART GUIDE LOGIC =================
     function getSmartSuggestion() {
         const now = new Date();
-        // 如果現在時間早於旅程開始 (測試用)，或晚於結束，顯示第一站
-        // 實際使用時，可以拿掉這個測試邏輯，直接用 now
         
-        // 1. 整理所有事件的絕對時間
         let allEvents = [];
         itineraryDB.forEach((day, dIdx) => {
-            const dateStr = day.date.split(' ')[0]; // "3/28"
+            const dateStr = day.date.split(' ')[0];
             const [m, d] = dateStr.split('/');
             
             day.events.forEach(ev => {
@@ -454,7 +459,6 @@
             });
         });
 
-        // 2. 找出 "下一個" 或 "當前" 事件
         let targetEvent = null;
         let label = "";
         let diffText = "";
@@ -466,12 +470,10 @@
             targetEvent = firstEvent;
             label = "即將開始：第一站";
             const diffMin = Math.floor((firstEvent.timestamp - now) / 60000);
-            // diffText = `還有 ${Math.floor(diffMin/60)}小時${diffMin%60}分`;
             diffText = "行前預覽";
         } else if (now > lastEvent.timestamp) {
-             return null; // 旅程結束
+             return null; 
         } else {
-            // 旅程中
             targetEvent = allEvents.find(e => e.timestamp > now);
             if (targetEvent) {
                 label = "下一站";
@@ -749,16 +751,26 @@
                     </div>`;
             } else if (currentToolFilter === 'jp') {
                 main.innerHTML = `
-                    <div class="animate-slide-up space-y-8">
+                    <div class="animate-slide-up space-y-6">
+                        <div class="glass-card p-4 rounded-2xl text-center bg-blue-50 border border-blue-200">
+                             <div class="text-sm text-blue-800 font-bold mb-1">💡 使用教學</div>
+                             <div class="text-xs text-blue-600">點擊 <i class="fas fa-volume-high mx-1"></i> 按鈕，手機會直接唸出日語！</div>
+                        </div>
+
                         ${toolsDB.jp.map(cat => `
                             <div>
                                 <h3 class="text-xs font-bold text-gray-400 uppercase mb-3 ml-2 tracking-wider border-l-2 border-blue-500 pl-2">${cat.label}</h3>
                                 <div class="grid gap-3">
-                                    ${cat.items.map(item => `
-                                        <div class="glass-card p-5 rounded-3xl border border-slate-50 active:scale-[0.98] transition-transform">
-                                            <div class="text-xs text-gray-500 mb-1 flex items-center gap-1"><i class="fas fa-language"></i> ${item.t}</div>
-                                            <div class="text-xl font-black text-gray-800 mb-2">${item.j}</div>
-                                            <div class="text-xs text-blue-500 font-bold bg-blue-50 inline-block px-2 py-1 rounded">${item.p}</div>
+                                    ${cat.items.map((item, idx) => `
+                                        <div class="glass-card p-5 rounded-3xl border border-slate-50 transition-transform flex items-center justify-between gap-3">
+                                            <div class="flex-1">
+                                                <div class="text-xs text-gray-500 mb-1 flex items-center gap-1"><i class="fas fa-language"></i> ${item.t}</div>
+                                                <div class="text-xl font-black text-gray-800 mb-1 leading-tight">${item.j}</div>
+                                                <div class="text-xs text-blue-500 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded">${item.p}</div>
+                                            </div>
+                                            <button onclick="speak('${item.j}', this)" class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                                                <i class="fas fa-volume-high text-xl"></i>
+                                            </button>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -963,10 +975,41 @@
     }
 
     window.quickSearch = (query) => {
-        // Universal Link
         const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
         window.open(url, '_blank');
         showToast(`正在搜尋...`);
+    }
+
+    // ================= SPEECH LOGIC (v5.0) =================
+    window.speak = (text, btn) => {
+        // 動畫反饋
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<div class="playing-wave"><span></span><span></span><span></span></div>`;
+        
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP'; // 設定為日語
+            utterance.rate = 0.9; // 稍微慢一點點比較清楚
+            
+            utterance.onend = () => {
+                btn.innerHTML = originalContent;
+            };
+            
+            utterance.onerror = (e) => {
+                console.error('Speech error', e);
+                btn.innerHTML = originalContent;
+                // Fallback: 如果瀏覽器不支援發音，跳轉 Google Translate
+                const url = `https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(text)}&op=translate`;
+                window.open(url, '_blank');
+            };
+
+            window.speechSynthesis.speak(utterance);
+        } else {
+            // Fallback for older browsers
+             btn.innerHTML = originalContent;
+             const url = `https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(text)}&op=translate`;
+             window.open(url, '_blank');
+        }
     }
 
     // ================= BACKUP & RESTORE =================
