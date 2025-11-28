@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v10.2</title>
+    <title>奎奎全家沖繩遊 🦕 v10.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -229,10 +229,10 @@
     <div id="modal-overlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-6 flex-col" onclick="closeModal()">
         <div class="bg-white w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl relative" onclick="event.stopPropagation()">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><i class="fas fa-times text-2xl"></i></button>
-            <div class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-widest">給司機看 (For Driver)</div>
-            <div class="text-2xl font-black text-gray-900 mb-6 border-b pb-4">このホテルまで<br>お願いします</div>
-            <div id="modal-hotel-name" class="text-xl font-bold text-blue-700 mb-2"></div>
-            <div class="text-xs text-gray-400">請帶我去這家飯店</div>
+            <div id="modal-tag" class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-widest">給司機看 (For Driver)</div>
+            <div id="modal-title" class="text-2xl font-black text-gray-900 mb-6 border-b pb-4">このホテルまで<br>お願いします</div>
+            <div id="modal-content" class="text-xl font-bold text-blue-700 mb-2"></div>
+            <div id="modal-note" class="text-xs text-gray-400">請帶我去這家飯店</div>
             <div class="mt-8">
                  <button onclick="closeModal()" class="bg-gray-100 text-gray-600 px-6 py-3 rounded-xl font-bold w-full">關閉</button>
             </div>
@@ -301,6 +301,7 @@
     </div>
 
     <div id="toast"><i class="fas fa-check-circle mr-2 text-green-400"></i><span id="toast-msg">已複製</span></div>
+
 <script>
     // ================= DATA (資料庫) =================
     const TRIP_YEAR = 2026;
@@ -1225,6 +1226,47 @@
                         </div>
                     </div>`;
 
+                 // v10.3 New: Gas Station Helper Card
+                 const gasHelperHTML = `
+                    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-1 shadow-lg mb-6 relative overflow-hidden text-white">
+                        <div class="bg-white/10 backdrop-blur-sm p-5 rounded-[1.3rem] border border-white/20">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">GAS STATION</div>
+                                    <h3 class="text-2xl font-black">加油請找 <span class="text-yellow-300">紅槍</span></h3>
+                                    <p class="text-xs opacity-90">Regular (レギュラー) = 92/95無鉛</p>
+                                </div>
+                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-md">
+                                    <i class="fas fa-gas-pump"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-2 text-center mb-4">
+                                <div class="bg-black/20 rounded-lg p-2">
+                                    <i class="fas fa-hand-sparkles mb-1 block opacity-70"></i>
+                                    <div class="text-[10px]">1.除靜電</div>
+                                </div>
+                                <div class="bg-black/20 rounded-lg p-2">
+                                    <i class="fas fa-credit-card mb-1 block opacity-70"></i>
+                                    <div class="text-[10px]">2.付錢/選油</div>
+                                </div>
+                                <div class="bg-red-700 rounded-lg p-2 border border-red-400">
+                                    <i class="fas fa-fill-drip mb-1 block"></i>
+                                    <div class="text-[10px] font-bold">3.紅槍加油</div>
+                                </div>
+                                <div class="bg-black/20 rounded-lg p-2">
+                                    <i class="fas fa-receipt mb-1 block opacity-70"></i>
+                                    <div class="text-[10px]">4.拿收據</div>
+                                </div>
+                            </div>
+
+                            <button onclick="showInfoCard('gas')" class="w-full bg-white text-red-600 font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">
+                                <i class="fas fa-comment-dots"></i> 給店員看 (日文)
+                            </button>
+                        </div>
+                    </div>
+                `;
+
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
                         
@@ -1240,6 +1282,8 @@
                         </button>
 
                         ${parkingHTML}
+
+                        ${gasHelperHTML}
 
                         <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4">
                             <button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform">
@@ -1340,7 +1384,7 @@
                                         <div class="bg-white/60 p-3 rounded-xl border border-red-100 relative">
                                             <div class="text-[10px] text-gray-500 uppercase">Hotel / 宿泊ホテル</div>
                                             <div class="font-bold text-gray-700">${medicalData.hotel}</div>
-                                            <button onclick="showTaxiCard('${medicalData.hotel}')" class="absolute top-3 right-3 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow"><i class="fas fa-taxi mr-1"></i>給司機看</button>
+                                            <button onclick="showInfoCard('hotel', '${medicalData.hotel}')" class="absolute top-3 right-3 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow"><i class="fas fa-taxi mr-1"></i>給司機看</button>
                                         </div>
                                         
                                         <div class="mt-4 p-3 bg-red-600 text-white rounded-xl text-center text-sm font-bold shadow-md">
@@ -1757,13 +1801,30 @@
         showToast("安心護照已更新");
     }
 
-    window.showTaxiCard = (hotelName) => {
-        if(!hotelName) {
-            showToast("請先編輯輸入飯店名稱");
-            return;
+    // v10.3 Update: Universal Info Card
+    window.showInfoCard = (type, payload) => {
+        const modal = document.getElementById('modal-overlay');
+        const tag = document.getElementById('modal-tag');
+        const title = document.getElementById('modal-title');
+        const content = document.getElementById('modal-content');
+        const note = document.getElementById('modal-note');
+
+        if(type === 'hotel') {
+             if(!payload) { showToast("請先編輯輸入飯店名稱"); return; }
+             tag.innerText = "給司機看 (For Driver)";
+             title.innerHTML = "このホテルまで<br>お願いします";
+             content.innerText = payload;
+             content.className = "text-xl font-bold text-blue-700 mb-2";
+             note.innerText = "請帶我去這家飯店";
+        } else if (type === 'gas') {
+             tag.innerText = "給加油站店員 (For Staff)";
+             title.innerHTML = "レギュラー満タン<br>現金で";
+             content.innerText = "Regular Full / Cash";
+             content.className = "text-xl font-bold text-red-600 mb-2";
+             note.innerText = "紅槍 (Regular) 加滿，付現";
         }
-        document.getElementById('modal-hotel-name').innerText = hotelName;
-        document.getElementById('modal-overlay').classList.add('open');
+        
+        modal.classList.add('open');
     }
 
     window.closeModal = () => {
@@ -2070,3 +2131,4 @@
 </script>
 </body>
 </html>
+
