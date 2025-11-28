@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v10.0</title>
+    <title>奎奎全家沖繩遊 🦕 v10.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -568,16 +568,22 @@
     }
 
     function updateCountdown() {
-        const tripDate = new Date(`${TRIP_YEAR}-03-28T13:15:00`).getTime();
+        const tripStart = new Date(`${TRIP_YEAR}-03-28T13:15:00`).getTime();
+        const tripEnd = new Date(`${TRIP_YEAR}-04-03T23:59:59`).getTime();
         const now = new Date().getTime();
-        const diff = tripDate - now;
 
-        if (diff > 0) {
+        if (now < tripStart) {
+            const diff = tripStart - now;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             document.getElementById('countdown').innerText = `還有 ${days} 天 ${hours} 小時`;
+            document.getElementById('countdown').className = "text-[10px] font-mono font-medium opacity-90 bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10";
+        } else if (now >= tripStart && now <= tripEnd) {
+            document.getElementById('countdown').innerText = "✈️ 旅程進行中";
+            document.getElementById('countdown').className = "text-[10px] font-bold opacity-100 bg-pink-500/80 text-white px-2 py-0.5 rounded-md animate-pulse";
         } else {
-            document.getElementById('countdown').innerText = "旅程進行中！";
+            document.getElementById('countdown').innerText = "回憶滿載 ❤️";
+            document.getElementById('countdown').className = "text-[10px] font-medium opacity-90 bg-gray-500/50 px-2 py-0.5 rounded-md";
         }
     }
 
@@ -598,6 +604,7 @@
     window.toggleRainMode = () => {
         isRainyMode = !isRainyMode;
         localStorage.setItem('rainy_mode', isRainyMode);
+        if(navigator.vibrate) navigator.vibrate(50);
         updateRainyModeUI();
         renderContent();
     }
@@ -766,9 +773,9 @@
             
             if (smart && smart.event) {
                 const ev = smart.event;
-                // Fix map link for v9.2
-                const mapLink = ev.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.map)}` : null;
-                const searchLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.title)}`;
+                // Fix map link for v10.1
+                const mapLink = ev.map ? `https://maps.google.com/?q=${encodeURIComponent(ev.map)}` : null;
+                const searchLink = `https://maps.google.com/?q=${encodeURIComponent(ev.title)}`;
                 
                 smartHTML = `
                     <div class="smart-card rounded-3xl p-5 mb-6 relative animate-slide-up">
@@ -828,8 +835,8 @@
                             const highlightClass = isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : "";
                             const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
                             
-                            // Link fix
-                            const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
+                            // Link fix v10.1
+                            const mapLink = current.map ? `https://maps.google.com/?q=${encodeURIComponent(current.map)}` : null;
 
                             return `
                             <div class="group bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative overflow-hidden transition-all active:scale-[0.98] ${highlightClass}">
@@ -925,7 +932,7 @@
                 </div>
             `;
         } else if (activeTab === 'tools') {
-            // (Tools Content is same as previous, omitted for brevity but included in full code above logic flow)
+            // (Tools Content)
              if (currentToolFilter === 'calc') {
                 // v8.0 Pie Chart Logic
                 let totalJPY = 0;
@@ -1452,13 +1459,24 @@
         }
     }
 
-    // ================= GASHA LOGIC =================
+    // ================= GASHA LOGIC v10.1 (No Negative Tokens) =================
     function getGashaBalance() {
         let completedMissions = 0;
         missionsDB.forEach(m => {
             if(localStorage.getItem(m.id) === '1') completedMissions++;
         });
-        return completedMissions - gashaCoinsUsed;
+        
+        // Calculate balance
+        let balance = completedMissions - gashaCoinsUsed;
+
+        // Auto-correct if balance is negative (Child-friendly logic)
+        if (balance < 0) {
+            gashaCoinsUsed = completedMissions;
+            localStorage.setItem('gasha_coins_used', gashaCoinsUsed);
+            balance = 0;
+        }
+
+        return balance;
     }
 
     window.spinGasha = () => {
@@ -1614,8 +1632,8 @@
     }
 
     window.quickSearch = (query) => {
-        // Universal Link for Google Maps
-        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        // Universal Link for Google Maps (v10.1 Fix)
+        const url = `https://maps.google.com/?q=${encodeURIComponent(query)}`;
         window.open(url, '_blank');
         showToast(`正在搜尋...`);
     }
@@ -1690,7 +1708,7 @@
         document.getElementById('modal-overlay').classList.remove('open');
     }
 
-    // ================= PARKING LOGIC (v9.0) =================
+    // ================= PARKING LOGIC (v10.1 Fix Links) =================
     window.saveParking = () => {
         const note = prompt("請輸入停車備註 (如: 3F 藍區 A-12)", "B1 柱子旁");
         if(note) {
@@ -1720,7 +1738,8 @@
 
     window.findCar = () => {
         if(parkingData) {
-            const url = `https://www.google.com/maps/search/?api=1&query=${parkingData.lat},${parkingData.lon}`;
+            // Fix for v10.1
+            const url = `https://maps.google.com/?q=${parkingData.lat},${parkingData.lon}`;
             window.open(url, '_blank');
         }
     }
