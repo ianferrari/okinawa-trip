@@ -6,12 +6,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v5.2</title>
+    <title>奎奎全家沖繩遊 🦕 v8.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #0f172a; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #0f172a; -webkit-tap-highlight-color: transparent; transition: background-color 0.5s; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -20,10 +20,17 @@
         .glass-dark { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); color: white; }
         .glass-card { background: rgba(255, 255, 255, 0.95); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255, 255, 255, 0.6); }
 
+        /* 雨天模式特效 */
+        body.rainy-mode #bg-layer { filter: grayscale(80%) brightness(0.6); }
+        body.rainy-mode .glass-card { border-left: 4px solid #60a5fa !important; }
+        .rain-badge { display: none; }
+        body.rainy-mode .rain-badge { display: inline-block; }
+
         /* 特殊卡片特效 */
         .smart-card { background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border: 2px solid #3b82f6; box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.4); }
         .pulse-dot { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); animation: pulse-blue 2s infinite; }
-        
+        .safe-card { background: linear-gradient(135deg, #fff1f2 0%, #fff 100%); border-left: 5px solid #e11d48; }
+
         @keyframes pulse-blue {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
@@ -62,6 +69,10 @@
         /* Calculator Specific */
         #jpyInput, #twdOutput, #rateInput { font-weight: 900; }
         #rateInput { border-bottom: 2px dashed #ca8a04; color: #ca8a04; width: 100px; text-align: center; }
+        
+        /* Pie Chart */
+        .pie-chart { width: 140px; height: 140px; border-radius: 50%; position: relative; margin: 0 auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+        .pie-chart::after { content: ""; position: absolute; width: 80px; height: 80px; background: white; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="h-screen flex flex-col text-gray-800 overflow-hidden relative">
@@ -82,10 +93,17 @@
                 <p class="text-sm opacity-95 font-medium mt-2 text-blue-100 drop-shadow-md"><i class="fas fa-calendar-alt mr-1"></i>3/28 (六) - 4/3 (五)</p>
             </div>
             
-            <div class="glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[75px] active:scale-95 transition-transform cursor-pointer" onclick="initWeather()">
-                <i id="weather-icon" class="fas fa-spinner fa-spin text-xl mb-1 block text-yellow-400"></i>
-                <span id="weather-temp" class="text-sm font-bold">...</span>
-                <div id="weather-loc" class="text-[9px] opacity-70 mt-0.5">重整</div>
+            <div class="flex gap-2">
+                <button onclick="toggleRainMode()" id="rain-btn" class="glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-white/20">
+                    <i id="rain-icon" class="fas fa-sun text-xl mb-1 block text-yellow-400"></i>
+                    <span id="rain-text" class="text-[9px] font-bold opacity-90">晴天</span>
+                </button>
+
+                <div class="glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[70px] active:scale-95 transition-transform cursor-pointer" onclick="initWeather()">
+                    <i id="weather-icon" class="fas fa-spinner fa-spin text-xl mb-1 block text-blue-300"></i>
+                    <span id="weather-temp" class="text-sm font-bold">...</span>
+                    <div id="weather-loc" class="text-[9px] opacity-70 mt-0.5">重整</div>
+                </div>
             </div>
         </div>
 
@@ -124,8 +142,26 @@
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
     
-    // 記帳資料
+    // 記帳資料 (v8.0 update: now includes category)
     let expenses = JSON.parse(localStorage.getItem('trip_expenses')) || [];
+
+    // 安心護照資料
+    let medicalData = JSON.parse(localStorage.getItem('medical_data')) || {
+        name: "", phone: "", hotel: "", allergies: []
+    };
+
+    // 雨天模式狀態
+    let isRainyMode = false;
+
+    // 支出類別定義 (v8.0)
+    const expenseCats = {
+        shopping: { name: "購物", icon: "fa-bag-shopping", color: "#f43f5e" },
+        food: { name: "餐飲", icon: "fa-utensils", color: "#f97316" },
+        transport: { name: "交通", icon: "fa-car", color: "#3b82f6" },
+        play: { name: "娛樂", icon: "fa-ticket", color: "#8b5cf6" },
+        hotel: { name: "住宿", icon: "fa-bed", color: "#10b981" },
+        other: { name: "其他", icon: "fa-box", color: "#64748b" }
+    };
 
     const bgImages = {
         D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
@@ -139,7 +175,17 @@
         TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
         MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop",
         CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop",
-        SYNC: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&fit=crop"
+        SYNC: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&fit=crop",
+        SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
+    };
+
+    const allergyDict = {
+        "egg": { label: "雞蛋 (卵)", jp: "卵 (Tamago)" },
+        "milk": { label: "牛奶 (乳)", jp: "牛乳 (Gyu-nyu)" },
+        "peanut": { label: "花生 (落花生)", jp: "落花生 (Rakkasei)" },
+        "shrimp": { label: "蝦 (海老)", jp: "エビ (Ebi)" },
+        "crab": { label: "蟹 (蟹)", jp: "カニ (Kani)" },
+        "wheat": { label: "小麥 (小麦)", jp: "小麦 (Komugi)" }
     };
 
     const itineraryDB = [
@@ -153,32 +199,50 @@
             { time: "20:00", title: "晚餐：名護在地", icon: "fa-utensils", note: "美拉花別邸 / 哥倫布牛排 / 全家", map: "Restaurant Columbin" }
         ]},
         { day: "D2", date: "3/29 (日)", title: "玻璃船 & 補給", highlights: "海中公園 / AEON 掃貨 / 玩沙", bg: bgImages.D2, events: [
-            { time: "09:30", title: "部瀨名海中公園", icon: "fa-water", note: "搭玻璃底船找尼莫 🐠", map: "部瀨名海中公園", mapcode: "206 442 077*71" },
+            { time: "09:30", title: "部瀨名海中公園", icon: "fa-water", note: "搭玻璃底船找尼莫 🐠", map: "部瀨名海中公園", mapcode: "206 442 077*71",
+              rainy: { title: "名護鳳梨園 (室內)", icon: "fa-leaf", note: "☔ 雨天備案：搭無人車看恐龍", map: "Nago Pineapple Park", mapcode: "206 716 467*85" } 
+            },
             { time: "12:00", title: "午餐：Hama 壽司", icon: "fa-bowl-rice", note: "名護店，平價迴轉壽司", map: "HAMA壽司 名護店" },
             { time: "13:30", title: "AEON 名護店", icon: "fa-cart-shopping", note: "大創買玩沙組、超市買水", map: "AEON 名護店", mapcode: "206 626 669*52" },
             { time: "15:00", title: "許田休息站", icon: "fa-ticket", note: "買水族館優惠票 (只收現金)", map: "道の駅 許田" },
-            { time: "16:00", title: "飯店沙灘玩沙", icon: "fa-umbrella-beach", note: "拿出大創買的玩具", map: "" },
+            { time: "16:00", title: "飯店沙灘玩沙", icon: "fa-umbrella-beach", note: "拿出大創買的玩具", map: "",
+              rainy: { title: "飯店室內/房間休息", icon: "fa-bed", note: "☔ 雨天備案：吃零食看電視" }
+            },
             { time: "18:00", title: "晚餐：美拉花別邸", icon: "fa-utensils", note: "走路去吃，榻榻米包廂", map: "美拉花" }
         ]},
         { day: "D3", date: "3/30 (一)", title: "美麗海 & 古宇利", highlights: "鯨鯊 / 跨海大橋 / 蝦蝦飯", bg: bgImages.D3, events: [
             { time: "09:30", title: "美麗海水族館", icon: "fa-fish", note: "停 P7 立體停車場最快，直衝黑潮之海", map: "海洋博公園P7立體停車場", mapcode: "553 075 797*77" },
-            { time: "13:30", title: "前往古宇利島", icon: "fa-car-side", note: "車上讓奎奎午睡", map: "" },
-            { time: "14:30", title: "古宇利海洋塔", icon: "fa-tower-observation", note: "搭無人鳳梨車", map: "古宇利海洋塔" },
+            { time: "13:30", title: "前往古宇利島", icon: "fa-car-side", note: "車上讓奎奎午睡", map: "",
+              rainy: { title: "前往水果樂園 (室內)", icon: "fa-car", note: "☔ 雨天改去室內景點", map: "OKINAWA fruits land" }
+            },
+            { time: "14:30", title: "古宇利海洋塔", icon: "fa-tower-observation", note: "搭無人鳳梨車", map: "古宇利海洋塔",
+              rainy: { title: "沖繩水果樂園", icon: "fa-lemon", note: "☔ 雨天備案：室內解謎遊戲", map: "OKINAWA fruits land", mapcode: "206 716 585*22" }
+            },
             { time: "16:00", title: "點心：蝦蝦飯", icon: "fa-shrimp", note: "Kouri Shrimp (橋旁)", map: "Kouri Shrimp" },
-            { time: "16:30", title: "橋下沙灘", icon: "fa-camera", note: "拍全家福", map: "古宇利海灘" },
+            { time: "16:30", title: "橋下沙灘", icon: "fa-camera", note: "拍全家福", map: "古宇利海灘",
+              rainy: { title: "AEON 逛街/休息", icon: "fa-shop", note: "☔ 雨天取消沙灘行程" }
+            },
             { time: "18:00", title: "晚餐：名護七選一", icon: "fa-fire-burner", note: "大家 / 燒肉乃我那霸 / 藏壽司", map: "燒肉乃我那霸 新館" }
         ]},
         { day: "D4", date: "3/31 (二)", title: "恐龍 & 公園", highlights: "DINO Park / 甜甜圈 / 溜滑梯", bg: bgImages.D4, events: [
-            { time: "10:00", title: "DINO 恐龍 PARK", icon: "fa-dragon", note: "⚠️ 爸爸請用揹巾，找80隻恐龍", map: "DINO恐龍PARK 山原亞熱帶之森", mapcode: "206 745 056*82" },
+            { time: "10:00", title: "DINO 恐龍 PARK", icon: "fa-dragon", note: "⚠️ 爸爸請用揹巾，找80隻恐龍", map: "DINO恐龍PARK 山原亞熱帶之森", mapcode: "206 745 056*82",
+              rainy: { title: "AEON 名護店 (二刷)", icon: "fa-gamepad", note: "☔ 恐龍公園下雨泥濘，改室內遊樂場", map: "AEON 名護店" }
+            },
             { time: "11:30", title: "午餐：御菓子御殿", icon: "fa-bowl-food", note: "就在恐龍公園樓上", map: "" },
             { time: "13:00", title: "島豆腐甜甜圈", icon: "fa-cookie-bite", note: "Shima Donuts (賣完吃 A&W)", map: "Shima Donuts" },
-            { time: "15:00", title: "21世紀之森公園", icon: "fa-child-reaching", note: "看黑色火車頭、長溜滑梯", map: "21世紀之森公園", mapcode: "206 626 779*74" },
+            { time: "15:00", title: "21世紀之森公園", icon: "fa-child-reaching", note: "看黑色火車頭、長溜滑梯", map: "21世紀之森公園", mapcode: "206 626 779*74",
+              rainy: { title: "名護博物館", icon: "fa-building-columns", note: "☔ 雨天備案：看鯨魚骨骼標本", map: "Nago Museum" }
+            },
             { time: "16:30", title: "Blue Seal 冰淇淋", icon: "fa-ice-cream", note: "名護店，吃 Kids Size", map: "Blue Seal Nago" }
         ]},
         { day: "D5", date: "4/01 (三)", title: "動物 & 放空", highlights: "Neo Park 小火車 / 飯店泳池", bg: bgImages.D5, events: [
-            { time: "10:00", title: "Neo Park 動植物園", icon: "fa-crow", note: "進門先搭復古小火車", map: "名護自然動植物公園", mapcode: "206 689 725*11" },
+            { time: "10:00", title: "Neo Park 動植物園", icon: "fa-crow", note: "進門先搭復古小火車", map: "名護自然動植物公園", mapcode: "206 689 725*11",
+              rainy: { title: "美麗海 (二刷)", icon: "fa-fish", note: "☔ 雨天備案：回去水族館看海牛/海龜", map: "美麗海水族館" }
+            },
             { time: "12:30", title: "午餐：Cookhal", icon: "fa-leaf", note: "或吃 幸醬沖繩麵 (榻榻米)", map: "Cookhal" },
-            { time: "15:30", title: "飯店泳池/沙灘", icon: "fa-person-swimming", note: "大人放空，小孩徹底放電", map: "" },
+            { time: "15:30", title: "飯店泳池/沙灘", icon: "fa-person-swimming", note: "大人放空，小孩徹底放電", map: "",
+              rainy: { title: "飯店室內設施", icon: "fa-hotel", note: "☔ 下雨就好好享受飯店吧" }
+            },
             { time: "18:00", title: "晚餐：百年古家 大家", icon: "fa-house", note: "必吃阿古豬火鍋 (已預約)", map: "百年古家 大家" },
             { time: "20:00", title: "打包行李", icon: "fa-suitcase", note: "明天要退房往南了", map: "" }
         ]},
@@ -191,7 +255,9 @@
             { time: "20:30", title: "Fontana Gelato", icon: "fa-ice-cream", note: "彩虹冰淇淋", map: "Fontana Gelato" }
         ]},
         { day: "D7", date: "4/03 (五)", title: "祈願 & 返家", highlights: "波上宮 / Outlet / 13:00還車", bg: bgImages.D7, events: [
-            { time: "09:20", title: "波上宮", icon: "fa-torii-gate", note: "懸崖上的神社，買御守", map: "波上宮" },
+            { time: "09:20", title: "波上宮", icon: "fa-torii-gate", note: "懸崖上的神社，買御守", map: "波上宮",
+              rainy: { title: "系滿魚市場", icon: "fa-fish", note: "☔ 雨天備案：有遮雨棚，吃海鮮", map: "糸満漁民食堂" }
+            },
             { time: "11:10", title: "ASHIBINAA Outlet", icon: "fa-shirt", note: "午餐(美食街) & 最後衝刺", map: "ASHIBINAA Outlet", mapcode: "232 544 452*22" },
             { time: "12:40", title: "加油 (OTS旁)", icon: "fa-gas-pump", note: "保留收據！(ENEOS)", map: "ENEOS Dr.Drive Self Toyosaki SS" },
             { time: "13:00", title: "OTS 還車", icon: "fa-car-side", note: "務必準時。檢查 ETC 卡拔了沒", map: "OTS 臨空豐崎營業所" },
@@ -307,7 +373,7 @@
         const weatherLoc = document.getElementById('weather-loc');
 
         weatherTemp.innerText = "...";
-        weatherIcon.className = "fas fa-spinner fa-spin text-xl mb-1 block text-yellow-400";
+        weatherIcon.className = "fas fa-spinner fa-spin text-xl mb-1 block text-blue-300";
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -360,10 +426,47 @@
     }
 
     function init() {
+        // Load rainy mode state
+        if(localStorage.getItem('rainy_mode') === 'true') {
+            isRainyMode = true;
+            updateRainyModeUI();
+        }
+        
         switchTab('itinerary');
         updateCountdown();
         setInterval(updateCountdown, 60000);
         initWeather();
+    }
+
+    // ================= RAINY MODE =================
+    window.toggleRainMode = () => {
+        isRainyMode = !isRainyMode;
+        localStorage.setItem('rainy_mode', isRainyMode);
+        updateRainyModeUI();
+        renderContent();
+    }
+
+    function updateRainyModeUI() {
+        const btn = document.getElementById('rain-btn');
+        const icon = document.getElementById('rain-icon');
+        const text = document.getElementById('rain-text');
+        const body = document.body;
+
+        if (isRainyMode) {
+            body.classList.add('rainy-mode');
+            btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-blue-400/50 bg-blue-900/50";
+            icon.className = "fas fa-cloud-showers-heavy text-xl mb-1 block text-blue-300";
+            text.innerText = "雨天備案";
+            text.className = "text-[9px] font-bold text-blue-200";
+            showToast("☔ 已切換為雨天備案模式");
+        } else {
+            body.classList.remove('rainy-mode');
+            btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-white/20";
+            icon.className = "fas fa-sun text-xl mb-1 block text-yellow-400";
+            text.innerText = "晴天";
+            text.className = "text-[9px] font-bold opacity-90";
+            showToast("☀️ 已切換為晴天模式");
+        }
     }
 
     window.switchTab = (tab, shouldRender=true) => {
@@ -428,6 +531,7 @@
              let bg = bgImages.TOOL;
              if(currentToolFilter === 'calc') bg = bgImages.CALC;
              if(currentToolFilter === 'sync') bg = bgImages.SYNC;
+             if(currentToolFilter === 'sos') bg = bgImages.SOS;
              document.getElementById('bg-layer').style.backgroundImage = `url('${bg}')`;
 
         } else if (activeTab === 'missions') {
@@ -457,8 +561,10 @@
                 const [h, min] = ev.time.split(':');
                 const eventDate = new Date(TRIP_YEAR, parseInt(m)-1, parseInt(d), parseInt(h), parseInt(min));
                 
+                const finalEv = (isRainyMode && ev.rainy) ? { ...ev, ...ev.rainy } : ev;
+
                 allEvents.push({
-                    ...ev,
+                    ...finalEv,
                     timestamp: eventDate,
                     dayTitle: day.title,
                     dayIdx: dIdx
@@ -563,27 +669,34 @@
                     </div>
                     
                     <div class="space-y-4">
-                        ${d.events.map((e, idx) => `
-                            <div class="group bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative overflow-hidden transition-transform active:scale-[0.98]">
+                        ${d.events.map((e, idx) => {
+                            const isRainyItem = isRainyMode && e.rainy;
+                            const current = isRainyItem ? { ...e, ...e.rainy } : e;
+                            const highlightClass = isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : "";
+                            const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
+
+                            return `
+                            <div class="group bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative overflow-hidden transition-all active:scale-[0.98] ${highlightClass}">
+                                ${badge}
                                 <div class="flex flex-col items-center gap-2 mt-1 min-w-[3rem]">
                                     <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white">
-                                        <i class="fas ${e.icon}"></i>
+                                        <i class="fas ${current.icon}"></i>
                                     </div>
                                     ${idx !== d.events.length - 1 ? '<div class="h-full w-0.5 bg-slate-100 rounded-full"></div>' : ''}
                                 </div>
                                 <div class="flex-1 py-1">
                                     <div class="flex justify-between items-start mb-1">
-                                        <h3 class="font-bold text-gray-800 text-lg">${e.time}</h3>
+                                        <h3 class="font-bold text-gray-800 text-lg">${current.time}</h3>
                                         <div class="flex gap-2">
-                                            ${e.mapcode ? `<button onclick="copyMapCode('${e.mapcode}')" class="glass px-2 py-1.5 rounded-full text-[10px] text-slate-600 font-bold border border-slate-200 active:bg-slate-200"><i class="fas fa-hashtag mr-1"></i>MapCode</button>` : ''}
-                                            ${e.map ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.map)}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}
+                                            ${current.mapcode ? `<button onclick="copyMapCode('${current.mapcode}')" class="glass px-2 py-1.5 rounded-full text-[10px] text-slate-600 font-bold border border-slate-200 active:bg-slate-200"><i class="fas fa-hashtag mr-1"></i>MapCode</button>` : ''}
+                                            ${current.map ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}
                                         </div>
                                     </div>
-                                    <p class="font-bold text-gray-700 mb-2">${e.title}</p>
-                                    ${e.note ? `<p class="text-xs text-gray-500 bg-slate-50 p-2 rounded-lg border border-slate-100"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${e.note}</p>` : ''}
+                                    <p class="font-bold text-gray-700 mb-2">${current.title}</p>
+                                    ${current.note ? `<p class="text-xs text-gray-500 bg-slate-50 p-2 rounded-lg border border-slate-100"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}
                                 </div>
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
                     <div class="h-12"></div>
                 </div>`;
@@ -642,31 +755,80 @@
             `;
         } else if (activeTab === 'tools') {
             if (currentToolFilter === 'calc') {
-                // 計算總額
-                let totalJPY = expenses.reduce((sum, item) => sum + item.price, 0);
+                // v8.0 Pie Chart Logic
+                let totalJPY = 0;
+                const catTotals = {};
+                
+                expenses.forEach(e => {
+                    totalJPY += e.price;
+                    const cat = e.cat || 'other'; // default to 'other' if no cat
+                    if (!catTotals[cat]) catTotals[cat] = 0;
+                    catTotals[cat] += e.price;
+                });
+                
                 let totalTWD = Math.round(totalJPY * CURRENT_RATE);
+                
+                // Gen Pie Chart CSS
+                let gradientStr = "";
+                let currentDeg = 0;
+                let legendHTML = "";
+                
+                if (totalJPY > 0) {
+                    const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
+                    const gradients = [];
+                    
+                    sortedCats.forEach(c => {
+                        const percent = catTotals[c] / totalJPY;
+                        const deg = percent * 360;
+                        const color = expenseCats[c] ? expenseCats[c].color : '#999';
+                        const name = expenseCats[c] ? expenseCats[c].name : '其他';
+                        
+                        gradients.push(`${color} ${currentDeg}deg ${currentDeg + deg}deg`);
+                        currentDeg += deg;
+                        
+                        legendHTML += `
+                            <div class="flex items-center gap-1 text-[10px] w-1/3 mb-1">
+                                <div class="w-2 h-2 rounded-full" style="background:${color}"></div>
+                                <span class="opacity-70">${name} ${Math.round(percent*100)}%</span>
+                            </div>
+                        `;
+                    });
+                    gradientStr = `conic-gradient(${gradients.join(', ')})`;
+                } else {
+                    gradientStr = "conic-gradient(#e2e8f0 0deg 360deg)";
+                    legendHTML = `<div class="text-center w-full text-xs text-gray-400 mt-2">尚無資料</div>`;
+                }
 
                 let expenseListHTML = '';
                 if(expenses.length === 0) {
                     expenseListHTML = `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>`;
                 } else {
-                    expenseListHTML = expenses.map((item, idx) => `
+                    expenseListHTML = expenses.map((item, idx) => {
+                        const cat = item.cat || 'other';
+                        const catInfo = expenseCats[cat];
+                        
+                        return `
                         <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-2">
-                            <div class="flex-1">
-                                <div class="font-bold text-gray-700">${item.name}</div>
-                                <div class="text-xs text-gray-400">¥${item.price.toLocaleString()} x ${CURRENT_RATE} ≈ $${Math.round(item.price * CURRENT_RATE).toLocaleString()}</div>
+                            <div class="flex-1 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs" style="background:${catInfo.color}">
+                                    <i class="fas ${catInfo.icon}"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-gray-700">${item.name}</div>
+                                    <div class="text-xs text-gray-400">¥${item.price.toLocaleString()} ≈ $${Math.round(item.price * CURRENT_RATE).toLocaleString()}</div>
+                                </div>
                             </div>
                             <button onclick="deleteExpense(${idx})" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center active:scale-90">
                                 <i class="fas fa-trash-alt text-xs"></i>
                             </button>
                         </div>
-                    `).join('');
+                    `}).join('');
                 }
 
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
                         <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative">
-                            <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器 (可修改)</h3>
+                            <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3>
                             <div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">
                                 1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" oninput="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD
                             </div>
@@ -690,10 +852,27 @@
                             <span class="text-xs font-bold">敗家記帳本</span>
                             <div class="h-px bg-gray-200 flex-1"></div>
                         </div>
+                        
+                        <div class="glass-card rounded-3xl p-4">
+                            <div class="pie-chart" style="background: ${gradientStr}"></div>
+                            <div class="flex flex-wrap justify-center mt-3 px-2">
+                                ${legendHTML}
+                            </div>
+                        </div>
 
                         <div class="glass-card rounded-3xl p-4">
                             <div class="flex flex-col gap-3 mb-3">
-                                <input id="exName" type="text" placeholder="品項 (如: 吹風機)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base focus:outline-blue-500">
+                                <div class="flex gap-2">
+                                    <input id="exName" type="text" placeholder="品項 (如: 吹風機)" class="flex-[2] bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base focus:outline-blue-500">
+                                    <select id="exCat" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-2 py-3 text-sm focus:outline-blue-500 text-gray-600">
+                                        <option value="shopping">🛍️ 購物</option>
+                                        <option value="food">🍽️ 餐飲</option>
+                                        <option value="transport">🚗 交通</option>
+                                        <option value="play">🎫 娛樂</option>
+                                        <option value="hotel">🏨 住宿</option>
+                                        <option value="other">📦 其他</option>
+                                    </select>
+                                </div>
                                 <input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base focus:outline-blue-500">
                             </div>
                             <div class="flex gap-2">
@@ -785,19 +964,92 @@
                         `).join('')}
                     </div>`;
             } else if (currentToolFilter === 'sos') {
+                let allergyTags = "";
+                if(medicalData.allergies.length > 0) {
+                    allergyTags = medicalData.allergies.map(a => 
+                        `<span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-200">${allergyDict[a].jp}</span>`
+                    ).join(" ");
+                } else {
+                    allergyTags = "<span class='text-gray-400 text-xs'>無 (なし)</span>";
+                }
+
                 main.innerHTML = `
-                    <div class="animate-slide-up space-y-3">
-                        ${toolsDB.sos.map(s => `
-                            <a href="tel:${s.tel}" class="${s.style} p-5 rounded-3xl shadow-lg flex items-center justify-between active:scale-95 transition-transform">
-                                <div>
-                                    <div class="text-sm opacity-80 font-medium mb-1">${s.name}</div>
-                                    <div class="text-3xl font-black tracking-tighter">${s.tel}</div>
+                    <div class="animate-slide-up space-y-6">
+                        
+                        <div class="safe-card p-6 rounded-3xl shadow-xl relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 text-red-600"><i class="fas fa-user-shield text-8xl"></i></div>
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-xl font-black text-gray-800"><i class="fas fa-passport text-red-500 mr-2"></i>兒童安心護照</h3>
+                                    <button onclick="toggleEditMedical()" class="text-xs bg-white border border-gray-200 px-3 py-1 rounded-full text-gray-500 font-bold">編輯</button>
                                 </div>
-                                <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-                                    <i class="fas fa-phone text-xl"></i>
+                                
+                                <div id="medical-view">
+                                    ${!medicalData.name ? 
+                                    `<div class="text-center py-6 text-gray-400 text-sm">⚠️ 請點擊「編輯」輸入資料<br>走失/就醫時出示此卡</div>` : 
+                                    `
+                                    <div class="space-y-4">
+                                        <div class="bg-white/60 p-3 rounded-xl border border-red-100">
+                                            <div class="text-[10px] text-gray-500 uppercase">My Name / 私の名前</div>
+                                            <div class="text-2xl font-black text-gray-800">${medicalData.name}</div>
+                                        </div>
+                                        
+                                        <div class="bg-white/60 p-3 rounded-xl border border-red-100">
+                                            <div class="text-[10px] text-gray-500 uppercase">Emergency Contact / 緊急連絡先</div>
+                                            <div class="text-xl font-bold text-blue-600"><i class="fas fa-phone mr-1"></i> ${medicalData.phone}</div>
+                                        </div>
+
+                                        <div class="bg-white/60 p-3 rounded-xl border border-red-100">
+                                            <div class="text-[10px] text-gray-500 uppercase">Allergy / アレルギー (過敏)</div>
+                                            <div class="flex flex-wrap gap-1 mt-1">${allergyTags}</div>
+                                        </div>
+
+                                        <div class="bg-white/60 p-3 rounded-xl border border-red-100">
+                                            <div class="text-[10px] text-gray-500 uppercase">Hotel / 宿泊ホテル</div>
+                                            <div class="font-bold text-gray-700">${medicalData.hotel}</div>
+                                        </div>
+                                        
+                                        <div class="mt-4 p-3 bg-red-600 text-white rounded-xl text-center text-sm font-bold shadow-md">
+                                            <i class="fas fa-hands-helping mr-1"></i> 助けてください (Please Help)
+                                        </div>
+                                    </div>
+                                    `}
                                 </div>
-                            </a>
-                        `).join('')}
+
+                                <div id="medical-edit" class="hidden space-y-3">
+                                    <input id="in-name" type="text" placeholder="孩子暱稱 (英文/日文)" value="${medicalData.name}" class="w-full p-3 rounded-xl border border-gray-200 text-sm">
+                                    <input id="in-phone" type="tel" placeholder="爸媽聯絡電話" value="${medicalData.phone}" class="w-full p-3 rounded-xl border border-gray-200 text-sm">
+                                    <input id="in-hotel" type="text" placeholder="住宿飯店名稱" value="${medicalData.hotel}" class="w-full p-3 rounded-xl border border-gray-200 text-sm">
+                                    
+                                    <div class="text-xs font-bold text-gray-500 mt-2 mb-1">過敏源勾選 (自動翻日文)</div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        ${Object.keys(allergyDict).map(k => `
+                                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100">
+                                                <input type="checkbox" class="allergy-chk" value="${k}" ${medicalData.allergies.includes(k) ? 'checked' : ''}>
+                                                <span class="text-xs text-gray-600">${allergyDict[k].label}</span>
+                                            </label>
+                                        `).join('')}
+                                    </div>
+                                    
+                                    <button onclick="saveMedical()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl mt-2">儲存資料</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase ml-2 tracking-wider">緊急電話</h3>
+                            ${toolsDB.sos.map(s => `
+                                <a href="tel:${s.tel}" class="${s.style} p-5 rounded-3xl shadow-lg flex items-center justify-between active:scale-95 transition-transform">
+                                    <div>
+                                        <div class="text-sm opacity-80 font-medium mb-1">${s.name}</div>
+                                        <div class="text-3xl font-black tracking-tighter">${s.tel}</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                                        <i class="fas fa-phone text-xl"></i>
+                                    </div>
+                                </a>
+                            `).join('')}
+                        </div>
                     </div>`;
             } else if (currentToolFilter === 'sync') {
                 main.innerHTML = `
@@ -868,6 +1120,7 @@
                         let bg = bgImages.TOOL;
                         if(t === 'calc') bg = bgImages.CALC;
                         if(t === 'sync') bg = bgImages.SYNC;
+                        if(t === 'sos') bg = bgImages.SOS;
                         document.getElementById('bg-layer').style.backgroundImage = `url('${bg}')`;
                     } else {
                         btn.className = "flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all text-white/80";
@@ -938,16 +1191,18 @@
         twdOutput.innerText = twd.toFixed(twd % 1 !== 0 ? 2 : 0).toLocaleString('en-US');
     }
 
+    // Updated addExpense for v8.0 (Category)
     window.addExpense = () => {
         const name = document.getElementById('exName').value;
         const price = document.getElementById('exPrice').value;
+        const cat = document.getElementById('exCat').value;
 
         if(!name || !price) {
             showToast("請輸入名稱和金額");
             return;
         }
 
-        expenses.unshift({ name: name, price: parseInt(price) }); 
+        expenses.unshift({ name: name, price: parseInt(price), cat: cat }); 
         localStorage.setItem('trip_expenses', JSON.stringify(expenses));
         
         showToast("已記帳");
@@ -963,7 +1218,8 @@
         let total = 0;
         let text = "🦕 奎奎沖繩敗家明細：\n\n";
         expenses.forEach(e => {
-            text += `▪️ ${e.name}: ¥${e.price.toLocaleString()}\n`;
+            const catName = expenseCats[e.cat || 'other'].name;
+            text += `[${catName}] ${e.name}: ¥${e.price.toLocaleString()}\n`;
             total += e.price;
         });
         text += `\n💰 總計: ¥${total.toLocaleString()} (約 NT$${Math.round(total * CURRENT_RATE).toLocaleString()})`;
@@ -1005,18 +1261,44 @@
             utterance.onerror = (e) => {
                 console.error('Speech error', e);
                 btn.innerHTML = originalContent;
-                // Fallback: 如果瀏覽器不支援發音，跳轉 Google Translate
                 const url = `https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(text)}&op=translate`;
                 window.open(url, '_blank');
             };
 
             window.speechSynthesis.speak(utterance);
         } else {
-            // Fallback for older browsers
              btn.innerHTML = originalContent;
              const url = `https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(text)}&op=translate`;
              window.open(url, '_blank');
         }
+    }
+
+    // ================= MEDICAL ID LOGIC (v6.0) =================
+    window.toggleEditMedical = () => {
+        const view = document.getElementById('medical-view');
+        const edit = document.getElementById('medical-edit');
+        if(edit.classList.contains('hidden')) {
+            view.classList.add('hidden');
+            edit.classList.remove('hidden');
+        } else {
+            view.classList.remove('hidden');
+            edit.classList.add('hidden');
+        }
+    }
+
+    window.saveMedical = () => {
+        const name = document.getElementById('in-name').value;
+        const phone = document.getElementById('in-phone').value;
+        const hotel = document.getElementById('in-hotel').value;
+        const checkboxes = document.querySelectorAll('.allergy-chk:checked');
+        const allergies = Array.from(checkboxes).map(c => c.value);
+
+        medicalData = { name, phone, hotel, allergies };
+        localStorage.setItem('medical_data', JSON.stringify(medicalData));
+        
+        toggleEditMedical();
+        renderContent(); 
+        showToast("安心護照已更新");
     }
 
     // ================= BACKUP & RESTORE =================
@@ -1024,6 +1306,7 @@
         const data = {};
         data.user_rate = localStorage.getItem('user_rate');
         data.trip_expenses = localStorage.getItem('trip_expenses');
+        data.medical_data = localStorage.getItem('medical_data');
         data.items = {};
         for(let i=0; i<localStorage.length; i++) {
             const k = localStorage.key(i);
@@ -1054,7 +1337,7 @@
             return;
         }
         
-        if(!confirm("⚠️ 確定要載入嗎？\n這將會覆蓋您手機上目前的：\n- 記帳紀錄\n- 清單勾選狀態\n- 任務成就")) {
+        if(!confirm("⚠️ 確定要載入嗎？\n這將會覆蓋您手機上目前的：\n- 記帳紀錄\n- 清單勾選狀態\n- 任務成就\n- 安心護照")) {
             return;
         }
         
@@ -1064,6 +1347,7 @@
             
             if(data.user_rate) localStorage.setItem('user_rate', data.user_rate);
             if(data.trip_expenses) localStorage.setItem('trip_expenses', data.trip_expenses);
+            if(data.medical_data) localStorage.setItem('medical_data', data.medical_data);
             
             if(data.items) {
                 const keysToRemove = [];
