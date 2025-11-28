@@ -772,7 +772,7 @@
         });
         document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
     }
-       // ================= SMART GUIDE LOGIC =================
+          // ================= SMART GUIDE LOGIC =================
     function getSmartSuggestion() {
         const now = new Date();
         let allEvents = [];
@@ -999,9 +999,11 @@
                         <div class="glass-card rounded-3xl p-4">
                             <h3 class="text-sm font-bold text-gray-600 mb-3"><i class="fas fa-pen mr-1"></i> 記一筆</h3>
                             <div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1">
-                                <label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold"><i class="fas fa-bag-shopping"></i> 購物</div></label>
-                                <label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold"><i class="fas fa-utensils"></i> 餐飲</div></label>
-                                <label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold"><i class="fas fa-box"></i> 其他</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-bag-shopping"></i> 購物</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-utensils"></i> 餐飲</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="cat" value="play" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-purple-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-ticket"></i> 娛樂</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="cat" value="transport" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-car"></i> 交通</div></label>
+                                <label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-box"></i> 其他</div></label>
                             </div>
                             <div class="flex flex-col gap-3 mb-3">
                                 <input id="exName" type="text" placeholder="品項名稱" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500">
