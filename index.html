@@ -27,9 +27,6 @@
         .tab-active { background: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); transform: scale(1.05); }
         .tab-inactive { background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255,255,255,0.1); }
         
-        /* Checkbox & Progress */
-        .custom-checkbox:checked + div { background-color: #2563eb; border-color: #2563eb; }
-        
         /* Toast Notification */
         #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: rgba(30, 41, 59, 0.9); color: #fff; text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 100px; font-size: 14px; backdrop-filter: blur(5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast.show { visibility: visible; opacity: 1; bottom: 110px; }
@@ -320,7 +317,8 @@
     }
 
     function init() {
-        switchTab('itinerary', false);
+        // ★ 關鍵修復：這裡參數不傳入 false，讓它預設為 true (進行渲染)
+        switchTab('itinerary');
         updateCountdown();
         setInterval(updateCountdown, 60000);
         initWeather();
@@ -453,13 +451,13 @@
                         ${list.items.map((item, i) => {
                             const key = `chk_${currentChecklistFilter}_${i}`;
                             const isChecked = localStorage.getItem(key) === '1';
-                            // ★ 修復：文字樣式直接用程式判斷，不依賴 CSS peer
+                            // 文字樣式
                             const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700';
                             
                             return `
                                 <label class="flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer group">
                                     <div class="relative flex items-center mt-0.5">
-                                        <input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all" 
+                                        <input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" 
                                             ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}')">
                                         <i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i>
                                     </div>
@@ -642,7 +640,6 @@
         }
     }
 
-    // ★ 修復：Toggle 後強制刷新頁面，讓打勾符號和刪除線立刻出現
     window.toggleCheck = (key) => {
         const val = localStorage.getItem(key);
         if (val === '1') localStorage.removeItem(key);
