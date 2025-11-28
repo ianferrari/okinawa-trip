@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v5.0</title>
+    <title>奎奎全家沖繩遊 🦕 v5.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
 
         /* 音波動畫 */
         .playing-wave { display: inline-flex; align-items: center; gap: 2px; height: 12px; }
-        .playing-wave span { width: 3px; background: #3b82f6; animation: wave 0.8s infinite ease-in-out; border-radius: 2px; }
+        .playing-wave span { width: 3px; background: #713f12; animation: wave 0.8s infinite ease-in-out; border-radius: 2px; }
         .playing-wave span:nth-child(1) { height: 40%; animation-delay: 0s; }
         .playing-wave span:nth-child(2) { height: 100%; animation-delay: 0.1s; }
         .playing-wave span:nth-child(3) { height: 60%; animation-delay: 0.2s; }
@@ -754,7 +754,7 @@
                     <div class="animate-slide-up space-y-6">
                         <div class="glass-card p-4 rounded-2xl text-center bg-blue-50 border border-blue-200">
                              <div class="text-sm text-blue-800 font-bold mb-1">💡 使用教學</div>
-                             <div class="text-xs text-blue-600">點擊 <i class="fas fa-volume-high mx-1"></i> 按鈕，手機會直接唸出日語！</div>
+                             <div class="text-xs text-blue-600">點擊 <i class="fas fa-volume-high mx-1 text-yellow-600"></i> 黃色按鈕，手機會直接唸出日語！</div>
                         </div>
 
                         ${toolsDB.jp.map(cat => `
@@ -762,13 +762,13 @@
                                 <h3 class="text-xs font-bold text-gray-400 uppercase mb-3 ml-2 tracking-wider border-l-2 border-blue-500 pl-2">${cat.label}</h3>
                                 <div class="grid gap-3">
                                     ${cat.items.map((item, idx) => `
-                                        <div class="glass-card p-5 rounded-3xl border border-slate-50 transition-transform flex items-center justify-between gap-3">
+                                        <div class="glass-card p-5 rounded-3xl border border-slate-50 transition-transform flex items-center justify-between gap-3 relative z-10">
                                             <div class="flex-1">
                                                 <div class="text-xs text-gray-500 mb-1 flex items-center gap-1"><i class="fas fa-language"></i> ${item.t}</div>
                                                 <div class="text-xl font-black text-gray-800 mb-1 leading-tight">${item.j}</div>
                                                 <div class="text-xs text-blue-500 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded">${item.p}</div>
                                             </div>
-                                            <button onclick="speak('${item.j}', this)" class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg active:scale-90 transition-transform">
+                                            <button onclick="speak('${item.j}', this)" class="w-12 h-12 flex-shrink-0 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center shadow-lg active:scale-90 transition-transform z-20">
                                                 <i class="fas fa-volume-high text-xl"></i>
                                             </button>
                                         </div>
@@ -980,7 +980,7 @@
         showToast(`正在搜尋...`);
     }
 
-    // ================= SPEECH LOGIC (v5.0) =================
+    // ================= SPEECH LOGIC (v5.1) =================
     window.speak = (text, btn) => {
         // 動畫反饋
         const originalContent = btn.innerHTML;
