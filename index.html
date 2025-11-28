@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v10.1</title>
+    <title>奎奎全家沖繩遊 🦕 v10.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -125,7 +125,7 @@
     </div>
 
     <div id="main-scroll" class="flex-1 overflow-y-auto p-4 pb-32 z-10 scroll-smooth rounded-t-[2.5rem] bg-slate-50 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] relative top-2">
-        </div>
+    </div>
 
     <div class="fixed bottom-0 w-full glass flex justify-around items-center pb-safe-bottom h-[85px] z-50 rounded-t-[2rem] shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
         <button onclick="switchTab('itinerary')" class="nav-btn flex flex-col items-center justify-center w-full h-full group" id="btn-itinerary">
@@ -239,13 +239,73 @@
         </div>
     </div>
 
-    <div id="toast"><i class="fas fa-check-circle mr-2 text-green-400"></i><span id="toast-msg">已複製</span></div>
+    <div id="driver-hud" class="fixed inset-0 bg-black z-[200] hidden flex-col p-6 text-white font-mono transition-opacity duration-300">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex flex-col">
+                <span class="text-xs text-gray-400 uppercase tracking-widest">CURRENT TIME</span>
+                <span id="hud-clock" class="text-xl font-bold">12:30</span>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="toggleRoadType()" id="btn-road-type" class="px-4 py-2 rounded-lg border border-gray-600 text-xs font-bold text-gray-400 active:bg-gray-800 transition-colors">
+                    一般道路 (50)
+                </button>
+                <button onclick="closeDriverMode()" class="w-10 h-10 rounded-full bg-red-900/50 text-red-500 border border-red-800 flex items-center justify-center active:scale-95">
+                    <i class="fas fa-power-off"></i>
+                </button>
+            </div>
+        </div>
 
+        <div class="flex-1 flex flex-col justify-center items-center text-center relative">
+            
+            <div class="w-full mb-8">
+                <div class="text-sm text-blue-400 font-bold mb-2 uppercase tracking-widest"><i class="fas fa-location-dot mr-1"></i> DESTINATION</div>
+                <h1 id="hud-title" class="text-4xl font-black text-white leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+                    載入中...
+                </h1>
+                <p id="hud-note" class="text-gray-500 text-sm mt-2 font-medium truncate px-4">...</p>
+            </div>
+
+            <div class="mb-10 w-full bg-gray-900/50 rounded-2xl border border-gray-800 p-6 relative overflow-hidden group active:bg-gray-800 transition-colors cursor-pointer" onclick="copyHudMapCode()">
+                <div class="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-[0.3em]">MAPCODE</div>
+                <div id="hud-mapcode" class="text-5xl sm:text-6xl font-black text-yellow-400 tracking-wider font-mono">
+                    --- ---
+                </div>
+                <div class="text-[10px] text-gray-600 mt-2">點擊複製</div>
+            </div>
+
+            <a id="hud-nav-btn" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-2xl font-black py-6 rounded-2xl shadow-[0_0_30px_rgba(37,99,235,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                <i class="fas fa-location-arrow animate-pulse"></i>
+                <span>GO 導航</span>
+            </a>
+
+        </div>
+
+        <div class="mt-6 border-t border-gray-800 pt-6 flex justify-between items-end">
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gray-500 uppercase mb-1">SPEED (GPS)</span>
+                <div class="flex items-baseline gap-1">
+                    <span id="hud-speed" class="text-5xl font-black text-white">0</span>
+                    <span class="text-sm text-gray-400 font-bold">km/h</span>
+                </div>
+            </div>
+
+            <div class="flex gap-4">
+                 <button onclick="changeHudEvent(-1)" class="w-16 h-16 rounded-2xl border border-gray-700 bg-gray-900 text-gray-500 flex items-center justify-center active:bg-gray-800">
+                    <i class="fas fa-chevron-left text-xl"></i>
+                </button>
+                <button onclick="changeHudEvent(1)" class="w-16 h-16 rounded-2xl border border-gray-700 bg-gray-900 text-white flex items-center justify-center active:bg-gray-800 shadow-lg shadow-white/5">
+                    <i class="fas fa-chevron-right text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"><i class="fas fa-check-circle mr-2 text-green-400"></i><span id="toast-msg">已複製</span></div>
 <script>
     // ================= DATA (資料庫) =================
     const TRIP_YEAR = 2026;
     
-    // 匯率
+    // 匯率與預算
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
     let TOTAL_BUDGET = localStorage.getItem('trip_budget') ? parseInt(localStorage.getItem('trip_budget')) : 100000;
@@ -261,7 +321,7 @@
     // 停車資料
     let parkingData = JSON.parse(localStorage.getItem('parking_data')) || null;
 
-    // 扭蛋資料 (Used Coins)
+    // 扭蛋資料
     let gashaCoinsUsed = localStorage.getItem('gasha_coins_used') ? parseInt(localStorage.getItem('gasha_coins_used')) : 0;
 
     // 雨天模式狀態
@@ -588,7 +648,6 @@
     }
 
     function init() {
-        // Load rainy mode state
         if(localStorage.getItem('rainy_mode') === 'true') {
             isRainyMode = true;
             updateRainyModeUI();
@@ -773,9 +832,9 @@
             
             if (smart && smart.event) {
                 const ev = smart.event;
-                // Fix map link for v10.1
-                const mapLink = ev.map ? `https://maps.google.com/?q=${encodeURIComponent(ev.map)}` : null;
-                const searchLink = `https://maps.google.com/?q=${encodeURIComponent(ev.title)}`;
+                // v10.2 Fix: Corrected Google Maps Link
+                const mapLink = ev.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.map)}` : null;
+                const searchLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.title)}`;
                 
                 smartHTML = `
                     <div class="smart-card rounded-3xl p-5 mb-6 relative animate-slide-up">
@@ -835,8 +894,8 @@
                             const highlightClass = isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : "";
                             const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
                             
-                            // Link fix v10.1
-                            const mapLink = current.map ? `https://maps.google.com/?q=${encodeURIComponent(current.map)}` : null;
+                            // v10.2 Fix: Corrected Link
+                            const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
 
                             return `
                             <div class="group bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative overflow-hidden transition-all active:scale-[0.98] ${highlightClass}">
@@ -1132,6 +1191,7 @@
                         if (jpyInput) jpyInput.focus();
                     }, 100);
             } else if (currentToolFilter === 'drive') {
+                 // v10.2 Fix: Corrected Link
                  const parkingHTML = !parkingData ? 
                     `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white">
                         <div class="text-center">
@@ -1167,6 +1227,18 @@
 
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
+                        
+                        <button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4">
+                            <div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform">
+                                <i class="fas fa-gauge-high text-7xl"></i>
+                            </div>
+                            <div class="relative z-10 flex flex-col items-start">
+                                <span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span>
+                                <h3 class="text-2xl font-black italic">DRIVER HUD</h3>
+                                <p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p>
+                            </div>
+                        </button>
+
                         ${parkingHTML}
 
                         <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4">
@@ -1225,7 +1297,6 @@
                         `).join('')}
                     </div>`;
             } else if (currentToolFilter === 'sos') {
-               // ... SOS content (same as before)
                 let allergyTags = "";
                 if(medicalData.allergies.length > 0) {
                     allergyTags = medicalData.allergies.map(a => 
@@ -1459,17 +1530,14 @@
         }
     }
 
-    // ================= GASHA LOGIC v10.1 (No Negative Tokens) =================
+    // ================= GASHA LOGIC =================
     function getGashaBalance() {
         let completedMissions = 0;
         missionsDB.forEach(m => {
             if(localStorage.getItem(m.id) === '1') completedMissions++;
         });
         
-        // Calculate balance
         let balance = completedMissions - gashaCoinsUsed;
-
-        // Auto-correct if balance is negative (Child-friendly logic)
         if (balance < 0) {
             gashaCoinsUsed = completedMissions;
             localStorage.setItem('gasha_coins_used', gashaCoinsUsed);
@@ -1487,20 +1555,18 @@
         const machine = document.getElementById('gasha-machine');
         machine.classList.add('animate-shake');
         
-        // 扣除代幣
         gashaCoinsUsed++;
         localStorage.setItem('gasha_coins_used', gashaCoinsUsed);
-        renderContent(); // Update UI to show decreased balance
+        renderContent(); 
 
         setTimeout(() => {
             machine.classList.remove('animate-shake');
-            // Random Reward
             const reward = rewardsDB[Math.floor(Math.random() * rewardsDB.length)];
             
             document.getElementById('gasha-reward-icon').innerText = reward.icon;
             document.getElementById('gasha-reward-text').innerText = reward.text;
             document.getElementById('gasha-modal').classList.add('open');
-            playCoinSound(); // Win sound
+            playCoinSound(); 
         }, 800);
     }
 
@@ -1538,7 +1604,6 @@
         twdOutput.innerText = twd.toFixed(twd % 1 !== 0 ? 2 : 0).toLocaleString('en-US');
     }
 
-    // New: Budget Setting
     window.setBudget = () => {
         const newBudget = prompt("請輸入總預算 (台幣):", TOTAL_BUDGET);
         if(newBudget && !isNaN(newBudget)) {
@@ -1548,7 +1613,6 @@
         }
     }
 
-    // 正常記帳
     window.addExpense = () => {
         const name = document.getElementById('exName').value;
         const price = document.getElementById('exPrice').value;
@@ -1567,7 +1631,6 @@
         renderContent();
     }
 
-    // 快速記帳邏輯
     window.openQuickExpense = () => {
         document.getElementById('expense-modal').classList.add('open');
         setTimeout(() => document.getElementById('quickExPrice').focus(), 100);
@@ -1595,7 +1658,6 @@
         
         showToast("快速記帳成功！");
         
-        // 如果剛好在工具頁面，更新UI
         if(activeTab === 'tools' && currentToolFilter === 'calc') {
             renderContent();
         }
@@ -1632,8 +1694,8 @@
     }
 
     window.quickSearch = (query) => {
-        // Universal Link for Google Maps (v10.1 Fix)
-        const url = `https://maps.google.com/?q=${encodeURIComponent(query)}`;
+        // v10.2 Fix: Corrected Link
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
         window.open(url, '_blank');
         showToast(`正在搜尋...`);
     }
@@ -1708,7 +1770,7 @@
         document.getElementById('modal-overlay').classList.remove('open');
     }
 
-    // ================= PARKING LOGIC (v10.1 Fix Links) =================
+    // ================= PARKING LOGIC =================
     window.saveParking = () => {
         const note = prompt("請輸入停車備註 (如: 3F 藍區 A-12)", "B1 柱子旁");
         if(note) {
@@ -1738,8 +1800,8 @@
 
     window.findCar = () => {
         if(parkingData) {
-            // Fix for v10.1
-            const url = `https://maps.google.com/?q=${parkingData.lat},${parkingData.lon}`;
+            // v10.2 Fix: Corrected Link
+            const url = `https://www.google.com/maps/search/?api=1&query=${parkingData.lat},${parkingData.lon}`;
             window.open(url, '_blank');
         }
     }
@@ -1760,7 +1822,6 @@
         data.trip_expenses = localStorage.getItem('trip_expenses');
         data.medical_data = localStorage.getItem('medical_data');
         data.parking_data = localStorage.getItem('parking_data');
-        // New: Backup Gasha progress
         data.gasha_coins_used = localStorage.getItem('gasha_coins_used');
         
         data.items = {};
@@ -1806,7 +1867,6 @@
             if(data.trip_expenses) localStorage.setItem('trip_expenses', data.trip_expenses);
             if(data.medical_data) localStorage.setItem('medical_data', data.medical_data);
             if(data.parking_data) localStorage.setItem('parking_data', data.parking_data);
-            // New: Restore Gasha
             if(data.gasha_coins_used) localStorage.setItem('gasha_coins_used', data.gasha_coins_used);
             
             if(data.items) {
@@ -1837,6 +1897,173 @@
         m.innerText = msg;
         t.className = "show";
         setTimeout(() => { t.className = ""; }, 3000);
+    }
+
+    // ================= DRIVER HUD LOGIC =================
+    let hudWatchId = null;
+    let wakeLock = null;
+    let hudCurrentEventIdx = 0; 
+    let hudAllEvents = []; 
+    let roadType = 'city'; 
+
+    function flattenEvents() {
+        let list = [];
+        itineraryDB.forEach((day, dIdx) => {
+            day.events.forEach((ev, eIdx) => {
+                let finalEv = (isRainyMode && ev.rainy) ? { ...ev, ...ev.rainy } : ev;
+                list.push({
+                    ...finalEv,
+                    dayTitle: day.day,
+                    fullTitle: ev.title
+                });
+            });
+        });
+        return list;
+    }
+
+    async function openDriverMode() {
+        const hud = document.getElementById('driver-hud');
+        hud.classList.remove('hidden');
+        hud.classList.add('flex');
+        
+        hudAllEvents = flattenEvents();
+        
+        const smart = getSmartSuggestion(); 
+        if(smart && smart.event) {
+            const foundIdx = hudAllEvents.findIndex(e => e.title === smart.event.title);
+            hudCurrentEventIdx = foundIdx >= 0 ? foundIdx : 0;
+        } else {
+            hudCurrentEventIdx = 0;
+        }
+        
+        updateHUDUI();
+
+        if (navigator.geolocation) {
+            hudWatchId = navigator.geolocation.watchPosition(updateHudSpeed, 
+                (err) => console.log(err), 
+                { enableHighAccuracy: true, maximumAge: 1000 }
+            );
+        }
+
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+            }
+        } catch (err) {
+            console.log('Wake Lock error:', err);
+        }
+        
+        startHudClock();
+    }
+
+    function closeDriverMode() {
+        const hud = document.getElementById('driver-hud');
+        hud.classList.add('hidden');
+        hud.classList.remove('flex');
+
+        if (hudWatchId) navigator.geolocation.clearWatch(hudWatchId);
+        
+        if (wakeLock) {
+            wakeLock.release();
+            wakeLock = null;
+        }
+    }
+
+    function updateHUDUI() {
+        const ev = hudAllEvents[hudCurrentEventIdx];
+        if(!ev) return;
+
+        document.getElementById('hud-title').innerText = ev.title;
+        document.getElementById('hud-note').innerText = ev.note || '無備註';
+        
+        const mcEl = document.getElementById('hud-mapcode');
+        if(ev.mapcode) {
+            mcEl.innerText = ev.mapcode;
+            mcEl.classList.remove('text-gray-600', 'text-2xl');
+            mcEl.classList.add('text-yellow-400', 'text-5xl');
+        } else {
+            mcEl.innerText = "NO MAPCODE";
+            mcEl.classList.remove('text-yellow-400', 'text-5xl');
+            mcEl.classList.add('text-gray-600', 'text-2xl');
+        }
+
+        const btn = document.getElementById('hud-nav-btn');
+        if(ev.map) {
+            // v10.2 Fix: Corrected Link
+            btn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.map)}`;
+            btn.classList.remove('opacity-50', 'pointer-events-none');
+            btn.innerHTML = `<i class="fas fa-location-arrow animate-pulse"></i> <span>GO 導航</span>`;
+        } else {
+            btn.href = "#";
+            btn.classList.add('opacity-50', 'pointer-events-none');
+            btn.innerHTML = `<span>無導航點</span>`;
+        }
+    }
+
+    function changeHudEvent(dir) {
+        hudCurrentEventIdx += dir;
+        if(hudCurrentEventIdx < 0) hudCurrentEventIdx = 0;
+        if(hudCurrentEventIdx >= hudAllEvents.length) hudCurrentEventIdx = hudAllEvents.length - 1;
+        
+        updateHUDUI();
+    }
+
+    function updateHudSpeed(position) {
+        const speedKmh = position.coords.speed ? Math.round(position.coords.speed * 3.6) : 0;
+        const speedEl = document.getElementById('hud-speed');
+        
+        speedEl.innerText = speedKmh;
+
+        const limit = roadType === 'city' ? 60 : 100;
+        
+        if(speedKmh > limit) {
+            speedEl.classList.remove('text-white');
+            speedEl.classList.add('text-red-500', 'animate-pulse');
+        } else {
+            speedEl.classList.add('text-white');
+            speedEl.classList.remove('text-red-500', 'animate-pulse');
+        }
+    }
+
+    function toggleRoadType() {
+        const btn = document.getElementById('btn-road-type');
+        if(roadType === 'city') {
+            roadType = 'highway';
+            btn.innerText = "高速道路 (80)";
+            btn.classList.replace('text-gray-400', 'text-blue-400');
+            btn.classList.replace('border-gray-600', 'border-blue-600');
+        } else {
+            roadType = 'city';
+            btn.innerText = "一般道路 (50)";
+            btn.classList.replace('text-blue-400', 'text-gray-400');
+            btn.classList.replace('border-blue-600', 'border-gray-600');
+        }
+    }
+
+    function startHudClock() {
+        const update = () => {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            const el = document.getElementById('hud-clock');
+            if(el) el.innerText = timeStr;
+            if(!document.getElementById('driver-hud').classList.contains('hidden')) {
+                requestAnimationFrame(() => setTimeout(update, 1000));
+            }
+        };
+        update();
+    }
+
+    function copyHudMapCode() {
+        const text = document.getElementById('hud-mapcode').innerText;
+        if(text !== "NO MAPCODE") {
+            navigator.clipboard.writeText(text);
+            const original = document.getElementById('hud-mapcode').style.color;
+            document.getElementById('hud-mapcode').style.color = "#4ade80"; 
+            setTimeout(() => {
+                 document.getElementById('hud-mapcode').style.color = ""; 
+            }, 300);
+            showToast("MapCode 已複製");
+        }
     }
 
     init();
