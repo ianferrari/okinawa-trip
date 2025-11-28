@@ -772,7 +772,6 @@
         });
         document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
     }
-
     // ================= SMART GUIDE LOGIC =================
     function getSmartSuggestion() {
         const now = new Date();
@@ -999,7 +998,7 @@
                 let budgetLeft = TOTAL_BUDGET - totalTWD;
                 let budgetPercent = Math.min((totalTWD / TOTAL_BUDGET) * 100, 100);
                 
-                // Tax Free Logic (v10.4 Update)
+                // Tax Free Logic
                 let taxBasketTotal = taxBasket.reduce((a, b) => a + b, 0);
                 let taxTarget = 5500;
                 let taxDiff = taxTarget - taxBasketTotal;
@@ -1060,9 +1059,9 @@
                                 <h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3>
                                 <button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button>
                             </div>
-                            <div class="flex gap-2 mb-3">
-                                <input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 bg-white border-2 border-pink-100 rounded-xl px-3 py-2 text-lg font-bold focus:outline-pink-400">
-                                <button onclick="addTaxItem()" class="bg-pink-500 text-white font-bold px-4 rounded-xl shadow-lg active:scale-95"><i class="fas fa-plus"></i></button>
+                            <div class="flex gap-2 mb-3 items-stretch">
+                                <input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 bg-white border-2 border-pink-100 rounded-xl px-3 py-2 text-lg font-bold focus:outline-pink-400 w-full">
+                                <button onclick="addTaxItem()" class="bg-pink-500 text-white font-bold px-6 rounded-xl shadow-lg active:scale-95 whitespace-nowrap flex items-center justify-center">加入</button>
                             </div>
                             <div class="mb-2">
                                 <div class="flex justify-between text-xs mb-1 font-bold text-gray-500">
@@ -1226,4 +1225,3 @@
 </script>
 </body>
 </html>
-
