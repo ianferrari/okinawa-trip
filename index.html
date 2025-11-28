@@ -36,7 +36,6 @@
 
         /* Calculator Specific */
         #jpyInput, #twdOutput, #rateInput { font-weight: 900; }
-        /* 移除 rateInput 的預設邊框，讓它看起來像文字 */
         #rateInput { border-bottom: 2px dashed #ca8a04; color: #ca8a04; width: 100px; text-align: center; }
     </style>
 </head>
@@ -94,8 +93,6 @@
 
 <script>
     // ================= DATA (資料庫) =================
-    
-    // 讀取「儲存的匯率」，如果沒有就用預設值 0.21
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
 
@@ -113,7 +110,6 @@
         CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop"
     };
 
-    // 行程資料 (含 MapCode)
     const itineraryDB = [
         { day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, events: [
             { time: "13:15", title: "星宇 JX302 起飛", icon: "fa-plane-departure", note: "給奎奎吃軟糖平衡耳壓", map: "台中國際機場" },
@@ -172,7 +168,6 @@
         ]}
     ];
 
-    // 清單資料
     const checklistDB = [
         { id: "pack", title: "🎒 行前打包 (完整)", items: [
             { text: "護照 (全家3本)", sub: "效期需 > 2026/10" },
@@ -211,7 +206,6 @@
         ] }
     ];
 
-    // 成就資料
     const missionsDB = [
         { id: "m1", title: "我是船長", desc: "在玻璃船找到尼莫", icon: "fa-fish" },
         { id: "m2", title: "海洋霸主", desc: "跟大鯨鯊拍合照", icon: "fa-camera" },
@@ -221,7 +215,6 @@
         { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying" }
     ];
 
-    // 工具資料 (drive, jp, sos)
     const toolsDB = {
         drive: [
             { title: "右駕口訣", content: "左轉小彎、右轉大彎<br>雨刷在左、方向燈在右", color: "bg-blue-50 text-blue-800" },
@@ -269,7 +262,6 @@
     let currentChecklistFilter = 'pack';
     let currentToolFilter = 'drive';
 
-    // 天氣與GPS
     function initWeather() {
         const weatherIcon = document.getElementById('weather-icon');
         const weatherTemp = document.getElementById('weather-temp');
@@ -281,12 +273,9 @@
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    fetchWeather(lat, lon, "目前位置");
+                    fetchWeather(position.coords.latitude, position.coords.longitude, "目前位置");
                 },
                 (error) => {
-                    console.log("GPS Error", error);
                     fetchWeather(26.5915, 127.9773, "名護市");
                 }
             );
@@ -310,14 +299,12 @@
             else if (code <= 3) iconEl.className = "fas fa-cloud-sun text-xl mb-1 block text-yellow-400";
             else if (code <= 65) iconEl.className = "fas fa-cloud-rain text-xl mb-1 block text-blue-300";
             else iconEl.className = "fas fa-bolt text-xl mb-1 block text-yellow-500";
-            
         } catch (e) {
             document.getElementById('weather-temp').innerText = "24°C";
             document.getElementById('weather-loc').innerText = "預報";
         }
     }
 
-    // 倒數計時 (2026/3/28)
     function updateCountdown() {
         const tripDate = new Date('2026-03-28T13:15:00').getTime();
         const now = new Date().getTime();
@@ -359,14 +346,12 @@
         
         renderHeaderSubNav();
         if(shouldRender) renderContent();
-        // ★ 關鍵修復：延遲一下再更新子選單顏色，確保 DOM 已經存在
         setTimeout(updateSubNavStyle, 50);
     }
 
     function renderHeaderSubNav() {
         const container = document.getElementById('sub-nav-container');
         
-        // 1. 行程頁
         if (activeTab === 'itinerary') {
             container.innerHTML = `
                 <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar px-2">
@@ -379,8 +364,6 @@
                     `).join('')}
                 </div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
-        
-        // 2. 清單頁 (使用 ID 與 switchChecklist)
         } else if (activeTab === 'checklist') {
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
@@ -392,8 +375,6 @@
                     `).join('')}
                 </div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
-        
-        // 3. 工具頁 (使用 ID 與 switchTool)
         } else if (activeTab === 'tools') {
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
@@ -403,8 +384,6 @@
                     <button id="btn-tool-sos" onclick="switchTool('sos')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
                 </div>`;
              document.getElementById('bg-layer').style.backgroundImage = `url('${currentToolFilter === 'calc' ? bgImages.CALC : bgImages.TOOL}')`;
-        
-        // 4. 成就頁
         } else if (activeTab === 'missions') {
             container.innerHTML = `<div class="text-center text-white/90 text-sm font-bold pt-2">完成任務可以獲得金牌喔！</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.MISSION}')`;
@@ -474,6 +453,9 @@
                         ${list.items.map((item, i) => {
                             const key = `chk_${currentChecklistFilter}_${i}`;
                             const isChecked = localStorage.getItem(key) === '1';
+                            // ★ 修復：文字樣式直接用程式判斷，不依賴 CSS peer
+                            const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700';
+                            
                             return `
                                 <label class="flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer group">
                                     <div class="relative flex items-center mt-0.5">
@@ -482,7 +464,7 @@
                                         <i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <div class="font-bold text-gray-700 peer-checked:text-gray-400 peer-checked:line-through transition-colors text-[15px]">${item.text}</div>
+                                        <div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>
                                         ${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}
                                     </div>
                                 </label>
@@ -614,25 +596,20 @@
         }
     }
 
-    // =======================================================
-    // 核心修復：專門用來切換並同步更新顏色的函式
-    // =======================================================
-
     // 切換清單
     window.switchChecklist = (id) => {
         currentChecklistFilter = id;
         renderContent(); 
-        updateSubNavStyle(); // 立刻更新按鈕顏色
+        updateSubNavStyle(); 
     }
 
     // 切換工具
     window.switchTool = (id) => {
         currentToolFilter = id;
         renderContent();
-        updateSubNavStyle(); // 立刻更新按鈕顏色
+        updateSubNavStyle(); 
     }
 
-    // 更新按鈕樣式的核心功能 (直接操作 Class，不重繪 HTML)
     function updateSubNavStyle() {
         if (activeTab === 'checklist') {
             checklistDB.forEach(c => {
@@ -650,14 +627,12 @@
             tools.forEach(t => {
                 const btn = document.getElementById(`btn-tool-${t}`);
                 if (btn) {
-                    // 定義不同工具的選取顏色
                     let activeColor = "bg-white text-blue-600";
                     if(t === 'calc') activeColor = "bg-white text-yellow-600";
                     if(t === 'sos') activeColor = "bg-white text-red-600";
                     
                     if (currentToolFilter === t) {
                         btn.className = `flex-1 py-2 rounded-xl text-xs font-bold transition-all ${activeColor} shadow-sm`;
-                        // 同步切換背景圖
                         document.getElementById('bg-layer').style.backgroundImage = `url('${t === 'calc' ? bgImages.CALC : bgImages.TOOL}')`;
                     } else {
                         btn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
@@ -667,11 +642,13 @@
         }
     }
 
-    // 互動功能
+    // ★ 修復：Toggle 後強制刷新頁面，讓打勾符號和刪除線立刻出現
     window.toggleCheck = (key) => {
         const val = localStorage.getItem(key);
         if (val === '1') localStorage.removeItem(key);
         else localStorage.setItem(key, '1');
+        
+        renderContent(); // 關鍵！通知畫面更新
     }
     
     window.resetChecklist = (id) => {
@@ -703,12 +680,11 @@
         });
     }
 
-    // 匯率計算功能 (自動儲存)
     window.updateRate = (val) => {
         if(val && val > 0) {
             CURRENT_RATE = parseFloat(val);
-            localStorage.setItem('user_rate', val); // 存入 localStorage
-            convertCurrency(); // 立即重新計算
+            localStorage.setItem('user_rate', val); 
+            convertCurrency(); 
         }
     }
 
@@ -726,7 +702,6 @@
         twdOutput.innerText = twd.toFixed(twd % 1 !== 0 ? 2 : 0).toLocaleString('en-US');
     }
 
-    // Quick Search
     window.quickSearch = (query) => {
         const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}&query_place_id=current_place`;
         window.open(url, '_system');
