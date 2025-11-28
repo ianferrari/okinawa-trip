@@ -97,7 +97,7 @@
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
     
-    // V8.0 新增：記帳資料 (讀取舊資料，若無則為空陣列)
+    // 記帳資料
     let expenses = JSON.parse(localStorage.getItem('trip_expenses')) || [];
 
     const bgImages = {
@@ -324,6 +324,7 @@
     }
 
     function init() {
+        // ★ 關鍵修復：這裡參數不傳入 false，讓它預設為 true (進行渲染)
         switchTab('itinerary');
         updateCountdown();
         setInterval(updateCountdown, 60000);
@@ -500,7 +501,7 @@
             `;
         } else if (activeTab === 'tools') {
             if (currentToolFilter === 'calc') {
-                // V8.0 記帳本整合
+                // V8.1 UI 優化：直式排列輸入框
                 
                 // 計算總額
                 let totalJPY = expenses.reduce((sum, item) => sum + item.price, 0);
@@ -552,9 +553,9 @@
                         </div>
 
                         <div class="glass-card rounded-3xl p-4">
-                            <div class="flex gap-2 mb-3">
-                                <input id="exName" type="text" placeholder="品項 (如: 吹風機)" class="flex-[2] bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-blue-500">
-                                <input id="exPrice" type="number" placeholder="¥ 金額" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-blue-500">
+                            <div class="flex flex-col gap-3 mb-3">
+                                <input id="exName" type="text" placeholder="品項 (如: 吹風機)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base focus:outline-blue-500">
+                                <input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base focus:outline-blue-500">
                             </div>
                             <button onclick="addExpense()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform">
                                 <i class="fas fa-plus-circle mr-2"></i> 記一筆
@@ -736,7 +737,7 @@
             CURRENT_RATE = parseFloat(val);
             localStorage.setItem('user_rate', val); 
             convertCurrency(); 
-            renderContent(); // 更新匯率後，下方的記帳金額也要重算
+            renderContent(); 
         }
     }
 
@@ -754,7 +755,6 @@
         twdOutput.innerText = twd.toFixed(twd % 1 !== 0 ? 2 : 0).toLocaleString('en-US');
     }
 
-    // V8.0 記帳邏輯
     window.addExpense = () => {
         const name = document.getElementById('exName').value;
         const price = document.getElementById('exPrice').value;
@@ -764,7 +764,7 @@
             return;
         }
 
-        expenses.unshift({ name: name, price: parseInt(price) }); // 加到最前面
+        expenses.unshift({ name: name, price: parseInt(price) }); 
         localStorage.setItem('trip_expenses', JSON.stringify(expenses));
         
         showToast("💰 已記錄！");
