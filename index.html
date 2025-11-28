@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v9.1</title>
+    <title>奎奎全家沖繩遊 🦕 v9.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -74,6 +74,10 @@
         /* Pie Chart */
         .pie-chart { width: 140px; height: 140px; border-radius: 50%; position: relative; margin: 0 auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
         .pie-chart::after { content: ""; position: absolute; width: 80px; height: 80px; background: white; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        /* Full Screen Card Modal */
+        #modal-overlay { display: none; }
+        #modal-overlay.open { display: flex; }
     </style>
 </head>
 <body class="h-screen flex flex-col text-gray-800 overflow-hidden relative">
@@ -133,6 +137,19 @@
         </button>
     </div>
 
+    <div id="modal-overlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-6 flex-col" onclick="closeModal()">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><i class="fas fa-times text-2xl"></i></button>
+            <div class="text-sm font-bold text-gray-500 mb-2 uppercase tracking-widest">給司機看 (For Driver)</div>
+            <div class="text-2xl font-black text-gray-900 mb-6 border-b pb-4">このホテルまで<br>お願いします</div>
+            <div id="modal-hotel-name" class="text-xl font-bold text-blue-700 mb-2"></div>
+            <div class="text-xs text-gray-400">請帶我去這家飯店</div>
+            <div class="mt-8">
+                 <button onclick="closeModal()" class="bg-gray-100 text-gray-600 px-6 py-3 rounded-xl font-bold w-full">關閉</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast"><i class="fas fa-check-circle mr-2 text-green-400"></i><span id="toast-msg">已複製</span></div>
 
 <script>
@@ -142,8 +159,9 @@
     // 匯率
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
+    let TOTAL_BUDGET = localStorage.getItem('trip_budget') ? parseInt(localStorage.getItem('trip_budget')) : 100000;
     
-    // 記帳資料 (v8.0 update: now includes category)
+    // 記帳資料
     let expenses = JSON.parse(localStorage.getItem('trip_expenses')) || [];
 
     // 安心護照資料
@@ -151,7 +169,7 @@
         name: "", phone: "", hotel: "", allergies: []
     };
 
-    // 停車資料 (v9.0)
+    // 停車資料
     let parkingData = JSON.parse(localStorage.getItem('parking_data')) || null;
 
     // 雨天模式狀態
@@ -415,6 +433,28 @@
         }
     }
 
+    // New: Fetch Live Exchange Rate
+    async function fetchExchangeRate() {
+        const btn = document.getElementById('fetchRateBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        try {
+            const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY');
+            const data = await res.json();
+            const twd = data.rates.TWD;
+            if(twd) {
+                updateRate(twd.toFixed(4));
+                document.getElementById('rateInput').value = twd.toFixed(4);
+                showToast(`匯率已更新：${twd}`);
+            }
+        } catch(e) {
+            showToast("更新失敗，請檢查網路");
+        } finally {
+            btn.innerHTML = originalText;
+        }
+    }
+
     function updateCountdown() {
         const tripDate = new Date(`${TRIP_YEAR}-03-28T13:15:00`).getTime();
         const now = new Date().getTime();
@@ -614,6 +654,10 @@
             
             if (smart && smart.event) {
                 const ev = smart.event;
+                // Fix map link for v9.2
+                const mapLink = ev.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.map)}` : null;
+                const searchLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.title)}`;
+                
                 smartHTML = `
                     <div class="smart-card rounded-3xl p-5 mb-6 relative animate-slide-up">
                         <div class="flex justify-between items-start mb-2">
@@ -641,14 +685,9 @@
                                 <i class="fas fa-hashtag"></i> MapCode
                             </button>` : ''}
                             
-                            ${ev.map ? `
-                            <button onclick="quickSearch('${ev.map}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-200 transition-colors active:scale-95">
-                                <i class="fas fa-location-arrow"></i> 導航
-                            </button>` : `
-                             <button onclick="quickSearch('${ev.title}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-200 transition-colors active:scale-95">
-                                <i class="fas fa-search"></i> 搜尋
-                            </button>
-                            `}
+                            <a href="${mapLink || searchLink}" target="_blank" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-200 transition-colors active:scale-95 text-center no-underline">
+                                <i class="fas ${mapLink ? 'fa-location-arrow' : 'fa-search'}"></i> ${mapLink ? '導航' : '搜尋'}
+                            </a>
                         </div>
                     </div>
                 `;
@@ -676,6 +715,9 @@
                             const current = isRainyItem ? { ...e, ...e.rainy } : e;
                             const highlightClass = isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : "";
                             const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
+                            
+                            // Link fix
+                            const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
 
                             return `
                             <div class="group bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative overflow-hidden transition-all active:scale-[0.98] ${highlightClass}">
@@ -691,7 +733,7 @@
                                         <h3 class="font-bold text-gray-800 text-lg">${current.time}</h3>
                                         <div class="flex gap-2">
                                             ${current.mapcode ? `<button onclick="copyMapCode('${current.mapcode}')" class="glass px-2 py-1.5 rounded-full text-[10px] text-slate-600 font-bold border border-slate-200 active:bg-slate-200"><i class="fas fa-hashtag mr-1"></i>MapCode</button>` : ''}
-                                            ${current.map ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}
+                                            ${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}
                                         </div>
                                     </div>
                                     <p class="font-bold text-gray-700 mb-2">${current.title}</p>
@@ -731,7 +773,7 @@
                             `;
                         }).join('')}
                     </div>
-                     <button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full mt-8 py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100">
+                      <button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full mt-8 py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100">
                         <i class="fas fa-rotate-right mr-1"></i> 重置清單
                     </button>
                 </div>`;
@@ -769,6 +811,8 @@
                 });
                 
                 let totalTWD = Math.round(totalJPY * CURRENT_RATE);
+                let budgetLeft = TOTAL_BUDGET - totalTWD;
+                let budgetPercent = Math.min((totalTWD / TOTAL_BUDGET) * 100, 100);
                 
                 // Tax Free Progress
                 let taxFreePercent = Math.min((totalJPY / 5500) * 100, 100);
@@ -835,9 +879,13 @@
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
                         <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative">
+                             <button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+
                             <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3>
                             <div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">
-                                1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" oninput="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD
+                                1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD
                             </div>
 
                             <div class="flex flex-col gap-4">
@@ -871,6 +919,14 @@
                         </div>
                         
                         <div class="glass-card rounded-3xl p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-xs font-bold text-gray-500">總預算: $${TOTAL_BUDGET.toLocaleString()}</div>
+                                <div class="text-xs font-bold ${budgetLeft < 0 ? 'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div>
+                            </div>
+                             <div class="w-full bg-gray-200 rounded-full h-1.5 mb-4">
+                                <div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div>
+                            </div>
+
                             <div class="pie-chart" style="background: ${gradientStr}"></div>
                             <div class="flex flex-wrap justify-center mt-3 px-2">
                                 ${legendHTML}
@@ -924,6 +980,9 @@
                                 </button>
                                 <button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform">
                                     <i class="fas fa-share-from-square"></i>
+                                </button>
+                                <button onclick="setBudget()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform">
+                                    <i class="fas fa-cog"></i>
                                 </button>
                             </div>
                         </div>
@@ -1083,9 +1142,10 @@
                                             <div class="flex flex-wrap gap-1 mt-1">${allergyTags}</div>
                                         </div>
 
-                                        <div class="bg-white/60 p-3 rounded-xl border border-red-100">
+                                        <div class="bg-white/60 p-3 rounded-xl border border-red-100 relative">
                                             <div class="text-[10px] text-gray-500 uppercase">Hotel / 宿泊ホテル</div>
                                             <div class="font-bold text-gray-700">${medicalData.hotel}</div>
+                                            <button onclick="showTaxiCard('${medicalData.hotel}')" class="absolute top-3 right-3 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow"><i class="fas fa-taxi mr-1"></i>給司機看</button>
                                         </div>
                                         
                                         <div class="mt-4 p-3 bg-red-600 text-white rounded-xl text-center text-sm font-bold shadow-md">
@@ -1270,12 +1330,19 @@
         twdOutput.innerText = twd.toFixed(twd % 1 !== 0 ? 2 : 0).toLocaleString('en-US');
     }
 
-    // Updated addExpense for v9.1
+    // New: Budget Setting
+    window.setBudget = () => {
+        const newBudget = prompt("請輸入總預算 (台幣):", TOTAL_BUDGET);
+        if(newBudget && !isNaN(newBudget)) {
+            TOTAL_BUDGET = parseInt(newBudget);
+            localStorage.setItem('trip_budget', TOTAL_BUDGET);
+            renderContent();
+        }
+    }
+
     window.addExpense = () => {
         const name = document.getElementById('exName').value;
         const price = document.getElementById('exPrice').value;
-        
-        // 修正：v9.1 改用 Radio button 選擇器
         const catEl = document.querySelector('input[name="cat"]:checked');
         const cat = catEl ? catEl.value : 'other';
 
@@ -1320,6 +1387,7 @@
     }
 
     window.quickSearch = (query) => {
+        // Universal Link for Google Maps
         const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
         window.open(url, '_blank');
         showToast(`正在搜尋...`);
@@ -1327,14 +1395,13 @@
 
     // ================= SPEECH LOGIC =================
     window.speak = (text, btn) => {
-        // 動畫反饋
         const originalContent = btn.innerHTML;
         btn.innerHTML = `<div class="playing-wave"><span></span><span></span><span></span></div>`;
         
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ja-JP'; // 設定為日語
-            utterance.rate = 0.9; // 稍微慢一點點比較清楚
+            utterance.lang = 'ja-JP'; 
+            utterance.rate = 0.9; 
             
             utterance.onend = () => {
                 btn.innerHTML = originalContent;
@@ -1355,7 +1422,7 @@
         }
     }
 
-    // ================= MEDICAL ID LOGIC =================
+    // ================= MEDICAL ID & Taxi Card =================
     window.toggleEditMedical = () => {
         const view = document.getElementById('medical-view');
         const edit = document.getElementById('medical-edit');
@@ -1381,6 +1448,19 @@
         toggleEditMedical();
         renderContent(); 
         showToast("安心護照已更新");
+    }
+
+    window.showTaxiCard = (hotelName) => {
+        if(!hotelName) {
+            showToast("請先編輯輸入飯店名稱");
+            return;
+        }
+        document.getElementById('modal-hotel-name').innerText = hotelName;
+        document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    window.closeModal = () => {
+        document.getElementById('modal-overlay').classList.remove('open');
     }
 
     // ================= PARKING LOGIC (v9.0) =================
@@ -1430,6 +1510,7 @@
     window.backupData = () => {
         const data = {};
         data.user_rate = localStorage.getItem('user_rate');
+        data.trip_budget = localStorage.getItem('trip_budget');
         data.trip_expenses = localStorage.getItem('trip_expenses');
         data.medical_data = localStorage.getItem('medical_data');
         data.parking_data = localStorage.getItem('parking_data');
@@ -1472,6 +1553,7 @@
             const data = JSON.parse(jsonStr);
             
             if(data.user_rate) localStorage.setItem('user_rate', data.user_rate);
+            if(data.trip_budget) localStorage.setItem('trip_budget', data.trip_budget);
             if(data.trip_expenses) localStorage.setItem('trip_expenses', data.trip_expenses);
             if(data.medical_data) localStorage.setItem('medical_data', data.medical_data);
             if(data.parking_data) localStorage.setItem('parking_data', data.parking_data);
