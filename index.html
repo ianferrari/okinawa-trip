@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v9.2</title>
+    <title>奎奎全家沖繩遊 🦕 v9.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -296,10 +296,14 @@
             { text: "住宿憑證/電話", sub: "第一晚 Check-in 用" },
             { text: "奎奎安撫包", sub: "貼紙書、軟糖、薄外套" },
             { text: "車內百寶袋", sub: "遮陽簾、車充、垃圾袋" },
-            { text: "3C 電子", sub: "行動電源(隨身)、充電投、線、相機相關" },
+            { text: "3C 電子", sub: "行動電源(隨身)、充電頭、線、相機" },
             { text: "生活備藥", sub: "退燒藥、益生菌、體溫計、鼻噴劑" },
             { text: "防曬/玩水", sub: "泳衣、防曬乳、帽子、墨鏡" },
-            { text: "食物剪刀 (托運)", sub: "絕對不可放隨身" }
+            { text: "食物剪刀 (托運)", sub: "絕對不可放隨身" },
+            { text: "衣物壓縮袋", sub: "回程裝髒衣服省空間" },
+            { text: "指甲剪", sub: "長途旅行必備" },
+            { text: "隨身筆", sub: "機上填入境卡用" },
+            { text: "夾鏈袋 (大/中)", sub: "裝濕泳衣、分裝零食" }
         ]},
         { id: "shop", title: "🛍️ 購物必買 (完整)", items: [
             { text: "合利他命 EX Plus", sub: "家庭常備藥" },
@@ -312,7 +316,11 @@
             { text: "安耐曬防曬", sub: "金瓶 (沖繩太陽毒)" },
             { text: "Tomica 沖繩限定車", sub: "PARCO / 機場" },
             { text: "辣味蝦餅 (南風堂)", sub: "下酒零食" },
-            { text: "邊銀食堂辣油", sub: "石垣島名產" }
+            { text: "邊銀食堂辣油", sub: "石垣島名產" },
+            { text: "Calbee 麥片", sub: "紅色包裝最經典" },
+            { text: "Orihiro 蒟蒻果凍", sub: "袋裝好攜帶 (要托運)" },
+            { text: "ROIHI 穴位貼布", sub: "老人頭像 (涼感/溫感)" },
+            { text: "Fino 髮膜/髮油", sub: "日本買很便宜" }
         ]},
         { id: "return", title: "🚨 回程防呆 (SOP)", items: [
             { text: "ETC 卡拔了嗎？", sub: "還車前確認 (最常忘記)" },
@@ -322,7 +330,9 @@
             { text: "布丁/果凍 托運了嗎？", sub: "液體 > 100ml 不可手提" },
             { text: "洗面乳/牙膏 托運了嗎？", sub: "這也是液體！" },
             { text: "護照拿出來了嗎？", sub: "不要鎖在飯店保險箱" },
-            { text: "Wifi機/SIM卡針", sub: "確認收好" }
+            { text: "Wifi機/SIM卡針", sub: "確認收好" },
+            { text: "行李秤重", sub: "確認沒超重 (單件23kg?)" },
+            { text: "身上零錢花光", sub: "機場扭蛋機/便利商店" }
         ] }
     ];
 
@@ -1286,6 +1296,26 @@
         }
     }
 
+    // New: Play Coin Sound
+    function playCoinSound() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, ctx.currentTime); // B5
+        osc.frequency.exponentialRampToValueAtTime(1318.51, ctx.currentTime + 0.1); // E6
+        
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+    }
+
     window.toggleMission = (id) => {
         const isDone = localStorage.getItem(id) === '1';
         if (isDone) {
@@ -1295,6 +1325,7 @@
             }
         } else {
             if(navigator.vibrate) navigator.vibrate(200);
+            playCoinSound(); // Trigger sound
             localStorage.setItem(id, '1');
             showToast("🎉 任務達成！太棒了！");
             renderContent();
@@ -1493,7 +1524,7 @@
 
     window.findCar = () => {
         if(parkingData) {
-            const url = `https://www.google.com/maps/dir/?api=1&destination=${parkingData.lat},${parkingData.lon}&travelmode=walking`;
+            const url = `https://www.google.com/maps/search/?api=1&query=${parkingData.lat},${parkingData.lon}`;
             window.open(url, '_blank');
         }
     }
