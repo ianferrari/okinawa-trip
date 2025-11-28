@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v3.0</title>
+    <title>奎奎全家沖繩遊 🦕 v4.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -19,6 +19,16 @@
         .glass { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.5); }
         .glass-dark { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); color: white; }
         .glass-card { background: rgba(255, 255, 255, 0.95); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255, 255, 255, 0.6); }
+
+        /* 特殊卡片特效 */
+        .smart-card { background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border: 2px solid #3b82f6; box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.4); }
+        .pulse-dot { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); animation: pulse-blue 2s infinite; }
+        
+        @keyframes pulse-blue {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
 
         /* iPhone 安全區域適配 */
         .pt-safe-top { padding-top: env(safe-area-inset-top); }
@@ -100,6 +110,8 @@
 
 <script>
     // ================= DATA (資料庫) =================
+    const TRIP_YEAR = 2026;
+    
     // 匯率
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
@@ -319,7 +331,7 @@
     }
 
     function updateCountdown() {
-        const tripDate = new Date('2026-03-28T13:15:00').getTime();
+        const tripDate = new Date(`${TRIP_YEAR}-03-28T13:15:00`).getTime();
         const now = new Date().getTime();
         const diff = tripDate - now;
 
@@ -416,14 +428,119 @@
         });
         document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
     }
+    
+    // ================= SMART GUIDE LOGIC =================
+    function getSmartSuggestion() {
+        const now = new Date();
+        // 如果現在時間早於旅程開始 (測試用)，或晚於結束，顯示第一站
+        // 實際使用時，可以拿掉這個測試邏輯，直接用 now
+        
+        // 1. 整理所有事件的絕對時間
+        let allEvents = [];
+        itineraryDB.forEach((day, dIdx) => {
+            const dateStr = day.date.split(' ')[0]; // "3/28"
+            const [m, d] = dateStr.split('/');
+            
+            day.events.forEach(ev => {
+                const [h, min] = ev.time.split(':');
+                const eventDate = new Date(TRIP_YEAR, parseInt(m)-1, parseInt(d), parseInt(h), parseInt(min));
+                
+                allEvents.push({
+                    ...ev,
+                    timestamp: eventDate,
+                    dayTitle: day.title,
+                    dayIdx: dIdx
+                });
+            });
+        });
+
+        // 2. 找出 "下一個" 或 "當前" 事件
+        let targetEvent = null;
+        let label = "";
+        let diffText = "";
+        
+        const firstEvent = allEvents[0];
+        const lastEvent = allEvents[allEvents.length - 1];
+        
+        if (now < firstEvent.timestamp) {
+            targetEvent = firstEvent;
+            label = "即將開始：第一站";
+            const diffMin = Math.floor((firstEvent.timestamp - now) / 60000);
+            // diffText = `還有 ${Math.floor(diffMin/60)}小時${diffMin%60}分`;
+            diffText = "行前預覽";
+        } else if (now > lastEvent.timestamp) {
+             return null; // 旅程結束
+        } else {
+            // 旅程中
+            targetEvent = allEvents.find(e => e.timestamp > now);
+            if (targetEvent) {
+                label = "下一站";
+                const diffMin = Math.floor((targetEvent.timestamp - now) / 60000);
+                if (diffMin < 60) diffText = `還有 ${diffMin} 分鐘`;
+                else diffText = `還有 ${Math.floor(diffMin/60)}小時${diffMin%60}分`;
+            }
+        }
+        
+        return { event: targetEvent, label, diffText };
+    }
+
 
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
         if (activeTab === 'itinerary') {
             const d = itineraryDB[currentDayIdx];
+            
+            // 取得智慧建議
+            const smart = getSmartSuggestion();
+            let smartHTML = '';
+            
+            if (smart && smart.event) {
+                const ev = smart.event;
+                smartHTML = `
+                    <div class="smart-card rounded-3xl p-5 mb-6 relative animate-slide-up">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                    <div class="w-2 h-2 bg-white rounded-full pulse-dot"></div> ${smart.label}
+                                </span>
+                                <span class="text-xs text-blue-500 font-bold">${smart.diffText}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex flex-shrink-0 items-center justify-center text-2xl border border-blue-100">
+                                <i class="fas ${ev.icon}"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-black text-slate-800 leading-tight mb-1">${ev.title}</h2>
+                                <p class="text-sm text-slate-500 font-medium">${ev.note || '準備出發！'}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            ${ev.mapcode ? `
+                            <button onclick="copyMapCode('${ev.mapcode}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors active:scale-95">
+                                <i class="fas fa-hashtag"></i> MapCode
+                            </button>` : ''}
+                            
+                            ${ev.map ? `
+                            <button onclick="quickSearch('${ev.map}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-200 transition-colors active:scale-95">
+                                <i class="fas fa-location-arrow"></i> 導航
+                            </button>` : `
+                             <button onclick="quickSearch('${ev.title}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-200 transition-colors active:scale-95">
+                                <i class="fas fa-search"></i> 搜尋
+                            </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+
             main.innerHTML = `
                 <div class="animate-slide-up">
+                    ${smartHTML}
+                    
                     <div class="glass-card rounded-3xl p-5 mb-6 relative overflow-hidden border-l-4 border-blue-500">
                         <div class="flex items-center gap-2 mb-2">
                              <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md">Day ${currentDayIdx + 1}</span>
@@ -855,11 +972,8 @@
     // ================= BACKUP & RESTORE =================
     window.backupData = () => {
         const data = {};
-        // 1. 抓取匯率
         data.user_rate = localStorage.getItem('user_rate');
-        // 2. 抓取記帳
         data.trip_expenses = localStorage.getItem('trip_expenses');
-        // 3. 抓取所有清單狀態 (chk_) 和 成就 (m)
         data.items = {};
         for(let i=0; i<localStorage.length; i++) {
             const k = localStorage.key(i);
@@ -868,10 +982,9 @@
             }
         }
         
-        // 轉成 Base64 字串 (簡易編碼)
         try {
             const jsonStr = JSON.stringify(data);
-            const encoded = btoa(encodeURIComponent(jsonStr)); // 處理中文編碼問題
+            const encoded = btoa(encodeURIComponent(jsonStr)); 
             
             navigator.clipboard.writeText(encoded).then(() => {
                 showToast("備份碼已複製！請傳給另一半");
@@ -899,12 +1012,10 @@
             const jsonStr = decodeURIComponent(atob(code));
             const data = JSON.parse(jsonStr);
             
-            // 開始還原
             if(data.user_rate) localStorage.setItem('user_rate', data.user_rate);
             if(data.trip_expenses) localStorage.setItem('trip_expenses', data.trip_expenses);
             
             if(data.items) {
-                // 先清除現有的 chk_ 和 m 開頭的 key，避免舊資料殘留
                 const keysToRemove = [];
                 for(let i=0; i<localStorage.length; i++) {
                     const k = localStorage.key(i);
@@ -912,7 +1023,6 @@
                 }
                 keysToRemove.forEach(k => localStorage.removeItem(k));
 
-                // 寫入新資料
                 for (const k in data.items) {
                     localStorage.setItem(k, data.items[k]);
                 }
