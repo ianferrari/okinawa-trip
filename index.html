@@ -362,6 +362,8 @@
 
     function renderHeaderSubNav() {
         const container = document.getElementById('sub-nav-container');
+        
+        // 1. 行程頁 (Itinerary)
         if (activeTab === 'itinerary') {
             container.innerHTML = `
                 <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar px-2">
@@ -374,32 +376,37 @@
                     `).join('')}
                 </div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
+        
+        // 2. 清單頁 (Checklist) - 這裡修復了！
         } else if (activeTab === 'checklist') {
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
                     ${checklistDB.map(c => `
-                        <button onclick="currentChecklistFilter='${c.id}'; renderContent();" 
+                        <button onclick="currentChecklistFilter='${c.id}'; renderContent(); renderHeaderSubNav();" 
                             class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentChecklistFilter === c.id ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80'}">
                             ${c.title.split(' ')[1]}
                         </button>
                     `).join('')}
                 </div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
+        
+        // 3. 工具頁 (Tools) - 這裡也修復了！
         } else if (activeTab === 'tools') {
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
-                    <button onclick="currentToolFilter='calc'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
-                    <button onclick="currentToolFilter='drive'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
-                    <button onclick="currentToolFilter='jp'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
-                    <button onclick="currentToolFilter='sos'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
+                    <button onclick="currentToolFilter='calc'; renderContent(); renderHeaderSubNav();" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
+                    <button onclick="currentToolFilter='drive'; renderContent(); renderHeaderSubNav();" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
+                    <button onclick="currentToolFilter='jp'; renderContent(); renderHeaderSubNav();" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
+                    <button onclick="currentToolFilter='sos'; renderContent(); renderHeaderSubNav();" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
                 </div>`;
              document.getElementById('bg-layer').style.backgroundImage = `url('${currentToolFilter === 'calc' ? bgImages.CALC : bgImages.TOOL}')`;
+        
+        // 4. 成就頁 (Missions)
         } else if (activeTab === 'missions') {
             container.innerHTML = `<div class="text-center text-white/90 text-sm font-bold pt-2">完成任務可以獲得金牌喔！</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.MISSION}')`;
         }
     }
-
     function updateHeaderActive() {
         const btns = document.querySelectorAll('.day-btn');
         btns.forEach((btn, i) => {
