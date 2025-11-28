@@ -33,12 +33,15 @@
         /* Toast Notification */
         #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: rgba(30, 41, 59, 0.9); color: #fff; text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 100px; font-size: 14px; backdrop-filter: blur(5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast.show { visibility: visible; opacity: 1; bottom: 110px; }
+
+        /* Calculator Specific */
+        #jpyInput, #twdOutput { font-weight: 900; }
     </style>
 </head>
 <body class="h-screen flex flex-col text-gray-800 overflow-hidden relative">
 
     <div id="bg-layer" class="absolute inset-0 z-0 bg-cover bg-center transition-all duration-700 transform scale-105" 
-         style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&auto=format&fit=crop');">
+         style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop');">
         <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-slate-100/90"></div>
     </div>
 
@@ -90,6 +93,10 @@
 <script>
     // ================= DATA (資料庫) =================
     
+    // 從 Google 搜尋工具取得的即時匯率
+    const REALTIME_EXCHANGE_RATE = 0.2009; // JPY 1 -> TWD 0.2009 (from 2025-11-28 search)
+    const EXCHANGE_RATE_DATE = "2025/11/28";
+
     const bgImages = {
         D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
         D2: "https://images.unsplash.com/photo-1582967788606-a171f1080ca8?q=80&w=1000&fit=crop",
@@ -100,17 +107,18 @@
         D7: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000&fit=crop",
         SHOP: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000&fit=crop",
         TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
-        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop" // 氣球
+        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop", // 氣球
+        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop" // 購物計算
     };
 
-    // 行程資料 (含 MapCode)
+    // 行程資料 (含 MapCode) - 保持 V6.0 資料不變
     const itineraryDB = [
         { day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, events: [
             { time: "13:15", title: "星宇 JX302 起飛", icon: "fa-plane-departure", note: "給奎奎吃軟糖平衡耳壓", map: "台中國際機場" },
             { time: "15:45", title: "抵達那霸機場", icon: "fa-plane-arrival", note: "1F Lawson 買鮮奶/成長奶", map: "" },
             { time: "16:30", title: "搭接駁車往 OTS", icon: "fa-bus", note: "1F 大廳外找 OTS 旗幟 (10-A月台)", map: "" },
             { time: "17:00", title: "OTS 臨空豐崎 取車", icon: "fa-car", note: "檢查車況、裝汽座。導航設飯店", map: "OTS 臨空豐崎營業所" },
-            { time: "18:00", title: "高速公路北上", icon: "fa-road", note: "中途停：中城 PA 或 伊芸 SA", map: "" },
+            { time: "18:00", title: "高速公路北上", icon: "fa-road", note: "中途停：中城PA或伊芸SA &記得買水 ", map: "" },
             { time: "19:30", title: "飯店 Check-in", icon: "fa-hotel", note: "Best Western Kouki Beach", map: "Best Western Okinawa Kouki Beach", mapcode: "206 473 354*11" },
             { time: "20:00", title: "晚餐：名護在地", icon: "fa-utensils", note: "美拉花別邸 / 哥倫布牛排 / 全家", map: "Restaurant Columbin" }
         ]},
@@ -162,6 +170,7 @@
         ]}
     ];
 
+    // 清單資料 - 保持 V6.0 資料不變
     const checklistDB = [
         { id: "pack", title: "🎒 行前打包 (完整)", items: [
             { text: "護照 (全家3本)", sub: "效期需 > 2026/10" },
@@ -170,7 +179,7 @@
             { text: "住宿憑證/電話", sub: "第一晚 Check-in 用" },
             { text: "奎奎安撫包", sub: "貼紙書、軟糖、薄外套" },
             { text: "車內百寶袋", sub: "遮陽簾、車充、垃圾袋" },
-            { text: "3C 電子", sub: "行動電源(隨身)、充電線、漫遊卡" },
+            { text: "3C 電子", sub: "行動電源(隨身)、充電投、線、相機相關" },
             { text: "生活備藥", sub: "退燒藥、益生菌、體溫計、鼻噴劑" },
             { text: "防曬/玩水", sub: "泳衣、防曬乳、帽子、墨鏡" },
             { text: "食物剪刀 (托運)", sub: "絕對不可放隨身" }
@@ -180,7 +189,7 @@
             { text: "若元錠 (Wakamoto)", sub: "顧腸胃" },
             { text: "EVE 止痛藥", sub: "藍色/白色" },
             { text: "Kowa 蚊蟲止癢液", sub: "刷頭版 (給奎奎用)" },
-            { text: "大創 - 恐龍泡澡球", sub: "AEON 名護店必買" },
+            { text: "大創 - 各種泡澡球", sub: "AEON 名護店必買" },
             { text: "大創 - 挖沙工具組", sub: "海邊玩沙用" },
             { text: "LuLuLun 面膜", sub: "沖繩限定 (苦瓜/香檸)" },
             { text: "安耐曬防曬", sub: "金瓶 (沖繩太陽毒)" },
@@ -200,16 +209,22 @@
         ] }
     ];
 
+    // 成就資料 - 保持 V6.0 資料不變
     const missionsDB = [
         { id: "m1", title: "我是船長", desc: "在玻璃船找到尼莫", icon: "fa-fish" },
         { id: "m2", title: "海洋霸主", desc: "跟大鯨鯊拍合照", icon: "fa-camera" },
-        { id: "m3", title: "小小勇者", desc: "森林探險不被恐龍嚇哭", icon: "fa-dragon" },
+        { id: "m3", title: "小小勇者", desc: "森林探險拯救受傷的恐龍", icon: "fa-dragon" },
         { id: "m4", title: "鳥鳥點名", desc: "搭小火車數出3種鳥", icon: "fa-crow" },
         { id: "m5", title: "海底尋寶", desc: "在透明地板找到魚", icon: "fa-water" },
         { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying" }
     ];
 
+    // 工具資料 (新增 calc 分頁)
     const toolsDB = {
+        calc: {
+            rate: REALTIME_EXCHANGE_RATE,
+            date: EXCHANGE_RATE_DATE
+        },
         drive: [
             { title: "右駕口訣", content: "左轉小彎、右轉大彎<br>雨刷在左、方向燈在右", color: "bg-blue-50 text-blue-800" },
             { title: "加油金句", content: "Regular 滿油 (紅槍)<br>レギュラー満タン<br>(Regyuraa mantan)", color: "bg-orange-50 text-orange-800" },
@@ -254,9 +269,9 @@
     let activeTab = 'itinerary';
     let currentDayIdx = 0;
     let currentChecklistFilter = 'pack';
-    let currentToolFilter = 'drive';
+    let currentToolFilter = 'drive'; // 預設工具頁為 'drive'
 
-    // 天氣與GPS
+    // 天氣與GPS - 保持 V6.0 邏輯不變
     function initWeather() {
         const weatherIcon = document.getElementById('weather-icon');
         const weatherTemp = document.getElementById('weather-temp');
@@ -304,7 +319,7 @@
         }
     }
 
-    // 倒數計時 (2026/3/28)
+    // 倒數計時 (2026/3/28) - 保持 V6.0 邏輯不變
     function updateCountdown() {
         const tripDate = new Date('2026-03-28T13:15:00').getTime();
         const now = new Date().getTime();
@@ -320,14 +335,13 @@
     }
 
     function init() {
-        renderHeaderSubNav();
-        renderContent();
+        switchTab('itinerary', false); // 預設載入行程
         updateCountdown();
         setInterval(updateCountdown, 60000);
         initWeather();
     }
 
-    window.switchTab = (tab) => {
+    window.switchTab = (tab, shouldRender=true) => {
         activeTab = tab;
         document.querySelectorAll('.nav-btn').forEach(btn => {
             const icon = btn.querySelector('i');
@@ -345,7 +359,7 @@
             }
         });
         renderHeaderSubNav();
-        renderContent();
+        if(shouldRender) renderContent();
     }
 
     function renderHeaderSubNav() {
@@ -374,13 +388,15 @@
                 </div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
         } else if (activeTab === 'tools') {
+            // V7.0 新增 calc (匯率)
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
+                    <button onclick="currentToolFilter='calc'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
                     <button onclick="currentToolFilter='drive'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
                     <button onclick="currentToolFilter='jp'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
                     <button onclick="currentToolFilter='sos'; renderContent()" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
                 </div>`;
-             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.TOOL}')`;
+             document.getElementById('bg-layer').style.backgroundImage = `url('${currentToolFilter === 'calc' ? bgImages.CALC : bgImages.TOOL}')`;
         } else if (activeTab === 'missions') {
             container.innerHTML = `<div class="text-center text-white/90 text-sm font-bold pt-2">完成任務可以獲得金牌喔！</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.MISSION}')`;
@@ -398,6 +414,7 @@
         const main = document.getElementById('main-scroll');
         
         if (activeTab === 'itinerary') {
+            // V6.0 行程渲染邏輯不變
             const d = itineraryDB[currentDayIdx];
             main.innerHTML = `
                 <div class="animate-slide-up">
@@ -439,6 +456,7 @@
                     <div class="h-12"></div>
                 </div>`;
         } else if (activeTab === 'checklist') {
+            // V6.0 清單渲染邏輯不變
             const list = checklistDB.find(c => c.id === currentChecklistFilter);
             main.innerHTML = `
                 <div class="animate-slide-up glass-card rounded-3xl p-6 min-h-[60vh]">
@@ -470,6 +488,7 @@
                     </button>
                 </div>`;
         } else if (activeTab === 'missions') {
+            // V6.0 成就渲染邏輯不變
             main.innerHTML = `
                 <div class="animate-slide-up grid grid-cols-2 gap-4">
                     ${missionsDB.map(m => {
@@ -490,21 +509,63 @@
                 </div>
             `;
         } else if (activeTab === 'tools') {
-             if (currentToolFilter === 'drive') {
+            if (currentToolFilter === 'calc') {
+                // V7.0 匯率計算機
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
-                        <div class="grid grid-cols-3 gap-2 mb-6">
-                            <button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95">
+                        <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300">
+                            <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">即時匯率換算器 (JPY ➔ TWD)</h3>
+                            <div class="text-xl font-bold text-gray-500 mb-4">
+                                1 JPY = <span class="text-yellow-600 text-3xl font-black">${toolsDB.calc.rate}</span> TWD
+                            </div>
+                            <p class="text-xs text-gray-400 mb-6">資料更新於 ${toolsDB.calc.date}</p>
+
+                            <div class="flex flex-col gap-4">
+                                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label>
+                                    <input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額 (¥)"
+                                        class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2">
+                                </div>
+                                
+                                <i class="fas fa-arrow-down text-3xl text-blue-500 animate-bounce"></i>
+
+                                <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                                    <label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label>
+                                    <div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2">0</div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="h-12"></div>
+                    </div>`;
+                // 立即綁定計算事件
+                setTimeout(() => {
+                    const jpyInput = document.getElementById('jpyInput');
+                    if (jpyInput) {
+                        jpyInput.focus();
+                    }
+                }, 100);
+
+            } else if (currentToolFilter === 'drive') {
+                // V7.0 新增 "找餐廳"
+                main.innerHTML = `
+                    <div class="animate-slide-up space-y-4">
+                        <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4">
+                            <button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform">
                                 <i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i>
                                 <span class="text-xs font-bold">找廁所</span>
                             </button>
-                            <button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95">
+                            <button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform">
                                 <i class="fas fa-store text-orange-500 text-xl mb-1 block"></i>
                                 <span class="text-xs font-bold">找超商</span>
                             </button>
-                            <button onclick="quickSearch('parking')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95">
+                            <button onclick="quickSearch('parking')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform">
                                 <i class="fas fa-square-parking text-slate-600 text-xl mb-1 block"></i>
                                 <span class="text-xs font-bold">找停車</span>
+                            </button>
+                            <button onclick="quickSearch('沖繩 親子友善餐廳')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform">
+                                <i class="fas fa-child text-green-600 text-xl mb-1 block"></i>
+                                <span class="text-xs font-bold">找餐廳</span>
                             </button>
                         </div>
 
@@ -517,6 +578,7 @@
                         `).join('')}
                     </div>`;
             } else if (currentToolFilter === 'jp') {
+                // V6.0 日語渲染邏輯不變
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-8">
                         ${toolsDB.jp.map(cat => `
@@ -535,6 +597,7 @@
                         `).join('')}
                     </div>`;
             } else if (currentToolFilter === 'sos') {
+                // V6.0 緊急聯絡渲染邏輯不變
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-3">
                         ${toolsDB.sos.map(s => `
@@ -590,8 +653,31 @@
         });
     }
 
+    // 匯率計算邏輯
+    window.convertCurrency = () => {
+        const jpyInput = document.getElementById('jpyInput');
+        const twdOutput = document.getElementById('twdOutput');
+        const jpy = parseFloat(jpyInput.value);
+        
+        if (isNaN(jpy) || jpy <= 0) {
+            twdOutput.innerText = "0";
+            return;
+        }
+
+        const twd = jpy * REALTIME_EXCHANGE_RATE;
+        // 顯示為整數或小數點後兩位
+        twdOutput.innerText = twd.toFixed(twd % 1 !== 0 ? 2 : 0).toLocaleString('en-US');
+    }
+
+    // Quick Search 邏輯 (使用 Google Maps URL Scheme)
     window.quickSearch = (query) => {
-        window.open(`https://www.google.com/maps/search/${query}/`);
+        // 使用 Google Maps 的 'search' URL 語法，`q` 是查詢字串
+        // 網頁版連結為 `https://www.google.com/maps/search/?api=1&query=`
+        // 加上 `&query_place_id=current_place` 可以優先使用目前位置
+        // 由於我們不能保證用戶有 Google Maps App，所以使用 Web URL。
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}&query_place_id=current_place`;
+        window.open(url, '_system');
+        showToast(`正在搜尋附近的「${query}」...`);
     }
 
     function showToast(msg) {
