@@ -2,8 +2,11 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>奎奎全家沖繩遊 🦕</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <title>奎奎全家沖繩遊 🦕 v3.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -14,25 +17,29 @@
         
         /* 毛玻璃與質感 */
         .glass { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255, 255, 255, 0.5); }
-        .glass-dark { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); color: white; }
+        .glass-dark { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); color: white; }
         .glass-card { background: rgba(255, 255, 255, 0.95); box-shadow: 0 8px 32px rgba(0,0,0,0.1); border: 1px solid rgba(255, 255, 255, 0.6); }
+
+        /* iPhone 安全區域適配 */
+        .pt-safe-top { padding-top: env(safe-area-inset-top); }
+        .pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
         /* 動畫特效 */
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
-        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        .animate-pop { animation: pop 0.3s ease-in-out; }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        .animate-pop { animation: pop 0.4s ease-in-out; }
 
         .tab-active { background: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); transform: scale(1.05); }
-        .tab-inactive { background: rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255,255,255,0.1); }
+        .tab-inactive { background: rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255,255,255,0.1); }
         
         /* Checkbox & Progress */
         .custom-checkbox:checked + div { background-color: #2563eb; border-color: #2563eb; }
         
         /* Toast Notification */
-        #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: rgba(30, 41, 59, 0.9); color: #fff; text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 100px; font-size: 14px; backdrop-filter: blur(5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
-        #toast.show { visibility: visible; opacity: 1; bottom: 110px; }
+        #toast { visibility: hidden; min-width: 200px; transform: translateX(-50%); background-color: rgba(30, 41, 59, 0.95); color: #fff; text-align: center; border-radius: 50px; padding: 12px 24px; position: fixed; z-index: 100; left: 50%; bottom: 120px; font-size: 14px; backdrop-filter: blur(8px); box-shadow: 0 10px 40px rgba(0,0,0,0.4); opacity: 0; transition: opacity 0.3s, bottom 0.3s; pointer-events: none; }
+        #toast.show { visibility: visible; opacity: 1; bottom: 130px; }
 
         /* Calculator Specific */
         #jpyInput, #twdOutput, #rateInput { font-weight: 900; }
@@ -43,11 +50,11 @@
 
     <div id="bg-layer" class="absolute inset-0 z-0 bg-cover bg-center transition-all duration-700 transform scale-105" 
          style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop');">
-        <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-slate-100/90"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/10 to-slate-100/90"></div>
     </div>
 
     <div class="z-10 pt-safe-top px-5 pb-2 flex-shrink-0">
-        <div class="flex justify-between items-start pt-12 mb-4 text-white">
+        <div class="flex justify-between items-start pt-6 mb-4 text-white">
             <div>
                 <div class="flex items-center gap-2 mb-2">
                     <span class="bg-blue-600 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase shadow-lg border border-blue-400/30">2026 TRIP</span>
@@ -57,20 +64,20 @@
                 <p class="text-sm opacity-95 font-medium mt-2 text-blue-100 drop-shadow-md"><i class="fas fa-calendar-alt mr-1"></i>3/28 (六) - 4/3 (五)</p>
             </div>
             
-            <div class="glass-dark px-4 py-3 rounded-2xl text-center shadow-lg min-w-[80px] active:scale-95 transition-transform" onclick="initWeather()">
+            <div class="glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[75px] active:scale-95 transition-transform cursor-pointer" onclick="initWeather()">
                 <i id="weather-icon" class="fas fa-spinner fa-spin text-xl mb-1 block text-yellow-400"></i>
-                <span id="weather-temp" class="text-sm font-bold">定位中</span>
-                <div id="weather-loc" class="text-[9px] opacity-70 mt-0.5">點擊重整</div>
+                <span id="weather-temp" class="text-sm font-bold">...</span>
+                <div id="weather-loc" class="text-[9px] opacity-70 mt-0.5">重整</div>
             </div>
         </div>
 
-        <div id="sub-nav-container" class="mt-2"></div>
+        <div id="sub-nav-container" class="mt-2 min-h-[44px]"></div>
     </div>
 
     <div id="main-scroll" class="flex-1 overflow-y-auto p-4 pb-32 z-10 scroll-smooth rounded-t-[2.5rem] bg-slate-50 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] relative top-2">
         </div>
 
-    <div class="fixed bottom-0 w-full glass flex justify-around items-center pb-safe-bottom h-[90px] z-50 rounded-t-[2rem] shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+    <div class="fixed bottom-0 w-full glass flex justify-around items-center pb-safe-bottom h-[85px] z-50 rounded-t-[2rem] shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
         <button onclick="switchTab('itinerary')" class="nav-btn flex flex-col items-center justify-center w-full h-full group" id="btn-itinerary">
             <div class="icon-box p-2 rounded-2xl mb-1 transition-all duration-300 group-active:scale-90"><i class="fas fa-map-location-dot text-xl text-blue-600"></i></div>
             <span class="text-[10px] font-bold text-blue-600">行程</span>
@@ -111,7 +118,8 @@
         SHOP: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000&fit=crop",
         TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
         MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop",
-        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop"
+        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop",
+        SYNC: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&fit=crop"
     };
 
     const itineraryDB = [
@@ -271,7 +279,7 @@
         const weatherTemp = document.getElementById('weather-temp');
         const weatherLoc = document.getElementById('weather-loc');
 
-        weatherTemp.innerText = "定位中...";
+        weatherTemp.innerText = "...";
         weatherIcon.className = "fas fa-spinner fa-spin text-xl mb-1 block text-yellow-400";
 
         if (navigator.geolocation) {
@@ -306,6 +314,7 @@
         } catch (e) {
             document.getElementById('weather-temp').innerText = "24°C";
             document.getElementById('weather-loc').innerText = "預報";
+            document.getElementById('weather-icon').className = "fas fa-cloud-sun text-xl mb-1 block text-yellow-400";
         }
     }
 
@@ -324,7 +333,6 @@
     }
 
     function init() {
-        // ★ 關鍵修復：這裡參數不傳入 false，讓它預設為 true (進行渲染)
         switchTab('itinerary');
         updateCountdown();
         setInterval(updateCountdown, 60000);
@@ -382,15 +390,21 @@
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
         } else if (activeTab === 'tools') {
             container.innerHTML = `
-                <div class="flex glass-dark p-1 rounded-2xl mx-1">
-                    <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率/記帳</button>
-                    <button id="btn-tool-drive" onclick="switchTool('drive')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
-                    <button id="btn-tool-jp" onclick="switchTool('jp')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
-                    <button id="btn-tool-sos" onclick="switchTool('sos')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
+                <div class="flex glass-dark p-1 rounded-2xl mx-1 overflow-x-auto hide-scrollbar">
+                    <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
+                    <button id="btn-tool-drive" onclick="switchTool('drive')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
+                    <button id="btn-tool-jp" onclick="switchTool('jp')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
+                    <button id="btn-tool-sos" onclick="switchTool('sos')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
+                    <button id="btn-tool-sync" onclick="switchTool('sync')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='sync'?'bg-white text-purple-600':'text-white/80'}">☁️ 同步</button>
                 </div>`;
-             document.getElementById('bg-layer').style.backgroundImage = `url('${currentToolFilter === 'calc' ? bgImages.CALC : bgImages.TOOL}')`;
+             
+             let bg = bgImages.TOOL;
+             if(currentToolFilter === 'calc') bg = bgImages.CALC;
+             if(currentToolFilter === 'sync') bg = bgImages.SYNC;
+             document.getElementById('bg-layer').style.backgroundImage = `url('${bg}')`;
+
         } else if (activeTab === 'missions') {
-            container.innerHTML = `<div class="text-center text-white/90 text-sm font-bold pt-2">完成任務可以獲得金牌喔！</div>`;
+            container.innerHTML = `<div class="text-center text-white/90 text-sm font-bold pt-2 drop-shadow-md">完成任務可以獲得金牌喔！</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.MISSION}')`;
         }
     }
@@ -400,6 +414,7 @@
         btns.forEach((btn, i) => {
             btn.className = `day-btn flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-all duration-300 ${i === currentDayIdx ? 'tab-active' : 'tab-inactive'}`;
         });
+        document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
     }
 
     function renderContent() {
@@ -435,7 +450,7 @@
                                         <h3 class="font-bold text-gray-800 text-lg">${e.time}</h3>
                                         <div class="flex gap-2">
                                             ${e.mapcode ? `<button onclick="copyMapCode('${e.mapcode}')" class="glass px-2 py-1.5 rounded-full text-[10px] text-slate-600 font-bold border border-slate-200 active:bg-slate-200"><i class="fas fa-hashtag mr-1"></i>MapCode</button>` : ''}
-                                            ${e.map ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.map)}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}
+                                            ${e.map ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.map)}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}
                                         </div>
                                     </div>
                                     <p class="font-bold text-gray-700 mb-2">${e.title}</p>
@@ -461,7 +476,7 @@
                             const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700';
                             
                             return `
-                                <label class="flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer group">
+                                <label class="flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer group select-none">
                                     <div class="relative flex items-center mt-0.5">
                                         <input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" 
                                             ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}')">
@@ -475,7 +490,7 @@
                             `;
                         }).join('')}
                     </div>
-                     <button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full mt-8 py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide">
+                     <button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full mt-8 py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100">
                         <i class="fas fa-rotate-right mr-1"></i> 重置清單
                     </button>
                 </div>`;
@@ -485,7 +500,7 @@
                     ${missionsDB.map(m => {
                         const isDone = localStorage.getItem(m.id) === '1';
                         return `
-                        <div onclick="toggleMission('${m.id}')" class="glass-card rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-2 aspect-square relative overflow-hidden transition-all active:scale-95 ${isDone ? 'border-2 border-yellow-400 bg-yellow-50' : 'grayscale opacity-80'}">
+                        <div onclick="toggleMission('${m.id}')" class="glass-card rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-2 aspect-square relative overflow-hidden transition-all active:scale-95 cursor-pointer ${isDone ? 'border-2 border-yellow-400 bg-yellow-50/90' : 'grayscale opacity-80'}">
                             ${isDone ? '<div class="absolute top-2 right-2 text-yellow-500 text-xl animate-pop"><i class="fas fa-check-circle"></i></div>' : ''}
                             <div class="w-14 h-14 rounded-full ${isDone ? 'bg-yellow-400 text-white' : 'bg-slate-200 text-slate-400'} flex items-center justify-center text-2xl mb-1 shadow-sm transition-colors">
                                 <i class="fas ${m.icon}"></i>
@@ -501,8 +516,6 @@
             `;
         } else if (activeTab === 'tools') {
             if (currentToolFilter === 'calc') {
-                // V8.1 UI 優化：直式排列輸入框
-                
                 // 計算總額
                 let totalJPY = expenses.reduce((sum, item) => sum + item.price, 0);
                 let totalTWD = Math.round(totalJPY * CURRENT_RATE);
@@ -557,9 +570,14 @@
                                 <input id="exName" type="text" placeholder="品項 (如: 吹風機)" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base focus:outline-blue-500">
                                 <input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-base focus:outline-blue-500">
                             </div>
-                            <button onclick="addExpense()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform">
-                                <i class="fas fa-plus-circle mr-2"></i> 記一筆
-                            </button>
+                            <div class="flex gap-2">
+                                <button onclick="addExpense()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform">
+                                    <i class="fas fa-plus-circle mr-2"></i> 記一筆
+                                </button>
+                                <button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform">
+                                    <i class="fas fa-share-from-square"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="pb-24">
@@ -576,7 +594,7 @@
                     </div>
                     `;
                 
-                // Focus logic
+                // Auto Focus Logic
                 setTimeout(() => {
                     const jpyInput = document.getElementById('jpyInput');
                     if (jpyInput) jpyInput.focus();
@@ -645,6 +663,30 @@
                             </a>
                         `).join('')}
                     </div>`;
+            } else if (currentToolFilter === 'sync') {
+                main.innerHTML = `
+                    <div class="animate-slide-up space-y-6">
+                        <div class="glass-card rounded-3xl p-6 border-l-4 border-purple-500">
+                            <div class="text-xs font-bold text-purple-600 uppercase mb-2">我是舊手機 / 傳送端</div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">備份資料</h3>
+                            <p class="text-sm text-gray-500 mb-4">將目前的記帳、清單勾選狀態產生為一串代碼，傳送到另一台手機。</p>
+                            <button onclick="backupData()" class="w-full bg-purple-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform">
+                                <i class="fas fa-copy mr-2"></i> 複製本機資料代碼
+                            </button>
+                        </div>
+
+                        <div class="glass-card rounded-3xl p-6 border-l-4 border-teal-500">
+                            <div class="text-xs font-bold text-teal-600 uppercase mb-2">我是新手機 / 接收端</div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">還原資料</h3>
+                            <p class="text-sm text-gray-500 mb-4">請貼上另一台手機產生的代碼。⚠️ 注意：目前的資料將會被覆蓋。</p>
+                            
+                            <textarea id="importDataInput" placeholder="在此貼上備份代碼..." class="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs mb-3 focus:outline-teal-500"></textarea>
+                            
+                            <button onclick="restoreData()" class="w-full bg-teal-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform">
+                                <i class="fas fa-file-import mr-2"></i> 載入並覆蓋
+                            </button>
+                        </div>
+                    </div>`;
             }
         }
     }
@@ -676,19 +718,23 @@
                 }
             });
         } else if (activeTab === 'tools') {
-            const tools = ['calc', 'drive', 'jp', 'sos'];
+            const tools = ['calc', 'drive', 'jp', 'sos', 'sync'];
             tools.forEach(t => {
                 const btn = document.getElementById(`btn-tool-${t}`);
                 if (btn) {
                     let activeColor = "bg-white text-blue-600";
                     if(t === 'calc') activeColor = "bg-white text-yellow-600";
                     if(t === 'sos') activeColor = "bg-white text-red-600";
+                    if(t === 'sync') activeColor = "bg-white text-purple-600";
                     
                     if (currentToolFilter === t) {
-                        btn.className = `flex-1 py-2 rounded-xl text-xs font-bold transition-all ${activeColor} shadow-sm`;
-                        document.getElementById('bg-layer').style.backgroundImage = `url('${t === 'calc' ? bgImages.CALC : bgImages.TOOL}')`;
+                        btn.className = `flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${activeColor} shadow-sm`;
+                        let bg = bgImages.TOOL;
+                        if(t === 'calc') bg = bgImages.CALC;
+                        if(t === 'sync') bg = bgImages.SYNC;
+                        document.getElementById('bg-layer').style.backgroundImage = `url('${bg}')`;
                     } else {
-                        btn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
+                        btn.className = "flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all text-white/80";
                     }
                 }
             });
@@ -704,10 +750,11 @@
     }
     
     window.resetChecklist = (id) => {
-        if(confirm('重置此清單？')) {
+        if(confirm('確定要重置這個清單嗎？')) {
             const len = checklistDB.find(c => c.id === id).items.length;
             for(let i=0; i<len; i++) localStorage.removeItem(`chk_${id}_${i}`);
             renderContent();
+            showToast("已重置清單");
         }
     }
 
@@ -728,7 +775,7 @@
 
     window.copyMapCode = (code) => {
         navigator.clipboard.writeText(code).then(() => {
-            showToast("🔢 MapCode 已複製: " + code);
+            showToast("MapCode 已複製");
         });
     }
 
@@ -760,15 +807,34 @@
         const price = document.getElementById('exPrice').value;
 
         if(!name || !price) {
-            showToast("⚠️ 請輸入名稱和金額");
+            showToast("請輸入名稱和金額");
             return;
         }
 
         expenses.unshift({ name: name, price: parseInt(price) }); 
         localStorage.setItem('trip_expenses', JSON.stringify(expenses));
         
-        showToast("💰 已記錄！");
+        showToast("已記帳");
         renderContent();
+    }
+    
+    window.exportExpenses = () => {
+        if(expenses.length === 0) {
+            showToast("沒有帳務可匯出");
+            return;
+        }
+        
+        let total = 0;
+        let text = "🦕 奎奎沖繩敗家明細：\n\n";
+        expenses.forEach(e => {
+            text += `▪️ ${e.name}: ¥${e.price.toLocaleString()}\n`;
+            total += e.price;
+        });
+        text += `\n💰 總計: ¥${total.toLocaleString()} (約 NT$${Math.round(total * CURRENT_RATE).toLocaleString()})`;
+        
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("帳務已複製！");
+        });
     }
 
     window.deleteExpense = (index) => {
@@ -780,9 +846,85 @@
     }
 
     window.quickSearch = (query) => {
-        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}&query_place_id=current_place`;
-        window.open(url, '_system');
-        showToast(`正在搜尋附近的「${query}」...`);
+        // Universal Link
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        window.open(url, '_blank');
+        showToast(`正在搜尋...`);
+    }
+
+    // ================= BACKUP & RESTORE =================
+    window.backupData = () => {
+        const data = {};
+        // 1. 抓取匯率
+        data.user_rate = localStorage.getItem('user_rate');
+        // 2. 抓取記帳
+        data.trip_expenses = localStorage.getItem('trip_expenses');
+        // 3. 抓取所有清單狀態 (chk_) 和 成就 (m)
+        data.items = {};
+        for(let i=0; i<localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if(k.startsWith('chk_') || k.startsWith('m')) {
+                data.items[k] = localStorage.getItem(k);
+            }
+        }
+        
+        // 轉成 Base64 字串 (簡易編碼)
+        try {
+            const jsonStr = JSON.stringify(data);
+            const encoded = btoa(encodeURIComponent(jsonStr)); // 處理中文編碼問題
+            
+            navigator.clipboard.writeText(encoded).then(() => {
+                showToast("備份碼已複製！請傳給另一半");
+            });
+        } catch (e) {
+            alert("備份失敗，請稍後再試");
+            console.error(e);
+        }
+    }
+
+    window.restoreData = () => {
+        const input = document.getElementById('importDataInput');
+        const code = input.value.trim();
+        
+        if(!code) {
+            showToast("請貼上代碼");
+            return;
+        }
+        
+        if(!confirm("⚠️ 確定要載入嗎？\n這將會覆蓋您手機上目前的：\n- 記帳紀錄\n- 清單勾選狀態\n- 任務成就")) {
+            return;
+        }
+        
+        try {
+            const jsonStr = decodeURIComponent(atob(code));
+            const data = JSON.parse(jsonStr);
+            
+            // 開始還原
+            if(data.user_rate) localStorage.setItem('user_rate', data.user_rate);
+            if(data.trip_expenses) localStorage.setItem('trip_expenses', data.trip_expenses);
+            
+            if(data.items) {
+                // 先清除現有的 chk_ 和 m 開頭的 key，避免舊資料殘留
+                const keysToRemove = [];
+                for(let i=0; i<localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if(k.startsWith('chk_') || k.startsWith('m')) keysToRemove.push(k);
+                }
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+
+                // 寫入新資料
+                for (const k in data.items) {
+                    localStorage.setItem(k, data.items[k]);
+                }
+            }
+            
+            alert("✅ 資料同步成功！網頁將重新整理。");
+            location.reload();
+            
+        } catch (e) {
+            alert("❌ 代碼格式錯誤，請確認是否複製完整。");
+            console.error(e);
+        }
     }
 
     function showToast(msg) {
