@@ -95,7 +95,7 @@
 <script>
     // ================= DATA (資料庫) =================
     
-    // ⚠️ 這裡改為讀取「儲存的匯率」，如果沒有就用預設值 0.21
+    // 讀取「儲存的匯率」，如果沒有就用預設值 0.21
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
 
@@ -356,14 +356,17 @@
                 box.className = 'icon-box p-2 rounded-2xl mb-1 transition-all';
             }
         });
+        
         renderHeaderSubNav();
         if(shouldRender) renderContent();
+        // ★ 關鍵修復：延遲一下再更新子選單顏色，確保 DOM 已經存在
+        setTimeout(updateSubNavStyle, 50);
     }
 
     function renderHeaderSubNav() {
         const container = document.getElementById('sub-nav-container');
         
-        // 1. 行程頁 (Itinerary)
+        // 1. 行程頁
         if (activeTab === 'itinerary') {
             container.innerHTML = `
                 <div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar px-2">
@@ -377,12 +380,12 @@
                 </div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
         
-        // 2. 清單頁 (Checklist) - 這裡修復了！
+        // 2. 清單頁 (使用 ID 與 switchChecklist)
         } else if (activeTab === 'checklist') {
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
                     ${checklistDB.map(c => `
-                        <button onclick="currentChecklistFilter='${c.id}'; renderContent(); renderHeaderSubNav();" 
+                        <button id="btn-chk-${c.id}" onclick="switchChecklist('${c.id}')" 
                             class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentChecklistFilter === c.id ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80'}">
                             ${c.title.split(' ')[1]}
                         </button>
@@ -390,23 +393,24 @@
                 </div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
         
-        // 3. 工具頁 (Tools) - 這裡也修復了！
+        // 3. 工具頁 (使用 ID 與 switchTool)
         } else if (activeTab === 'tools') {
             container.innerHTML = `
                 <div class="flex glass-dark p-1 rounded-2xl mx-1">
-                    <button onclick="currentToolFilter='calc'; renderContent(); renderHeaderSubNav();" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
-                    <button onclick="currentToolFilter='drive'; renderContent(); renderHeaderSubNav();" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
-                    <button onclick="currentToolFilter='jp'; renderContent(); renderHeaderSubNav();" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
-                    <button onclick="currentToolFilter='sos'; renderContent(); renderHeaderSubNav();" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
+                    <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
+                    <button id="btn-tool-drive" onclick="switchTool('drive')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
+                    <button id="btn-tool-jp" onclick="switchTool('jp')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
+                    <button id="btn-tool-sos" onclick="switchTool('sos')" class="flex-1 py-2 rounded-xl text-xs font-bold ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
                 </div>`;
              document.getElementById('bg-layer').style.backgroundImage = `url('${currentToolFilter === 'calc' ? bgImages.CALC : bgImages.TOOL}')`;
         
-        // 4. 成就頁 (Missions)
+        // 4. 成就頁
         } else if (activeTab === 'missions') {
             container.innerHTML = `<div class="text-center text-white/90 text-sm font-bold pt-2">完成任務可以獲得金牌喔！</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.MISSION}')`;
         }
     }
+
     function updateHeaderActive() {
         const btns = document.querySelectorAll('.day-btn');
         btns.forEach((btn, i) => {
@@ -511,7 +515,6 @@
             `;
         } else if (activeTab === 'tools') {
             if (currentToolFilter === 'calc') {
-                // V7.1 更新：讓匯率變成可編輯的 Input
                 main.innerHTML = `
                     <div class="animate-slide-up space-y-4">
                         <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300">
@@ -611,6 +614,59 @@
         }
     }
 
+    // =======================================================
+    // 核心修復：專門用來切換並同步更新顏色的函式
+    // =======================================================
+
+    // 切換清單
+    window.switchChecklist = (id) => {
+        currentChecklistFilter = id;
+        renderContent(); 
+        updateSubNavStyle(); // 立刻更新按鈕顏色
+    }
+
+    // 切換工具
+    window.switchTool = (id) => {
+        currentToolFilter = id;
+        renderContent();
+        updateSubNavStyle(); // 立刻更新按鈕顏色
+    }
+
+    // 更新按鈕樣式的核心功能 (直接操作 Class，不重繪 HTML)
+    function updateSubNavStyle() {
+        if (activeTab === 'checklist') {
+            checklistDB.forEach(c => {
+                const btn = document.getElementById(`btn-chk-${c.id}`);
+                if (btn) {
+                    if (currentChecklistFilter === c.id) {
+                        btn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-blue-600 shadow-sm";
+                    } else {
+                        btn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
+                    }
+                }
+            });
+        } else if (activeTab === 'tools') {
+            const tools = ['calc', 'drive', 'jp', 'sos'];
+            tools.forEach(t => {
+                const btn = document.getElementById(`btn-tool-${t}`);
+                if (btn) {
+                    // 定義不同工具的選取顏色
+                    let activeColor = "bg-white text-blue-600";
+                    if(t === 'calc') activeColor = "bg-white text-yellow-600";
+                    if(t === 'sos') activeColor = "bg-white text-red-600";
+                    
+                    if (currentToolFilter === t) {
+                        btn.className = `flex-1 py-2 rounded-xl text-xs font-bold transition-all ${activeColor} shadow-sm`;
+                        // 同步切換背景圖
+                        document.getElementById('bg-layer').style.backgroundImage = `url('${t === 'calc' ? bgImages.CALC : bgImages.TOOL}')`;
+                    } else {
+                        btn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
+                    }
+                }
+            });
+        }
+    }
+
     // 互動功能
     window.toggleCheck = (key) => {
         const val = localStorage.getItem(key);
@@ -647,7 +703,7 @@
         });
     }
 
-    // 匯率計算功能 (V7.1 改版)
+    // 匯率計算功能 (自動儲存)
     window.updateRate = (val) => {
         if(val && val > 0) {
             CURRENT_RATE = parseFloat(val);
