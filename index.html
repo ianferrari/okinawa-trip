@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v12.0</title>
+    <title>奎奎全家沖繩遊 🦕 v12.1 Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -352,6 +352,12 @@
     // 雨天模式狀態
     let isRainyMode = false;
 
+    // 頁面狀態變數 (State Variables)
+    let activeTab = 'itinerary';
+    let currentDayIdx = 0;
+    let currentChecklistFilter = 'pack';
+    let currentToolFilter = 'drive';
+
     // 支出類別定義
     const expenseCats = {
         shopping: { name: "購物", icon: "fa-bag-shopping", color: "#f43f5e" },
@@ -569,13 +575,10 @@
             { name: "那霸南部醫療", tel: "098-888-0123", style: "bg-white border text-gray-800" }
         ]
     };
-    // ================= LOGIC & UTILS =================
-    let activeTab = 'itinerary';
-    let currentDayIdx = 0;
-    let currentChecklistFilter = 'pack';
-    let currentToolFilter = 'drive';
 
-    // Weather & Init
+    // ================= LOGIC & UTILS (核心邏輯) =================
+
+    // Weather Init
     function initWeather() {
         const weatherIcon = document.getElementById('weather-icon');
         const weatherTemp = document.getElementById('weather-temp');
@@ -991,3 +994,4 @@
 </script>
 </body>
 </html>
+
