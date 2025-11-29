@@ -575,7 +575,6 @@
             { name: "那霸南部醫療", tel: "098-888-0123", style: "bg-white border text-gray-800" }
         ]
     };
-
     // ================= LOGIC & UTILS (核心邏輯) =================
 
     // Weather Init
@@ -612,7 +611,7 @@
         }
     }
 
-    // Tab Switching
+    // Tab Switching Logic
     window.switchTab = (tab, shouldRender=true) => {
         activeTab = tab;
         document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -636,6 +635,45 @@
         renderHeaderSubNav();
         if(shouldRender) renderContent();
         setTimeout(updateSubNavStyle, 50);
+    }
+
+    // 關鍵修復：這裡補回了之前漏掉的切換函式！
+    window.switchChecklist = (id) => {
+        currentChecklistFilter = id;
+        renderContent();
+        updateSubNavStyle();
+    }
+
+    window.switchTool = (id) => {
+        currentToolFilter = id;
+        renderContent();
+        updateSubNavStyle();
+    }
+
+    // 關鍵修復：這裡補回了按鈕樣式更新函式！
+    function updateSubNavStyle() {
+        if(activeTab === 'checklist') {
+            checklistDB.forEach(c => {
+                const btn = document.getElementById(`btn-chk-${c.id}`);
+                if(btn) btn.className = currentChecklistFilter === c.id ? 
+                    "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-white text-blue-600 shadow-sm" : 
+                    "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
+            });
+        } else if(activeTab === 'tools') {
+            ['calc','drive','jp','sos','sync'].forEach(t => {
+                const btn = document.getElementById(`btn-tool-${t}`);
+                if(btn) {
+                    let c = "bg-white text-blue-600";
+                    if(t === 'calc') c = "bg-white text-yellow-600";
+                    if(t === 'sos') c = "bg-white text-red-600";
+                    if(t === 'sync') c = "bg-white text-purple-600";
+                    
+                    btn.className = currentToolFilter === t ? 
+                        `flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${c} shadow-sm` : 
+                        "flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all text-white/80";
+                }
+            });
+        }
     }
 
     function renderHeaderSubNav() {
@@ -994,4 +1032,3 @@
 </script>
 </body>
 </html>
-
