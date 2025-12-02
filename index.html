@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v13.0 Ultimate</title>
+    <title>奎奎全家沖繩遊 🦕 v13.1 Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -433,7 +433,6 @@
             { time: "16:00", title: "飯店沙灘玩沙", icon: "fa-umbrella-beach", note: "拿出大創買的玩具", map: "", rainy: { title: "飯店室內/房間休息", icon: "fa-bed", note: "☔ 雨天備案：吃零食看電視" } },
             { time: "18:00", title: "晚餐：美拉花別邸", icon: "fa-utensils", note: "走路去吃，榻榻米包廂", map: "美拉花" }
         ]},
-        // ... 其他天數資料將在邏輯中循環處理，完整性在上方已呈現過，此處保留 D1-D2 範例，實際程式碼請包含 D1-D7 完整資料
         { day: "D3", date: "3/30 (一)", title: "美麗海 & 古宇利", highlights: "鯨鯊 / 跨海大橋 / 蝦蝦飯", bg: bgImages.D3, events: [
             { time: "09:30", title: "美麗海水族館", icon: "fa-fish", note: "停 P7 立體停車場最快，直衝黑潮之海", map: "海洋博公園P7立體停車場", mapcode: "553 075 797*77" },
             { time: "13:30", title: "前往古宇利島", icon: "fa-car-side", note: "車上讓奎奎午睡", map: "", rainy: { title: "前往水果樂園 (室內)", icon: "fa-car", note: "☔ 雨天改去室內景點", map: "OKINAWA fruits land" } },
@@ -473,18 +472,20 @@
             { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "回家囉！", map: "" }
         ]}
     ];
-    const checklistDB = [
+    // 1. 定義預設清單
+    const defaultChecklistDB = [
         { id: "pack", title: "🎒 行前打包 (完整)", items: [{ text: "護照 (全家3本)", sub: "效期需 > 2026/10" }, { text: "駕照正本 + 日文譯本", sub: "OTS 取車必備" }, { text: "Visit Japan Web 截圖", sub: "存手機相簿" }, { text: "住宿憑證/電話", sub: "第一晚 Check-in 用" }, { text: "奎奎安撫包", sub: "貼紙書、軟糖、薄外套" }, { text: "車內百寶袋", sub: "遮陽簾、車充、垃圾袋" }, { text: "3C 電子", sub: "行動電源(隨身)、充電頭、線、相機" }, { text: "生活備藥", sub: "退燒藥、益生菌、體溫計、鼻噴劑" }, { text: "防曬/玩水", sub: "泳衣、防曬乳、帽子、墨鏡" }, { text: "食物剪刀 (托運)", sub: "絕對不可放隨身" }, { text: "衣物壓縮袋", sub: "回程裝髒衣服省空間" }, { text: "指甲剪", sub: "長途旅行必備" }, { text: "隨身筆", sub: "機上填入境卡用" }, { text: "夾鏈袋 (大/中)", sub: "裝濕泳衣、分裝零食" }] },
         { id: "shop", title: "🛍️ 購物必買 (完整)", items: [{ text: "合利他命 EX Plus", sub: "家庭常備藥" }, { text: "若元錠 (Wakamoto)", sub: "顧腸胃" }, { text: "EVE 止痛藥", sub: "藍色/白色" }, { text: "Kowa 蚊蟲止癢液", sub: "刷頭版 (給奎奎用)" }, { text: "大創 - 各種泡澡球", sub: "AEON 名護店必買" }, { text: "大創 - 挖沙工具組", sub: "海邊玩沙用" }, { text: "LuLuLun 面膜", sub: "沖繩限定 (苦瓜/香檸)" }, { text: "安耐曬防曬", sub: "金瓶 (沖繩太陽毒)" }, { text: "Tomica 沖繩限定車", sub: "PARCO / 機場" }, { text: "辣味蝦餅 (南風堂)", sub: "下酒零食" }, { text: "邊銀食堂辣油", sub: "石垣島名產" }, { text: "Calbee 麥片", sub: "紅色包裝最經典" }, { text: "Orihiro 蒟蒻果凍", sub: "袋裝好攜帶 (要托運)" }, { text: "ROIHI 穴位貼布", sub: "老人頭像 (涼感/溫感)" }, { text: "Fino 髮膜/髮油", sub: "日本買很便宜" }] },
         { id: "return", title: "🚨 回程防呆 (SOP)", items: [{ text: "ETC 卡拔了嗎？", sub: "還車前確認 (最常忘記)" }, { text: "車充頭拔了嗎？", sub: "還車前確認" }, { text: "門邊垃圾/玩具清空？", sub: "還車前確認" }, { text: "油加滿了嗎？", sub: "保留收據給店員" }, { text: "布丁/果凍 托運了嗎？", sub: "液體 > 100ml 不可手提" }, { text: "洗面乳/牙膏 托運了嗎？", sub: "這也是液體！" }, { text: "護照拿出來了嗎？", sub: "不要鎖在飯店保險箱" }, { text: "Wifi機/SIM卡針", sub: "確認收好" }, { text: "行李秤重", sub: "確認沒超重 (單件23kg?)" }, { text: "身上零錢花光", sub: "機場扭蛋機/便利商店" }] }
     ];
+    // 2. 實際使用的 checklistDB
+    let checklistDB = JSON.parse(localStorage.getItem('trip_checklist_db')) || defaultChecklistDB;
 
     const missionsDB = [
         { id: "m1", title: "我是船長", desc: "在玻璃船找到尼莫", icon: "fa-fish" }, { id: "m2", title: "海洋霸主", desc: "跟大鯨鯊拍合照", icon: "fa-camera" },
         { id: "m3", title: "小小勇者", desc: "森林探險拯救受傷的恐龍", icon: "fa-dragon" }, { id: "m4", title: "鳥鳥點名", desc: "搭小火車數出3種鳥", icon: "fa-crow" },
         { id: "m5", title: "海底尋寶", desc: "在透明地板找到魚", icon: "fa-water" }, { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying" }
     ];
-
     const toolsDB = {
         drive: [
             { title: "右駕口訣", content: "左轉小彎、右轉大彎<br>雨刷在左、方向燈在右", color: "bg-blue-50 text-blue-800" },
@@ -519,7 +520,7 @@
         updateCountdown();
         setInterval(updateCountdown, 60000);
         initWeather();
-        checkDailyPopup(); // 每日防呆檢查 (NEW)
+        checkDailyPopup(); // 每日防呆檢查
     }
 
     // 天氣
@@ -598,7 +599,6 @@
         setTimeout(updateSubNavStyle, 50);
     }
     
-    // ... (Checklist & Tool switch logic same as before, see renderContent for updates)
     window.switchChecklist = (id) => { currentChecklistFilter = id; renderContent(); updateSubNavStyle(); }
     window.switchTool = (id) => { currentToolFilter = id; renderContent(); updateSubNavStyle(); }
     
@@ -631,8 +631,8 @@
             container.innerHTML = `<div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar px-2">${itineraryDB.map((d, i) => `<button onclick="currentDayIdx=${i}; renderContent(); updateHeaderActive()" class="day-btn flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-all duration-300 ${i === currentDayIdx ? 'tab-active' : 'tab-inactive'}"><div class="text-[10px] opacity-80 uppercase">${d.day}</div><div>${d.date.split(' ')[0]}</div></button>`).join('')}</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
         } else if (activeTab === 'checklist') {
-            container.innerHTML = `<div class="flex glass-dark p-1 rounded-2xl mx-1">${checklistDB.map(c => `<button id="btn-chk-${c.id}" onclick="switchChecklist('${c.id}')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentChecklistFilter === c.id ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80'}">${c.title.split(' ')[1]}</button>`).join('')}</div>`;
-            document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
+            const list = checklistDB.find(c => c.id === currentChecklistFilter);
+            main.innerHTML = `<div class="animate-slide-up glass-card rounded-3xl p-6 min-h-[60vh]"><h3 class="font-bold text-xl mb-6 text-gray-800 border-b pb-4 border-gray-100 flex items-center gap-2"><span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>${list.title}</h3><div class="space-y-3">${list.items.map((item, i) => { const key = `chk_${currentChecklistFilter}_${item.text}`; const isChecked = localStorage.getItem(key) === '1'; const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700'; return `<div class="flex items-start gap-2 group"><label class="flex-1 flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer select-none border-slate-100 shadow-sm bg-white"><div class="relative flex items-center mt-0.5"><input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}')"><i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i></div><div class="flex-1"><div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}</div></label><button onclick="deleteChecklistItem(${i})" class="mt-3 w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 active:scale-90 transition-all rounded-full hover:bg-red-50"><i class="fas fa-trash-alt"></i></button></div>`; }).join('')}</div><button onclick="addChecklistItem()" class="w-full mt-4 py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-[0.98]"><i class="fas fa-plus mr-1"></i> 新增項目</button><div class="mt-8 pt-4 border-t border-gray-100"><button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100 mb-2"><i class="fas fa-rotate-right mr-1"></i> 重置勾選狀態</button><button onclick="openGiftModal()" class="w-full py-4 bg-red-50 text-red-500 rounded-2xl text-lg font-bold shadow-sm active:scale-95 border border-red-100"><i class="fas fa-gift mr-2"></i> 管理伴手禮清單</button></div></div>`;
         } else if (activeTab === 'tools') {
             container.innerHTML = `<div class="flex glass-dark p-1 rounded-2xl mx-1 overflow-x-auto hide-scrollbar"><button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button><button id="btn-tool-drive" onclick="switchTool('drive')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button><button id="btn-tool-jp" onclick="switchTool('jp')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button><button id="btn-tool-sos" onclick="switchTool('sos')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button><button id="btn-tool-sync" onclick="switchTool('sync')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='sync'?'bg-white text-purple-600':'text-white/80'}">☁️ 同步</button></div>`;
             let bg = bgImages.TOOL;
@@ -671,7 +671,7 @@
             }).join('')}</div><div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative"><label class="text-[10px] font-bold text-yellow-600 uppercase mb-1 block"><i class="fas fa-pen-nib mr-1"></i> 今日隨筆 (One-Line Diary)</label><textarea class="w-full bg-transparent border-none text-sm text-gray-700 focus:ring-0 p-0 resize-none h-16 leading-relaxed focus:outline-none" placeholder="今天發生了什麼好笑的事？(自動儲存)" oninput="localStorage.setItem('${diaryKey}', this.value)">${savedDiary}</textarea></div><div class="h-12"></div></div>`;
         } else if (activeTab === 'checklist') {
             const list = checklistDB.find(c => c.id === currentChecklistFilter);
-            main.innerHTML = `<div class="animate-slide-up glass-card rounded-3xl p-6 min-h-[60vh]"><h3 class="font-bold text-xl mb-6 text-gray-800 border-b pb-4 border-gray-100 flex items-center gap-2"><span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>${list.title}</h3><div class="space-y-4">${list.items.map((item, i) => { const key = `chk_${currentChecklistFilter}_${i}`; const isChecked = localStorage.getItem(key) === '1'; const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700'; return `<label class="flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer group select-none"><div class="relative flex items-center mt-0.5"><input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}')"><i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i></div><div class="flex-1"><div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}</div></label>`; }).join('')}</div><button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full mt-8 py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100"><i class="fas fa-rotate-right mr-1"></i> 重置清單</button><button onclick="openGiftModal()" class="w-full mt-4 py-4 bg-red-50 text-red-500 rounded-2xl text-lg font-bold shadow-sm active:scale-95 border border-red-100"><i class="fas fa-gift mr-2"></i> 管理伴手禮清單</button></div>`;
+            main.innerHTML = `<div class="animate-slide-up glass-card rounded-3xl p-6 min-h-[60vh]"><h3 class="font-bold text-xl mb-6 text-gray-800 border-b pb-4 border-gray-100 flex items-center gap-2"><span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>${list.title}</h3><div class="space-y-3">${list.items.map((item, i) => { const key = `chk_${currentChecklistFilter}_${item.text}`; const isChecked = localStorage.getItem(key) === '1'; const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700'; return `<div class="flex items-start gap-2 group"><label class="flex-1 flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer select-none border-slate-100 shadow-sm bg-white"><div class="relative flex items-center mt-0.5"><input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}')"><i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i></div><div class="flex-1"><div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}</div></label><button onclick="deleteChecklistItem(${i})" class="mt-3 w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 active:scale-90 transition-all rounded-full hover:bg-red-50"><i class="fas fa-trash-alt"></i></button></div>`; }).join('')}</div><button onclick="addChecklistItem()" class="w-full mt-4 py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-[0.98]"><i class="fas fa-plus mr-1"></i> 新增項目</button><div class="mt-8 pt-4 border-t border-gray-100"><button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100 mb-2"><i class="fas fa-rotate-right mr-1"></i> 重置勾選狀態</button><button onclick="openGiftModal()" class="w-full py-4 bg-red-50 text-red-500 rounded-2xl text-lg font-bold shadow-sm active:scale-95 border border-red-100"><i class="fas fa-gift mr-2"></i> 管理伴手禮清單</button></div></div>`;
         } else if (activeTab === 'missions') {
             const balance = getGashaBalance();
             main.innerHTML = `<div class="animate-slide-up space-y-4"><div id="gasha-machine" class="glass-card rounded-3xl p-6 text-center border-4 border-pink-400 bg-pink-50 relative overflow-hidden"><div class="absolute -left-10 -top-10 w-32 h-32 bg-pink-200 rounded-full opacity-50 blur-xl"></div><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-xl font-black text-pink-600">🎉 快樂扭蛋機</h3><button onclick="openRewardEditor()" class="text-[10px] bg-white border border-pink-200 text-pink-400 px-2 py-1 rounded-full"><i class="fas fa-cog"></i> 設定獎品</button></div><div class="text-4xl font-black text-gray-800 mb-2">${balance} <span class="text-sm text-gray-500 font-medium">枚代幣</span></div><p class="text-xs text-gray-500 mb-4">每完成 1 個任務，就能轉 1 次！</p><button onclick="spinGasha()" ${balance <= 0 ? 'disabled' : ''} class="w-full py-4 rounded-2xl font-bold text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${balance > 0 ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-300/50' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">${balance > 0 ? '<i class="fas fa-gift animate-bounce"></i> 投入代幣轉動' : '去完成任務賺代幣！'}</button></div></div><div class="grid grid-cols-2 gap-4">${missionsDB.map(m => {const isDone = localStorage.getItem(m.id) === '1'; return `<div onclick="toggleMission('${m.id}')" class="glass-card rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-2 aspect-square relative overflow-hidden transition-all active:scale-95 cursor-pointer ${isDone ? 'border-2 border-yellow-400 bg-yellow-50/90' : 'grayscale opacity-80'}">${isDone ? '<div class="absolute top-2 right-2 text-yellow-500 text-xl animate-pop"><i class="fas fa-check-circle"></i></div>' : ''}<div class="w-14 h-14 rounded-full ${isDone ? 'bg-yellow-400 text-white' : 'bg-slate-200 text-slate-400'} flex items-center justify-center text-2xl mb-1 shadow-sm transition-colors"><i class="fas ${m.icon}"></i></div><div class="font-bold text-slate-800 leading-tight">${m.title}</div><div class="text-[10px] text-slate-500 leading-tight">${m.desc}</div></div>`}).join('')}</div></div>`;
@@ -686,7 +686,7 @@
                  const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><p class="text-xs text-gray-500 mb-4">停好車後按一下，不怕找不到車！</p><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-map-pin mr-2"></i> 🅿️ 我停這</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div></div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
                  const gasHelperHTML = `<div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-1 shadow-lg mb-6 relative overflow-hidden text-white"><div class="bg-white/10 backdrop-blur-sm p-5 rounded-[1.3rem] border border-white/20"><div class="flex justify-between items-start mb-4"><div><div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">GAS STATION</div><h3 class="text-2xl font-black">加油請找 <span class="text-yellow-300">紅槍</span></h3><p class="text-xs opacity-90">Regular (レギュラー) = 92/95無鉛</p></div><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-md"><i class="fas fa-gas-pump"></i></div></div><div class="grid grid-cols-2 gap-2 text-center mb-4"><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-hand-sparkles mb-1 block opacity-70"></i><div class="text-[10px]">1.除靜電</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-credit-card mb-1 block opacity-70"></i><div class="text-[10px]">2.付錢/選油</div></div><div class="bg-red-700 rounded-lg p-2 border border-red-400"><i class="fas fa-fill-drip mb-1 block"></i><div class="text-[10px] font-bold">3.紅槍加油</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-receipt mb-1 block opacity-70"></i><div class="text-[10px]">4.拿收據</div></div></div><button onclick="showInfoCard('gas')" class="w-full bg-white text-red-600 font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"><i class="fas fa-comment-dots"></i> 給店員看 (日文)</button></div></div>`;
                  
-                 // 加入安撫音效按鈕區 (NEW)
+                 // 加入安撫音效按鈕區
                  const soundBoardHTML = `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6"><h3 class="text-xs font-bold text-gray-500 uppercase mb-3"><i class="fas fa-music mr-1"></i> 安撫音效板 (Soundboard)</h3><div class="grid grid-cols-3 gap-3"><button onclick="playSound('clapping')" class="aspect-square bg-yellow-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">👏</button><button onclick="playSound('laugh')" class="aspect-square bg-pink-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">😆</button><button onclick="playSound('fart')" class="aspect-square bg-amber-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">💨</button><button onclick="playSound('magic')" class="aspect-square bg-purple-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">✨</button><button onclick="playSound('wrong')" class="aspect-square bg-red-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">❌</button><button onclick="playSound('correct')" class="aspect-square bg-green-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">⭕</button></div></div>`;
                  
                  main.innerHTML = `<div class="animate-slide-up space-y-4"><button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4"><div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div><div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div></button>${parkingHTML}${gasHelperHTML}<div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4"><button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找廁所</span></button><button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找超商</span></button><button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-xl mb-1 block"></i><span class="text-xs font-bold">小小畫家</span></button><button onclick="document.getElementById('food-modal').classList.add('open')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-utensils text-green-600 text-xl mb-1 block"></i><span class="text-xs font-bold">吃什麼？</span></button></div>${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-card ${d.color} border border-black/5 relative overflow-hidden"><i class="fas fa-car absolute -right-2 -bottom-2 text-6xl opacity-10"></i><div class="text-xs font-bold opacity-60 mb-2 uppercase tracking-wider">${d.title}</div><div class="text-xl font-black leading-tight">${d.content}</div></div>`).join('')}</div>`;
@@ -778,7 +778,15 @@
     window.resetTaxBasket = () => { if(confirm("確定要清空免稅購物籃嗎？")) { taxBasket = []; renderContent(); } }
     window.fetchExchangeRate = async () => { const btn = document.getElementById('fetchRateBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); const twd = data.rates.TWD; if(twd) { updateRate(twd.toFixed(4)); document.getElementById('rateInput').value = twd.toFixed(4); showToast(`匯率已更新：${twd}`); } } catch(e) { showToast("更新失敗，請檢查網路"); } finally { btn.innerHTML = originalText; } }
     window.toggleCheck = (key) => { const v=localStorage.getItem(key); v==='1'?localStorage.removeItem(key):localStorage.setItem(key,'1'); renderContent(); }
-    window.resetChecklist = (id) => { if(confirm('重置清單？')) { checklistDB.find(c=>c.id===id).items.forEach((_,i)=>localStorage.removeItem(`chk_${id}_${i}`)); renderContent(); showToast("已重置"); } }
+    
+    // (已修復的) 重置清單邏輯 - 使用文字作為 Key
+    window.resetChecklist = (id) => { 
+        if(confirm('重置清單？')) { 
+            checklistDB.find(c=>c.id===id).items.forEach(item => localStorage.removeItem(`chk_${id}_${item.text}`)); 
+            renderContent(); 
+            showToast("已重置"); 
+        } 
+    }
     
     // 音效與震動
     function playCoinSound() { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(987,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(1318,ctx.currentTime+0.1); g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.5); o.start(); o.stop(ctx.currentTime+0.5); }
@@ -831,6 +839,46 @@
 
     // Start App
     init();
+    
+    // ================= 新增/刪除清單功能 (定義在最底部確保載入) =================
+    // 儲存清單資料庫
+    function saveChecklistDB() {
+        localStorage.setItem('trip_checklist_db', JSON.stringify(checklistDB));
+    }
+
+    // 新增項目
+    window.addChecklistItem = () => {
+        const text = prompt("請輸入要新增的項目名稱：");
+        if (!text) return; 
+        
+        const sub = prompt("請輸入備註 (例如：紅色包裝)，可不填：") || "";
+        
+        // 找到目前的清單並加入
+        const list = checklistDB.find(c => c.id === currentChecklistFilter);
+        list.items.push({ text: text, sub: sub });
+        
+        saveChecklistDB(); 
+        renderContent();   
+        showToast("已新增項目");
+    }
+
+    // 刪除項目
+    window.deleteChecklistItem = (index) => {
+        if (!confirm("確定要刪除這個項目嗎？")) return;
+        
+        const list = checklistDB.find(c => c.id === currentChecklistFilter);
+        
+        // 刪除該項目相關的勾選紀錄
+        const itemText = list.items[index].text;
+        localStorage.removeItem(`chk_${currentChecklistFilter}_${itemText}`);
+        
+        // 從陣列中移除
+        list.items.splice(index, 1);
+        
+        saveChecklistDB(); 
+        renderContent();   
+        showToast("已刪除項目");
+    }
 </script>
 </body>
 </html>
