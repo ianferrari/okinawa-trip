@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v14.0 Ultimate</title>
+    <title>奎奎全家沖繩遊 🦕 v14.1 Ultimate</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -33,34 +33,38 @@
         .safe-card { background: linear-gradient(135deg, #fff1f2 0%, #fff 100%); border-left: 5px solid #e11d48; }
         .parking-card { background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 2px solid #22c55e; }
 
-        /* ================= CSS 修改部分 ================= */
-
-		/* 行程時間軸連接線 (優化版) */
+        /* ================= NEW: 行程時間軸樣式 (v14.1) ================= */
+        /* 連接線 */
         .timeline-connector {
-         position: absolute;
-		 left: 2.2rem; /* 對齊圖示中心 */
-		 top: 3.5rem;  /* 從圖示下方開始 */
-		 bottom: -1rem; /* 連接到下一個卡片 */
-		 border-left: 2px dashed #cbd5e1;
-		 z-index: 0;
+            position: absolute;
+            left: 2.2rem; /* 對齊 icon 中心 */
+            top: 3.5rem;  /* 從 icon 下方開始 */
+            bottom: -1rem; /* 連接到下一個卡片頂部 */
+            border-left: 2px dashed #cbd5e1;
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-		/* 移動時間膠囊 (新功能) */
-		.travel-pill {
-		 position: absolute;
-		 left: 2.2rem;
-		 top: 50%;
-		 transform: translate(-50%, -50%);
-		 background-color: #f1f5f9;
-		 border: 1px solid #cbd5e1;
-		 color: #64748b;
-		 font-size: 10px;
-		 font-weight: bold;
-		 padding: 2px 8px;
-		 border-radius: 99px;
-		 white-space: nowrap;
-		 z-index: 1;
-		 box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-		}
+
+        /* 移動時間膠囊 */
+        .travel-pill {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            /* 讓膠囊置中於線條 */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
         /* 景點詳細 Modal (v14 New) */
         .spot-hero { height: 200px; background-size: cover; background-position: center; border-radius: 1.5rem 1.5rem 0 0; position: relative; }
@@ -104,7 +108,7 @@
         canvas { touch-action: none; cursor: crosshair; }
         .color-btn.active { transform: scale(1.2); border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
 
-        /* Modals 顯示控制 (增加 spot-modal, sos-modal) */
+        /* Modals 顯示控制 */
         #modal-overlay, #expense-modal, #gasha-modal, #reward-editor-modal, #gift-modal, #food-modal, #daily-check-modal, #spot-modal, #sos-card-modal { display: none; }
         #modal-overlay.open, #expense-modal.open, #gasha-modal.open, #reward-editor-modal.open, #gift-modal.open, #food-modal.open, #daily-check-modal.open, #spot-modal.open, #sos-card-modal.open { display: flex; }
 
@@ -444,9 +448,7 @@
     ];
     let rewardsDB = JSON.parse(localStorage.getItem('gasha_rewards')) || [...defaultRewards];
 
-// ================= 資料庫更新 (請覆蓋原本的 spotInfoDB 和 itineraryDB) =================
-
-    // 1. 景點詳細資料庫 (全景點補完版)
+    // 1. 景點詳細資料庫 (全景點補完版 - v14.1)
     const spotInfoDB = {
         // --- Day 1 ---
         "tpe_airport": { title: "台中國際機場", tags: ["出發", "機場"], image: "https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?q=80&w=1000", desc: "旅程的起點！記得再次檢查護照效期。", tips: "💡 帶小孩通關可以走優先通道，記得先裝好水。", map: "台中國際機場" },
@@ -493,7 +495,23 @@
         "gas_station": { title: "ENEOS 加油站", tags: ["加油", "還車"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 旁邊的加油站，還車前必須加滿油並保留收據。記得加 Regular (紅槍)。", tips: "💡 這裡通常排隊很長，建議預留 20 分鐘加油時間。", map: "ENEOS Dr.Drive Self Toyosaki SS" }
     };
 
-    // 2. 行程資料庫 (新增 travel 欄位 與 spotId 連結)
+    const bgImages = {
+        D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
+        D2: "https://images.unsplash.com/photo-1582967788606-a171f1080ca8?q=80&w=1000&fit=crop",
+        D3: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000&fit=crop",
+        D4: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000&fit=crop",
+        D5: "https://images.unsplash.com/photo-1534234828569-2f2249520468?q=80&w=1000&fit=crop",
+        D6: "https://images.unsplash.com/photo-1570533412033-662309e3df4e?q=80&w=1000&fit=crop",
+        D7: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000&fit=crop",
+        SHOP: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000&fit=crop",
+        TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
+        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop",
+        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop",
+        SYNC: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&fit=crop",
+        SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
+    };
+
+    // 2. 行程資料庫 (新增 travel 欄位 與 spotId 連結 - v14.1)
     const itineraryDB = [
         { day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, events: [
             { time: "13:15", title: "星宇 JX302 起飛", spotId: "tpe_airport", icon: "fa-plane-departure", note: "給奎奎吃軟糖平衡耳壓", map: "台中國際機場", duration: "2.5h", travel: "✈️ 飛行 90分" },
@@ -616,7 +634,7 @@
         police: { jp: "警察を呼んでください", en: "Call the police!", note: "請叫警察" },
         ambulance: { jp: "救急車を呼んでください", en: "Call an ambulance!", note: "請叫救護車" }
     };
-// ================= 2. 邏輯與功能 (LOGIC) =================
+	// ================= 2. 邏輯與功能 (LOGIC) =================
 
     function init() {
         if(isRainyMode) updateRainyModeUI();
@@ -758,98 +776,104 @@
         document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
     }
 
-    // 渲染主內容 (Render Main Content) - v14 Ultimate
+    // 渲染主內容 (Render Main Content) - v14.1 修復版
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
-        // ================= 渲染邏輯修改 (請找到 renderContent 函式，替換 activeTab === 'itinerary' 的部分) =================
-
-    if (activeTab === 'itinerary') {
-        const d = itineraryDB[currentDayIdx];
-        const diaryKey = `diary_${d.day}`;
-        const savedDiary = localStorage.getItem(diaryKey) || "";
-        
-        main.innerHTML = `
-        <div class="animate-slide-up">
-            <div class="glass-card rounded-3xl p-5 mb-6 relative overflow-hidden border-l-4 border-blue-500">
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md">Day ${currentDayIdx + 1}</span>
-                    <h2 class="text-xl font-bold text-gray-800">${d.date}</h2>
-                </div>
-                <div class="text-sm font-medium text-gray-500 mb-3">${d.title}</div>
-                <div class="text-sm bg-slate-50 p-3 rounded-xl border border-slate-100 text-gray-600 flex items-start gap-2">
-                    <i class="fas fa-star text-yellow-500 mt-0.5"></i> <span class="font-medium">${d.highlights}</span>
-                </div>
-            </div>
+        // 1. 行程 (Itinerary) - 包含時間軸膠囊、粉紅色停留時間、可點擊標題
+        if (activeTab === 'itinerary') {
+            const d = itineraryDB[currentDayIdx];
+            const diaryKey = `diary_${d.day}`;
+            const savedDiary = localStorage.getItem(diaryKey) || "";
             
-            <div class="space-y-4">
-                ${d.events.map((e, idx) => {
-                    const isRainyItem = isRainyMode && e.rainy;
-                    const current = isRainyItem ? { ...e, ...e.rainy } : e;
-                    const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
-                    const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
-                    const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${current.note || ''}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
-                    
-                    // 時間軸連接線
-                    const isLast = idx === d.events.length - 1;
-                    // (NEW) 如果有 travel 資料，顯示在連接線上
-                    const travelHtml = (current.travel && !isLast) 
-                        ? `<div class="travel-pill">${current.travel}</div>` 
-                        : '';
+            main.innerHTML = `
+            <div class="animate-slide-up">
+                <div class="glass-card rounded-3xl p-5 mb-6 relative overflow-hidden border-l-4 border-blue-500">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md">Day ${currentDayIdx + 1}</span>
+                        <h2 class="text-xl font-bold text-gray-800">${d.date}</h2>
+                    </div>
+                    <div class="text-sm font-medium text-gray-500 mb-3">${d.title}</div>
+                    <div class="text-sm bg-slate-50 p-3 rounded-xl border border-slate-100 text-gray-600 flex items-start gap-2">
+                        <i class="fas fa-star text-yellow-500 mt-0.5"></i> <span class="font-medium">${d.highlights}</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    ${d.events.map((e, idx) => {
+                        const isRainyItem = isRainyMode && e.rainy;
+                        const current = isRainyItem ? { ...e, ...e.rainy } : e;
+                        const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
                         
-                    const connector = !isLast ? `<div class="timeline-connector">${travelHtml}</div>` : '';
-                    
-                    // (NEW) 停留時間：改為粉紅色、字體加大、加粗
-                    const durationTag = current.duration ? `<span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-md ml-2 font-bold shadow-sm"><i class="fas fa-clock mr-1"></i>停留 ${current.duration}</span>` : '';
-                    
-                    // 景點標題 (可點擊)
-                    const titleHtml = current.spotId 
-                        ? `<div onclick="openSpotModal('${current.spotId}')" class="font-bold text-blue-600 text-lg cursor-pointer hover:underline decoration-blue-300 underline-offset-4 decoration-2 flex items-center gap-1">${current.title} <i class="fas fa-circle-info text-xs opacity-50"></i></div>`
-                        : `<h3 class="font-bold text-gray-800 text-lg">${current.title}</h3>`;
+                        // Universal Link 修正
+                        const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
+                        const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${current.note || ''}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
+                        
+                        // ================= v14.1 修改重點：時間軸與停留時間 =================
+                        const isLast = idx === d.events.length - 1;
+                        
+                        // 1. 移動時間膠囊 (Travel Pill)
+                        // 只有當不是最後一個行程，且有 travel 資料時才顯示
+                        const travelHtml = (current.travel && !isLast) 
+                            ? `<div class="travel-pill">${current.travel}</div>` 
+                            : '';
+                        
+                        // 將膠囊放入連接線容器中
+                        const connector = !isLast ? `<div class="timeline-connector">${travelHtml}</div>` : '';
+                        
+                        // 2. 停留時間 (Duration)
+                        // 改為粉紅色背景、字體加大加粗
+                        const durationTag = current.duration ? `<span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-md ml-2 font-bold shadow-sm"><i class="fas fa-clock mr-1"></i>停留 ${current.duration}</span>` : '';
+                        
+                        // 3. 景點標題 (Title)
+                        // 如果有 spotId，就變成可點擊的連結樣式
+                        const titleHtml = current.spotId 
+                            ? `<div onclick="openSpotModal('${current.spotId}')" class="font-bold text-blue-600 text-lg cursor-pointer hover:underline decoration-blue-300 underline-offset-4 decoration-2 flex items-center gap-1">${current.title} <i class="fas fa-circle-info text-xs opacity-50"></i></div>`
+                            : `<h3 class="font-bold text-gray-800 text-lg">${current.title}</h3>`;
 
-                    return `
-                    <div class="relative group">
-                        ${connector}
-                        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : ""}">
-                            ${badge}
-                            <div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]">
-                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white z-10 relative">
-                                    <i class="fas ${current.icon}"></i>
-                                </div>
-                            </div>
-                            <div class="flex-1 py-1 min-w-0">
-                                <div class="flex justify-between items-start mb-1">
-                                    <div class="flex items-center">
-                                        <h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3>
-                                    </div>
-                                    <div class="flex gap-2 shrink-0">
-                                        ${shareBtn}
-                                        ${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}
+                        return `
+                        <div class="relative group">
+                            ${connector}
+                            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : ""}">
+                                ${badge}
+                                <div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]">
+                                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white z-10 relative">
+                                        <i class="fas ${current.icon}"></i>
                                     </div>
                                 </div>
-                                
-                                <div class="flex items-center flex-wrap mb-2 gap-y-1">
-                                    ${titleHtml}
-                                    ${durationTag}
+                                <div class="flex-1 py-1 min-w-0">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <div class="flex items-center">
+                                            <h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3>
+                                        </div>
+                                        <div class="flex gap-2 shrink-0">
+                                            ${shareBtn}
+                                            ${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center flex-wrap mb-2 gap-y-1">
+                                        ${titleHtml}
+                                        ${durationTag}
+                                    </div>
+                                    
+                                    ${current.note ? `<p class="text-xs text-gray-500 bg-slate-50 p-2 rounded-lg border border-slate-100 leading-relaxed"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}
+                                    
+                                    ${current.mapcode ? `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}
                                 </div>
-                                
-                                ${current.note ? `<p class="text-xs text-gray-500 bg-slate-50 p-2 rounded-lg border border-slate-100 leading-relaxed"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}
-                                
-                                ${current.mapcode ? `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}
                             </div>
-                        </div>
-                    </div>`;
-                }).join('')}
-            </div>
-            
-            <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative mb-6">
-                <label class="text-[10px] font-bold text-yellow-600 uppercase mb-1 block"><i class="fas fa-pen-nib mr-1"></i> 今日隨筆 (One-Line Diary)</label>
-                <textarea class="w-full bg-transparent border-none text-sm text-gray-700 focus:ring-0 p-0 resize-none h-16 leading-relaxed focus:outline-none" placeholder="今天發生了什麼好笑的事？(自動儲存)" oninput="localStorage.setItem('${diaryKey}', this.value)">${savedDiary}</textarea>
-            </div>
-            <div class="h-12"></div>
-        </div>`;
+                        </div>`;
+                    }).join('')}
+                </div>
+                
+                <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative mb-6">
+                    <label class="text-[10px] font-bold text-yellow-600 uppercase mb-1 block"><i class="fas fa-pen-nib mr-1"></i> 今日隨筆 (One-Line Diary)</label>
+                    <textarea class="w-full bg-transparent border-none text-sm text-gray-700 focus:ring-0 p-0 resize-none h-16 leading-relaxed focus:outline-none" placeholder="今天發生了什麼好笑的事？(自動儲存)" oninput="localStorage.setItem('${diaryKey}', this.value)">${savedDiary}</textarea>
+                </div>
+                <div class="h-12"></div>
+            </div>`;
     }
-			} else if (activeTab === 'checklist') {
+	} else if (activeTab === 'checklist') {
             const list = checklistDB.find(c => c.id === currentChecklistFilter);
             main.innerHTML = `
             <div class="animate-slide-up glass-card rounded-3xl p-6 min-h-[60vh]">
@@ -961,7 +985,7 @@
         document.getElementById('spot-tips').innerText = spot.tips;
         
         // 產生標籤
-        const tagsHtml = spot.tags.map(t => `<span class="bg-black/40 px-2 py-1 rounded text-[10px] backdrop-blur-md font-bold">${t}</span>`).join('');
+        const tagsHtml = spot.tags.map(t => `<span class="bg-black/40 px-2 py-1 rounded text-[10px] backdrop-blur-md font-bold text-white shadow-sm border border-white/20">${t}</span>`).join('');
         document.getElementById('spot-tags').innerHTML = tagsHtml;
         
         // 設定導航按鈕
