@@ -505,22 +505,6 @@
         "gas_station": { title: "ENEOS 加油站", tags: ["加油", "還車"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 旁邊的加油站，還車前必須加滿油並保留收據。記得加 Regular (紅槍)。", tips: "💡 這裡通常排隊很長，建議預留 20 分鐘加油時間。", map: "ENEOS Dr.Drive Self Toyosaki SS" }
     };
 
-    const bgImages = {
-        D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
-        D2: "https://images.unsplash.com/photo-1582967788606-a171f1080ca8?q=80&w=1000&fit=crop",
-        D3: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000&fit=crop",
-        D4: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000&fit=crop",
-        D5: "https://images.unsplash.com/photo-1534234828569-2f2249520468?q=80&w=1000&fit=crop",
-        D6: "https://images.unsplash.com/photo-1570533412033-662309e3df4e?q=80&w=1000&fit=crop",
-        D7: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000&fit=crop",
-        SHOP: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000&fit=crop",
-        TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
-        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop",
-        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop",
-        SYNC: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&fit=crop",
-        SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
-    };
-
     // 2. 行程資料庫 (新增 travel 欄位 與 spotId 連結)
     const itineraryDB = [
         { day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, events: [
@@ -1211,7 +1195,6 @@
     
     function startHudClock() { const u=()=>{const d=new Date(); document.getElementById('hud-clock').innerText=`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`; if(!document.getElementById('driver-hud').classList.contains('hidden'))requestAnimationFrame(()=>setTimeout(u,1000));}; u(); }
     function copyHudMapCode() { const t=document.getElementById('hud-mapcode'); if(t.innerText!=="NO MAPCODE"){navigator.clipboard.writeText(t.innerText); t.style.color="#4ade80"; setTimeout(()=>t.style.color="",300); showToast("Copied");} }
-    
 	// Start App
     init();
 </script>
