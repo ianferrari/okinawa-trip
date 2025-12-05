@@ -388,39 +388,48 @@
     </div>
 
     <div id="driver-hud" class="fixed inset-0 bg-black z-[200] hidden flex-col p-6 text-white font-mono transition-opacity duration-300">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-4">
             <div class="flex flex-col">
-                <span class="text-xs text-gray-400 uppercase tracking-widest">CURRENT TIME</span>
-                <span id="hud-clock" class="text-xl font-bold">12:30</span>
+                <span class="text-xs text-gray-500 uppercase tracking-widest">TIME</span>
+                <span id="hud-clock" class="text-2xl font-bold text-gray-300">12:30</span>
             </div>
             <div class="flex gap-3">
-                <button onclick="toggleRoadType()" id="btn-road-type" class="px-4 py-2 rounded-lg border border-gray-600 text-xs font-bold text-gray-400 active:bg-gray-800 transition-colors">一般道路 (50)</button>
-                <button onclick="closeDriverMode()" class="w-10 h-10 rounded-full bg-red-900/50 text-red-500 border border-red-800 flex items-center justify-center active:scale-95"><i class="fas fa-power-off"></i></button>
+                <button onclick="toggleRoadType()" id="btn-road-type" class="px-4 py-2 rounded-lg border border-blue-900 bg-blue-900/20 text-blue-400 text-sm font-bold active:bg-blue-800 transition-colors">一般道路 (50)</button>
+                <button onclick="closeDriverMode()" class="w-10 h-10 rounded-full bg-red-900/30 text-red-500 border border-red-900/50 flex items-center justify-center active:scale-95"><i class="fas fa-power-off"></i></button>
             </div>
         </div>
-        <div class="flex-1 flex flex-col justify-center items-center text-center relative">
-            <div class="w-full mb-8">
-                <div class="text-sm text-blue-400 font-bold mb-2 uppercase tracking-widest"><i class="fas fa-location-dot mr-1"></i> DESTINATION</div>
-                <h1 id="hud-title" class="text-4xl font-black text-white leading-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">載入中...</h1>
-                <p id="hud-note" class="text-gray-500 text-sm mt-2 font-medium truncate px-4">...</p>
-            </div>
-            <div class="mb-10 w-full bg-gray-900/50 rounded-2xl border border-gray-800 p-6 relative overflow-hidden group active:bg-gray-800 transition-colors cursor-pointer" onclick="copyHudMapCode()">
-                <div class="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] text-gray-500 tracking-[0.3em]">MAPCODE</div>
-                <div id="hud-mapcode" class="text-5xl sm:text-6xl font-black text-yellow-400 tracking-wider font-mono">--- ---</div>
-                <div class="text-[10px] text-gray-600 mt-2">點擊複製</div>
-            </div>
-            <a id="hud-nav-btn" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-2xl font-black py-6 rounded-2xl shadow-[0_0_30px_rgba(37,99,235,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-3"><i class="fas fa-location-arrow animate-pulse"></i><span>GO 導航</span></a>
-        </div>
-        <div class="mt-6 border-t border-gray-800 pt-6 flex justify-between items-end">
-            <div class="flex flex-col">
-                <span class="text-[10px] text-gray-500 uppercase mb-1">SPEED (GPS)</span>
-                <div class="flex items-baseline gap-1"><span id="hud-speed" class="text-5xl font-black text-white">0</span><span class="text-sm text-gray-400 font-bold">km/h</span></div>
-            </div>
-            <div class="flex gap-4">
-                 <button onclick="changeHudEvent(-1)" class="w-16 h-16 rounded-2xl border border-gray-700 bg-gray-900 text-gray-500 flex items-center justify-center active:bg-gray-800"><i class="fas fa-chevron-left text-xl"></i></button>
-                <button onclick="changeHudEvent(1)" class="w-16 h-16 rounded-2xl border border-gray-700 bg-gray-900 text-white flex items-center justify-center active:bg-gray-800 shadow-lg shadow-white/5"><i class="fas fa-chevron-right text-xl"></i></button>
+
+        <div class="flex flex-col items-center text-center relative mb-4">
+            <div class="w-full">
+                <h1 id="hud-title" class="text-3xl font-black text-white leading-tight drop-shadow-md truncate px-2">載入中...</h1>
+                
+                <div class="my-4 w-full bg-gray-900 rounded-xl border border-gray-800 p-3 relative group active:bg-gray-800 transition-colors cursor-pointer" onclick="copyHudMapCode()">
+                    <div class="text-[9px] text-gray-500 tracking-[0.2em] mb-1">MAPCODE</div>
+                    <div id="hud-mapcode" class="text-4xl font-black text-yellow-400 tracking-wider font-mono">--- ---</div>
+                </div>
+
+                <a id="hud-nav-btn" href="#" target="_blank" class="w-full bg-blue-600 hover:bg-blue-500 text-white text-xl font-black py-4 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-3"><i class="fas fa-location-arrow animate-pulse"></i><span>GO 導航</span></a>
             </div>
         </div>
+
+        <div class="flex-1 flex flex-col justify-center items-center relative">
+            <div class="text-xs text-gray-600 font-bold uppercase tracking-[0.5em] mb-2">SPEED (GPS)</div>
+            
+            <div class="flex items-baseline justify-center gap-2 relative">
+                <span id="hud-speed" class="text-[9rem] font-black text-white leading-none tracking-tighter transition-all duration-200 drop-shadow-2xl">0</span>
+                <span class="text-xl text-gray-500 font-bold absolute -right-12 bottom-8">km/h</span>
+            </div>
+
+            <div id="speed-warning" class="opacity-0 transition-opacity duration-300 text-red-500 font-black text-lg mt-2 tracking-widest bg-red-900/30 px-3 py-1 rounded animate-pulse">
+                ⚠️ SLOW DOWN
+            </div>
+        </div>
+
+        <div class="absolute bottom-8 right-6 flex gap-4">
+             <button onclick="changeHudEvent(-1)" class="w-16 h-16 rounded-2xl border border-gray-800 bg-gray-900/80 text-gray-500 flex items-center justify-center active:bg-gray-800 backdrop-blur"><i class="fas fa-chevron-left text-xl"></i></button>
+            <button onclick="changeHudEvent(1)" class="w-16 h-16 rounded-2xl border border-gray-700 bg-gray-800/80 text-white flex items-center justify-center active:bg-gray-700 shadow-lg shadow-white/5 backdrop-blur"><i class="fas fa-chevron-right text-xl"></i></button>
+        </div>
+    </div>
     </div>
 
     <div id="toast"><i class="fas fa-check-circle mr-2 text-green-400"></i><span id="toast-msg">已複製</span></div>
@@ -1107,19 +1116,103 @@
     window.restoreData = () => { const c=document.getElementById('importDataInput').value.trim(); if(!c)return; if(confirm("覆蓋資料？")){try{const d=JSON.parse(decodeURIComponent(atob(c))); if(d.user_rate)localStorage.setItem('user_rate',d.user_rate); if(d.trip_budget)localStorage.setItem('trip_budget',d.trip_budget); if(d.trip_expenses)localStorage.setItem('trip_expenses',d.trip_expenses); if(d.trip_gifts)localStorage.setItem('trip_gifts',d.trip_gifts); if(d.medical_data)localStorage.setItem('medical_data',d.medical_data); if(d.parking_data)localStorage.setItem('parking_data',d.parking_data); if(d.gasha_coins_used)localStorage.setItem('gasha_coins_used',d.gasha_coins_used); if(d.gasha_rewards)localStorage.setItem('gasha_rewards',d.gasha_rewards); if(d.items){for(let k in d.items)localStorage.setItem(k,d.items[k]);} alert("成功！"); location.reload();}catch(e){alert("代碼錯誤");}} }
     function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
     
-    // Driver HUD Logic
-    let hudWatchId = null, wakeLock = null, hudCurrentEventIdx = 0, hudAllEvents = [], roadType = 'city';
+    // ================= Driver HUD Logic (v14.2 升級版) =================
+    let hudWatchId = null, wakeLock = null, hudCurrentEventIdx = 0, hudAllEvents = [];
+    let roadType = 'city';
+    let currentSpeedLimit = 50; // 預設速限 50
+
     function flattenEvents() { let l=[]; itineraryDB.forEach(d=>{d.events.forEach(e=>{l.push({...((isRainyMode&&e.rainy)?{...e,...e.rainy}:e), dayTitle:d.day, fullTitle:e.title});});}); return l; }
-    async function openDriverMode() { document.getElementById('driver-hud').classList.remove('hidden'); document.getElementById('driver-hud').classList.add('flex'); hudAllEvents=flattenEvents(); hudCurrentEventIdx=0; updateHUDUI(); if(navigator.geolocation) hudWatchId=navigator.geolocation.watchPosition(updateHudSpeed,console.log,{enableHighAccuracy:true}); try{if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen');}catch(e){} startHudClock(); }
-    function closeDriverMode() { document.getElementById('driver-hud').classList.add('hidden'); document.getElementById('driver-hud').classList.remove('flex'); if(hudWatchId)navigator.geolocation.clearWatch(hudWatchId); if(wakeLock)wakeLock.release(); }
-    function updateHUDUI() { const e=hudAllEvents[hudCurrentEventIdx]; if(!e)return; document.getElementById('hud-title').innerText=e.title; document.getElementById('hud-note').innerText=e.note||''; const mc=document.getElementById('hud-mapcode'); if(e.mapcode){mc.innerText=e.mapcode; mc.classList.replace('text-gray-600','text-yellow-400'); mc.classList.replace('text-2xl','text-5xl');}else{mc.innerText="NO MAPCODE"; mc.classList.replace('text-yellow-400','text-gray-600'); mc.classList.replace('text-5xl','text-2xl');} const btn=document.getElementById('hud-nav-btn'); if(e.map){btn.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.map)}`; btn.classList.remove('opacity-50','pointer-events-none'); btn.innerHTML=`<i class="fas fa-location-arrow animate-pulse"></i> <span>GO 導航</span>`;}else{btn.href="#"; btn.classList.add('opacity-50','pointer-events-none'); btn.innerHTML=`<span>無導航點</span>`;} }
-    function changeHudEvent(d) { hudCurrentEventIdx+=d; if(hudCurrentEventIdx<0)hudCurrentEventIdx=0; if(hudCurrentEventIdx>=hudAllEvents.length)hudCurrentEventIdx=hudAllEvents.length-1; updateHUDUI(); }
-    function updateHudSpeed(p) { const s=p.coords.speed?Math.round(p.coords.speed*3.6):0; const el=document.getElementById('hud-speed'); el.innerText=s; const l=roadType==='city'?60:100; if(s>l){el.classList.remove('text-white');el.classList.add('text-red-500','animate-pulse');}else{el.classList.add('text-white');el.classList.remove('text-red-500','animate-pulse');} }
-    function toggleRoadType() { const b=document.getElementById('btn-road-type'); if(roadType==='city'){roadType='highway';b.innerText="高速 (80)";b.classList.replace('text-gray-400','text-blue-400');b.classList.replace('border-gray-600','border-blue-600');}else{roadType='city';b.innerText="一般 (50)";b.classList.replace('text-blue-400','text-gray-400');b.classList.replace('border-blue-600','border-gray-600');} }
+    
+    async function openDriverMode() { 
+        document.getElementById('driver-hud').classList.remove('hidden'); 
+        document.getElementById('driver-hud').classList.add('flex'); 
+        hudAllEvents=flattenEvents(); 
+        hudCurrentEventIdx=0; 
+        updateHUDUI(); 
+        if(navigator.geolocation) hudWatchId=navigator.geolocation.watchPosition(updateHudSpeed,console.log,{enableHighAccuracy:true}); 
+        try{if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen');}catch(e){} 
+        startHudClock(); 
+    }
+    
+    function closeDriverMode() { 
+        document.getElementById('driver-hud').classList.add('hidden'); 
+        document.getElementById('driver-hud').classList.remove('flex'); 
+        if(hudWatchId)navigator.geolocation.clearWatch(hudWatchId); 
+        if(wakeLock)wakeLock.release(); 
+    }
+    
+    function updateHUDUI() { 
+        const e=hudAllEvents[hudCurrentEventIdx]; if(!e)return; 
+        document.getElementById('hud-title').innerText=e.title; 
+        const mc=document.getElementById('hud-mapcode'); 
+        if(e.mapcode){
+            mc.innerText=e.mapcode; 
+            mc.classList.replace('text-gray-600','text-yellow-400');
+        }else{
+            mc.innerText="NO MAPCODE"; 
+            mc.classList.replace('text-yellow-400','text-gray-600'); 
+        } 
+        const btn=document.getElementById('hud-nav-btn'); 
+        if(e.map){
+            btn.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.map)}`; 
+            btn.classList.remove('opacity-50','pointer-events-none'); 
+            btn.innerHTML=`<i class="fas fa-location-arrow animate-pulse"></i> <span>GO 導航</span>`;
+        }else{
+            btn.href="#"; 
+            btn.classList.add('opacity-50','pointer-events-none'); 
+            btn.innerHTML=`<span>無導航點</span>`;
+        } 
+    }
+    
+    function changeHudEvent(d) { 
+        hudCurrentEventIdx+=d; 
+        if(hudCurrentEventIdx<0)hudCurrentEventIdx=0; 
+        if(hudCurrentEventIdx>=hudAllEvents.length)hudCurrentEventIdx=hudAllEvents.length-1; 
+        updateHUDUI(); 
+    }
+    
+    // 關鍵修改：速度顯示與超速變色
+    function updateHudSpeed(p) { 
+        const s = p.coords.speed ? Math.round(p.coords.speed * 3.6) : 0; 
+        const el = document.getElementById('hud-speed'); 
+        const warn = document.getElementById('speed-warning');
+        
+        el.innerText = s; 
+        
+        // 超速判斷邏輯
+        if(s > currentSpeedLimit) {
+            // 超速狀態：紅色、發光、顯示警告
+            el.className = "text-[9rem] font-black text-red-500 leading-none tracking-tighter transition-all duration-200 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]";
+            warn.classList.remove('opacity-0');
+        } else {
+            // 正常狀態：白色
+            el.className = "text-[9rem] font-black text-white leading-none tracking-tighter transition-all duration-200 drop-shadow-2xl";
+            warn.classList.add('opacity-0');
+        }
+    }
+    
+    // 關鍵修改：切換道路類型與速限
+    function toggleRoadType() { 
+        const b = document.getElementById('btn-road-type'); 
+        if(roadType === 'city') {
+            roadType = 'highway';
+            currentSpeedLimit = 80; // 高速公路速限設為 80 (沖繩自動車道)
+            b.innerText = "高速道路 (80)";
+            b.className = "px-4 py-2 rounded-lg border border-green-500 bg-green-900/30 text-green-400 text-sm font-bold active:bg-green-800 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.3)]";
+            showToast("🚗 切換為高速模式 (限速80)");
+        } else {
+            roadType = 'city';
+            currentSpeedLimit = 50; // 一般道路速限設為 50
+            b.innerText = "一般道路 (50)";
+            b.className = "px-4 py-2 rounded-lg border border-blue-900 bg-blue-900/20 text-blue-400 text-sm font-bold active:bg-blue-800 transition-colors";
+            showToast("🏙️ 切換為市區模式 (限速50)");
+        } 
+    }
+    
     function startHudClock() { const u=()=>{const d=new Date(); document.getElementById('hud-clock').innerText=`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`; if(!document.getElementById('driver-hud').classList.contains('hidden'))requestAnimationFrame(()=>setTimeout(u,1000));}; u(); }
     function copyHudMapCode() { const t=document.getElementById('hud-mapcode'); if(t.innerText!=="NO MAPCODE"){navigator.clipboard.writeText(t.innerText); t.style.color="#4ade80"; setTimeout(()=>t.style.color="",300); showToast("Copied");} }
-
-    // Start App
+    
+	// Start App
     init();
 </script>
 </body>
