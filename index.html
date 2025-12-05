@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v14.1 Ultimate</title>
+    <title>奎奎全家沖繩遊 🦕 v14.3 Ultimate</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -33,8 +33,7 @@
         .safe-card { background: linear-gradient(135deg, #fff1f2 0%, #fff 100%); border-left: 5px solid #e11d48; }
         .parking-card { background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 2px solid #22c55e; }
 
-        /* ================= NEW: 行程時間軸樣式 (v14.1) ================= */
-        /* 連接線 */
+        /* ================= 行程時間軸樣式 (New) ================= */
         .timeline-connector {
             position: absolute;
             left: 2.2rem; /* 對齊 icon 中心 */
@@ -47,33 +46,25 @@
             justify-content: center;
         }
 
-        /* 移動時間膠囊 */
         .travel-pill {
-		position: absolute;
-		left: 2.2rem;
-		top: 50%;
-		transform: translate(-50%, -50%);
-		background-color: #f1f5f9;
-		border: 1px solid #cbd5e1;
-		color: #64748b;
-		font-size: 10px;
-		font-weight: 700;
-		padding: 2px 8px;
-		border-radius: 99px;
-		white-space: nowrap;
-		z-index: 10;
-		box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            /* 讓膠囊置中於線條 */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
-		.timeline-connector {
-		position: absolute;
-		left: 2.2rem;
-		top: 3.5rem;
-		bottom: -1rem;
-		border-left: 2px dashed #cbd5e1;
-		z-index: 0;
-		}
 
-        /* 景點詳細 Modal (v14 New) */
+        /* 景點詳細 Modal (New) */
         .spot-hero { height: 200px; background-size: cover; background-position: center; border-radius: 1.5rem 1.5rem 0 0; position: relative; }
         .spot-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%); border-radius: 1.5rem 1.5rem 0 0; }
 
@@ -430,7 +421,6 @@
             <button onclick="changeHudEvent(1)" class="w-16 h-16 rounded-2xl border border-gray-700 bg-gray-800/80 text-white flex items-center justify-center active:bg-gray-700 shadow-lg shadow-white/5 backdrop-blur"><i class="fas fa-chevron-right text-xl"></i></button>
         </div>
     </div>
-    </div>
 
     <div id="toast"><i class="fas fa-check-circle mr-2 text-green-400"></i><span id="toast-msg">已複製</span></div>
 <script>
@@ -447,7 +437,7 @@
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
     let TOTAL_BUDGET = localStorage.getItem('trip_budget') ? parseInt(localStorage.getItem('trip_budget')) : 100000;
     
-    // 資料讀取
+    // 資料讀取 (LocalStorage)
     let expenses = JSON.parse(localStorage.getItem('trip_expenses')) || [];
     let taxBasket = [];
     let giftDB = JSON.parse(localStorage.getItem('trip_gifts')) || [];
@@ -455,7 +445,7 @@
     let parkingData = JSON.parse(localStorage.getItem('parking_data')) || null;
     let gashaCoinsUsed = localStorage.getItem('gasha_coins_used') ? parseInt(localStorage.getItem('gasha_coins_used')) : 0;
     
-    // 扭蛋獎勵
+    // 扭蛋獎勵預設值
     const defaultRewards = [
         { icon: "🍬", text: "吃一顆軟糖" }, { icon: "📺", text: "看 10 分鐘卡通" },
         { icon: "🧍‍♂️", text: "爸爸背背 5 分鐘" }, { icon: "🍹", text: "喝一瓶果汁" },
@@ -472,37 +462,59 @@
         "ots_rent": { title: "OTS 臨空豐崎", tags: ["租車", "購票"], image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000", desc: "台灣人最愛的租車公司，有中文人員。這裡有賣優惠門票（美麗海、玉泉洞等），比現場買便宜！", tips: "💡 這裡有模擬駕駛艙可以讓小孩玩，記得檢查 ETC 卡插好了沒。", map: "OTS 臨空豐崎營業所" },
         "hotel_nago": { title: "Best Western 名護", tags: ["住宿", "海景"], image: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1000", desc: "位於名護喜瀨海灘旁，房間很大，且每間都有無敵海景！樓下就有便利商店。", tips: "💡 早餐可以看到海，記得早點去搶窗邊位置。", map: "Best Western Okinawa Kouki Beach" },
         "dinner_d1": { title: "哥倫布牛排 / 美拉花", tags: ["晚餐", "名護"], image: "https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=1000", desc: "名護在地老字號牛排館「哥倫布」，或是對面的「美拉花」吃沖繩料理，都是在地人的愛店。", tips: "💡 哥倫布的濃湯非常復古好喝！", map: "Restaurant Columbin" },
+        
         // --- Day 2 ---
         "busena": { title: "部瀨名海中公園", tags: ["看魚", "玻璃船"], image: "https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?q=80&w=1000", desc: "不用弄濕身體就能看海底世界！復古的鯨魚造型玻璃底船，出海約 20 分鐘，魚群非常多。", tips: "💡 若風浪大船會停駛，記得先看官網。拿海中展望塔的票根可以買魚飼料餵魚。", map: "部瀨名海中公園" },
         "hama_sushi": { title: "HAMA 壽司 名護", tags: ["午餐", "壽司"], image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1000", desc: "日本知名連鎖平價迴轉壽司，種類多，有許多熟食和烏龍麵適合小孩。", tips: "💡 可以先用 App 預約，不然現場要抽號碼牌等很久。", map: "HAMA壽司 名護店" },
         "aeon_nago": { title: "AEON 名護店", tags: ["購物", "補給"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "名護最大的超市商場，有大創、玩具區、超市。這時候要買齊這幾天要喝的水、零食、玩沙工具。", tips: "💡 超市晚上的熟食打折很划算！大創在 2 樓。", map: "AEON 名護店" },
         "kyoda": { title: "許田休息站", tags: ["票券", "休息"], image: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?q=80&w=1000", desc: "全沖繩第一名的休息站！除了買水族館優惠票（只收現金），這裡的炸天婦羅、黑糖包也是必吃。", tips: "💡 必買「三矢」的炸開口笑 (Sata Andagi)，熱熱吃超讚。", map: "道の駅 許田" },
+        
         // --- Day 3 ---
         "churaumi": { title: "美麗海水族館", tags: ["必去", "鯨鯊"], image: "https://images.unsplash.com/photo-1582967788606-a171f1080ca8?q=80&w=1000", desc: "沖繩地標！金氏世界紀錄的「黑潮之海」水槽，看鯨鯊和鬼蝠魟優雅游動。戶外有免費的海豚秀。", tips: "💡 11:00/13:00/15:00 有鯨鯊餵食秀，務必提早 15 分鐘去卡位！", map: "沖繩美麗海水族館" },
         "kouri_drive": { title: "古宇利大橋", tags: ["風景", "兜風"], image: "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?q=80&w=1000", desc: "開車經過全長 2km 的跨海大橋，兩邊是絕美的「古宇利藍」，彷彿行駛在海上。", tips: "💡 過橋時可以把車窗搖下來，海風很舒服。", map: "古宇利大橋" },
         "kouri_tower": { title: "古宇利海洋塔", tags: ["風景", "鳳梨車"], image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000", desc: "可以搭乘無人自動駕駛的鳳梨車上山，沿途風景優美，塔頂敲鐘可以祈求幸福。", tips: "💡 塔內的甜點店有賣「古宇利島限定」的南瓜泡芙。", map: "古宇利海洋塔" },
         "kouri_shrimp": { title: "Kouri Shrimp", tags: ["點心", "蝦蝦飯"], image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000", desc: "原本是餐車起家，現在有店面了。蒜香奶油蝦配上兩球飯，超級罪惡又好吃！", tips: "💡 用點餐機點餐，人多時可以外帶去車上或海邊吃。", map: "Kouri Shrimp" },
         "yakiniku": { title: "燒肉乃我那霸", tags: ["晚餐", "燒肉"], image: "https://images.unsplash.com/photo-1594041680508-e3873d24c271?q=80&w=1000", desc: "名護最有名的燒肉店，自家肉舖直營，阿古豬和和牛都很新鮮，價格也合理。", tips: "💡 新館座位比較寬敞乾淨，適合帶小孩。", map: "燒肉乃我那霸 新館" },
+
         // --- Day 4 ---
         "dino": { title: "DINO 恐龍 PARK", tags: ["恐龍", "探險"], image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000", desc: "就在「御菓子御殿」名護店的後山，原始森林裡藏了 80 幾隻會動會叫的恐龍，非常逼真！", tips: "💡 森林路面有些起伏，推車勉強可行但建議用揹巾。出口就是土產店。", map: "DINO恐龍PARK 山原亞熱帶之森" },
         "okashi": { title: "御菓子御殿", tags: ["午餐", "伴手禮"], image: "https://images.unsplash.com/photo-1574621100236-d25a64a063f3?q=80&w=1000", desc: "紅芋塔的發源地！這裡可以參觀工廠生產線，二樓有餐廳可以吃飯，風景不錯。", tips: "💡 這裡賣的紅芋塔是最新鮮的，可以買單個現場吃。", map: "御菓子御殿 名護店" },
         "shima_donuts": { title: "島豆腐甜甜圈", tags: ["甜點", "健康"], image: "https://images.unsplash.com/photo-1626017240366-075f8f5370d0?q=80&w=1000", desc: "用沖繩島豆腐渣做的甜甜圈，口感Q彈又健康，給小孩吃也很安心。店面非常可愛。", tips: "💡 常常下午就賣完了，建議早點去或先打電話預留。", map: "Shima Donuts" },
         "park_21": { title: "21世紀之森公園", tags: ["公園", "放電"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "名護市民的大公園，有沙灘、棒球場，重點是有大型遊樂設施和長長的溜滑梯！還有展示蒸汽火車頭。", tips: "💡 這裡沒有遮蔭，記得防曬和補水。", map: "21世紀之森公園" },
         "blue_seal": { title: "Blue Seal 冰淇淋", tags: ["冰品", "必吃"], image: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?q=80&w=1000", desc: "源自美國的沖繩在地冰淇淋！必點「鹽味金楚糕」和「紅芋」口味。", tips: "💡 每個月的 10 號和 20 號有優惠活動（Big Dip Day）。", map: "Blue Seal Nago" },
+
         // --- Day 5 ---
         "neopark": { title: "Neo Park 動植物園", tags: ["動物", "火車"], image: "https://images.unsplash.com/photo-1534234828569-2f2249520468?q=80&w=1000", desc: "主打「人與動物零距離」，可以搭乘復古輕便鐵道小火車環園一周。鳥類非常多且熱情。", tips: "💡 進門記得買鳥飼料，但要注意鳥群可能會很激動。", map: "名護自然動植物公園" },
         "cookhal": { title: "Cookhal", tags: ["午餐", "農場"], image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000", desc: "農場直營的咖啡廳，食材超級新鮮，充滿野菜的料理。環境很舒服放鬆。", tips: "💡 這裡也有賣新鮮的沖繩蔬果和加工品。", map: "Cookhal" },
         "ufuya": { title: "百年古家 大家", tags: ["晚餐", "阿古豬"], image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1000", desc: "由百年古宅改建的餐廳，氣氛滿分！必吃阿古豬涮涮鍋，晚上還有燈光造景。", tips: "💡 這裡非常熱門，沒有預約幾乎吃不到，一定要先訂位。", map: "百年古家 大家" },
+
         // --- Day 6 ---
         "parco": { title: "PARCO CITY", tags: ["購物", "雨天"], image: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000", desc: "浦添西海岸最新最大的商場！Uniqlo, MUJI, 阿卡將本舖應有盡有。美食街可以直接看海。", tips: "💡 3F 的 Green Zone 兒童區可以放電。停車場非常大，記得拍照記位置。", map: "SAN-A 浦添西海岸 PARCO CITY" },
         "dmm": { title: "DMM 水族館", tags: ["水族館", "科技"], image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=1000", desc: "結合最新影像技術的水族館，雖然比美麗海小，但互動性很高。可以摸魚、看樹懶。", tips: "💡 位於 iias 商場內，逛完可以直接吃飯逛街。", map: "DMM Kariyushi Aquarium" },
         "daiwa": { title: "Daiwa Roynet", tags: ["住宿", "市區"], image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000", desc: "就在國際通旁邊，交通超級方便，離單軌牧志站很近。房間乾淨舒適。", tips: "💡 飯店停車場是塔式的，如果車太大可能要停特約停車場。", map: "Daiwa Roynet Hotel Naha Kokusai-dori" },
         "mcdonalds": { title: "麥當勞 國際通", tags: ["晚餐", "救贖"], image: "https://images.unsplash.com/photo-1552895638-f7fe08d2f7d5?q=80&w=1000", desc: "當小孩不想吃日本料理時的救星。日本麥當勞的快樂兒童餐玩具通常很厲害！", tips: "💡 可以用機器點餐，有中文介面。", map: "McDonald's Kokusai Dori Makishi" },
         "fontana": { title: "Fontana Gelato", tags: ["甜點", "打卡"], image: "https://images.unsplash.com/photo-1560008511-11c63416e52d?q=80&w=1000", desc: "國際通巷子裡的義式冰淇淋，色彩繽紛的彩虹冰淇淋是拍照打卡必備！", tips: "💡 店面很小容易錯過，認明門口的大冰淇淋模型。", map: "Fontana Gelato" },
+
         // --- Day 7 ---
         "naminoue": { title: "波上宮", tags: ["神社", "景點"], image: "https://images.unsplash.com/photo-1599464402636-6c2438883e1c?q=80&w=1000", desc: "那霸市內唯一的沙灘神社，建在懸崖上，非常有氣勢。可以買書包造型的御守。", tips: "💡 旁邊就是波之上海灘，拜完可以去踩踩水。", map: "波上宮" },
         "ashibinaa": { title: "ASHIBINAA Outlet", tags: ["購物", "Outlet"], image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000", desc: "位於機場附近，適合回程前最後衝刺。Adidas, Nike, GAP 常常有驚人的折扣。", tips: "💡 週末人很多，建議預留足夠時間去機場。", map: "ASHIBINAA Outlet" },
         "gas_station": { title: "ENEOS 加油站", tags: ["加油", "還車"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 旁邊的加油站，還車前必須加滿油並保留收據。記得加 Regular (紅槍)。", tips: "💡 這裡通常排隊很長，建議預留 20 分鐘加油時間。", map: "ENEOS Dr.Drive Self Toyosaki SS" }
+    };
+
+    const bgImages = {
+        D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
+        D2: "https://images.unsplash.com/photo-1582967788606-a171f1080ca8?q=80&w=1000&fit=crop",
+        D3: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000&fit=crop",
+        D4: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000&fit=crop",
+        D5: "https://images.unsplash.com/photo-1534234828569-2f2249520468?q=80&w=1000&fit=crop",
+        D6: "https://images.unsplash.com/photo-1570533412033-662309e3df4e?q=80&w=1000&fit=crop",
+        D7: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000&fit=crop",
+        SHOP: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000&fit=crop",
+        TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
+        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop",
+        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop",
+        SYNC: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&fit=crop",
+        SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
     };
 
     // 2. 行程資料庫 (新增 travel 欄位 與 spotId 連結)
@@ -564,13 +576,15 @@
         ]}
     ];
 
-    // 其他資料庫
+    // 食物轉盤選項
     const foodOptions = [
         { icon: "🍜", name: "沖繩麵 / 拉麵" }, { icon: "🥩", name: "燒肉 / 牛排" },
         { icon: "🍣", name: "壽司 / 生魚片" }, { icon: "🍔", name: "A&W 漢堡" },
         { icon: "🍚", name: "丼飯 / 定食" }, { icon: "🏪", name: "便利商店大餐" }, 
         { icon: "🌮", name: "塔可飯" }
     ];
+
+    // 記帳分類 (重要：必須在渲染前定義)
     const expenseCats = {
         shopping: { name: "購物", icon: "fa-bag-shopping", color: "#f43f5e" },
         food: { name: "餐飲", icon: "fa-utensils", color: "#f97316" },
@@ -579,17 +593,21 @@
         hotel: { name: "住宿", icon: "fa-bed", color: "#10b981" },
         other: { name: "其他", icon: "fa-box", color: "#64748b" }
     };
+    
+    // 清單資料庫
     const defaultChecklistDB = [
         { id: "pack", title: "🎒 行前打包 (完整)", items: [{ text: "護照 (全家3本)", sub: "效期需 > 2026/10" }, { text: "駕照正本 + 日文譯本", sub: "OTS 取車必備" }, { text: "Visit Japan Web 截圖", sub: "存手機相簿" }, { text: "住宿憑證/電話", sub: "第一晚 Check-in 用" }, { text: "奎奎安撫包", sub: "貼紙書、軟糖、薄外套" }, { text: "車內百寶袋", sub: "遮陽簾、車充、垃圾袋" }, { text: "3C 電子", sub: "行動電源(隨身)、充電頭、線、相機" }, { text: "生活備藥", sub: "退燒藥、益生菌、體溫計、鼻噴劑" }, { text: "防曬/玩水", sub: "泳衣、防曬乳、帽子、墨鏡" }, { text: "食物剪刀 (托運)", sub: "絕對不可放隨身" }, { text: "衣物壓縮袋", sub: "回程裝髒衣服省空間" }, { text: "指甲剪", sub: "長途旅行必備" }, { text: "隨身筆", sub: "機上填入境卡用" }, { text: "夾鏈袋 (大/中)", sub: "裝濕泳衣、分裝零食" }] },
         { id: "shop", title: "🛍️ 購物必買 (完整)", items: [{ text: "合利他命 EX Plus", sub: "家庭常備藥" }, { text: "若元錠 (Wakamoto)", sub: "顧腸胃" }, { text: "EVE 止痛藥", sub: "藍色/白色" }, { text: "Kowa 蚊蟲止癢液", sub: "刷頭版 (給奎奎用)" }, { text: "大創 - 各種泡澡球", sub: "AEON 名護店必買" }, { text: "大創 - 挖沙工具組", sub: "海邊玩沙用" }, { text: "LuLuLun 面膜", sub: "沖繩限定 (苦瓜/香檸)" }, { text: "安耐曬防曬", sub: "金瓶 (沖繩太陽毒)" }, { text: "Tomica 沖繩限定車", sub: "PARCO / 機場" }, { text: "辣味蝦餅 (南風堂)", sub: "下酒零食" }, { text: "邊銀食堂辣油", sub: "石垣島名產" }, { text: "Calbee 麥片", sub: "紅色包裝最經典" }, { text: "Orihiro 蒟蒻果凍", sub: "袋裝好攜帶 (要托運)" }, { text: "ROIHI 穴位貼布", sub: "老人頭像 (涼感/溫感)" }, { text: "Fino 髮膜/髮油", sub: "日本買很便宜" }] },
         { id: "return", title: "🚨 回程防呆 (SOP)", items: [{ text: "ETC 卡拔了嗎？", sub: "還車前確認 (最常忘記)" }, { text: "車充頭拔了嗎？", sub: "還車前確認" }, { text: "門邊垃圾/玩具清空？", sub: "還車前確認" }, { text: "油加滿了嗎？", sub: "保留收據給店員" }, { text: "布丁/果凍 托運了嗎？", sub: "液體 > 100ml 不可手提" }, { text: "洗面乳/牙膏 托運了嗎？", sub: "這也是液體！" }, { text: "護照拿出來了嗎？", sub: "不要鎖在飯店保險箱" }, { text: "Wifi機/SIM卡針", sub: "確認收好" }, { text: "行李秤重", sub: "確認沒超重 (單件23kg?)" }, { text: "身上零錢花光", sub: "機場扭蛋機/便利商店" }] }
     ];
     let checklistDB = JSON.parse(localStorage.getItem('trip_checklist_db')) || defaultChecklistDB;
+
     const missionsDB = [
         { id: "m1", title: "我是船長", desc: "在玻璃船找到尼莫", icon: "fa-fish" }, { id: "m2", title: "海洋霸主", desc: "跟大鯨鯊拍合照", icon: "fa-camera" },
         { id: "m3", title: "小小勇者", desc: "森林探險拯救受傷的恐龍", icon: "fa-dragon" }, { id: "m4", title: "鳥鳥點名", desc: "搭小火車數出3種鳥", icon: "fa-crow" },
         { id: "m5", title: "海底尋寶", desc: "在透明地板找到魚", icon: "fa-water" }, { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying" }
     ];
+
     const toolsDB = {
         drive: [
             { title: "右駕口訣", content: "左轉小彎、右轉大彎<br>雨刷在左、方向燈在右", color: "bg-blue-50 text-blue-800" },
@@ -609,9 +627,22 @@
             { name: "名護北部醫院", tel: "0980-52-2719", style: "bg-white border text-gray-800" }, { name: "那霸南部醫療", tel: "098-888-0123", style: "bg-white border text-gray-800" }
         ]
     };
-    const allergyDict = { "egg": { label: "雞蛋 (卵)", jp: "卵 (Tamago)" }, "milk": { label: "牛奶 (乳)", jp: "牛乳 (Gyu-nyu)" }, "peanut": { label: "花生 (落花生)", jp: "落花生 (Rakkasei)" }, "shrimp": { label: "蝦 (海老)", jp: "エビ (Ebi)" }, "crab": { label: "蟹 (蟹)", jp: "カニ (Kani)" }, "wheat": { label: "小麥 (小麦)", jp: "小麦 (Komugi)" } };
-    const sosMessages = { sick: { jp: "子供が病気です", en: "My child is sick.", note: "小孩生病了" }, lost: { jp: "道に迷いました", en: "I am lost.", note: "我迷路了" }, police: { jp: "警察を呼んでください", en: "Call the police!", note: "請叫警察" }, ambulance: { jp: "救急車を呼んでください", en: "Call an ambulance!", note: "請叫救護車" } };
+
+    const allergyDict = {
+        "egg": { label: "雞蛋 (卵)", jp: "卵 (Tamago)" }, "milk": { label: "牛奶 (乳)", jp: "牛乳 (Gyu-nyu)" },
+        "peanut": { label: "花生 (落花生)", jp: "落花生 (Rakkasei)" }, "shrimp": { label: "蝦 (海老)", jp: "エビ (Ebi)" },
+        "crab": { label: "蟹 (蟹)", jp: "カニ (Kani)" }, "wheat": { label: "小麥 (小麦)", jp: "小麦 (Komugi)" }
+    };
+    
+    // SOS 訊息字典 (v14.3)
+    const sosMessages = {
+        sick: { jp: "子供が病気です", en: "My child is sick.", note: "小孩生病了" },
+        lost: { jp: "道に迷いました", en: "I am lost.", note: "我迷路了" },
+        police: { jp: "警察を呼んでください", en: "Call the police!", note: "請叫警察" },
+        ambulance: { jp: "救急車を呼んでください", en: "Call an ambulance!", note: "請叫救護車" }
+    };
 	// ================= 2. 邏輯與功能 (LOGIC) =================
+
     function init() {
         if(isRainyMode) updateRainyModeUI();
         switchTab('itinerary');
@@ -621,6 +652,7 @@
         checkDailyPopup(); 
     }
 
+    // 天氣模組
     function initWeather() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -669,7 +701,8 @@
         }
     }
 
-    window.switchTab = (tab) => {
+    // 頁面切換
+    window.switchTab = (tab, shouldRender = true) => {
         activeTab = tab;
         document.querySelectorAll('.nav-btn').forEach(btn => {
             const icon = btn.querySelector('i');
@@ -690,7 +723,7 @@
             }
         });
         renderHeaderSubNav();
-        renderContent();
+        if (shouldRender) renderContent();
         setTimeout(updateSubNavStyle, 50);
     }
     
@@ -721,6 +754,7 @@
         }
     }
 
+    // 渲染上方子選單
     function renderHeaderSubNav() {
         const container = document.getElementById('sub-nav-container');
         if (activeTab === 'itinerary') {
@@ -749,10 +783,11 @@
         document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
     }
 
-    // 渲染主內容
+    // 渲染主內容 (Render Main Content) - v14.3
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
+        // 1. 行程 (Itinerary)
         if (activeTab === 'itinerary') {
             const d = itineraryDB[currentDayIdx];
             const diaryKey = `diary_${d.day}`;
@@ -779,15 +814,15 @@
                         const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
                         const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${current.note || ''}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
                         
-                        // 時間軸與移動時間
+                        // 時間軸與移動時間膠囊
                         const isLast = idx === d.events.length - 1;
                         const travelHtml = (current.travel && !isLast) ? `<div class="travel-pill">${current.travel}</div>` : '';
                         const connector = !isLast ? `<div class="timeline-connector">${travelHtml}</div>` : '';
                         
-                        // 停留時間
+                        // 停留時間 (粉紅色加強版)
                         const durationTag = current.duration ? `<span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-md ml-2 font-bold shadow-sm"><i class="fas fa-clock mr-1"></i>停留 ${current.duration}</span>` : '';
                         
-                        // 標題連結
+                        // 標題連結 (點擊開彈窗)
                         const titleHtml = current.spotId 
                             ? `<div onclick="openSpotModal('${current.spotId}')" class="font-bold text-blue-600 text-lg cursor-pointer hover:underline decoration-blue-300 underline-offset-4 decoration-2 flex items-center gap-1">${current.title} <i class="fas fa-circle-info text-xs opacity-50"></i></div>`
                             : `<h3 class="font-bold text-gray-800 text-lg">${current.title}</h3>`;
@@ -823,13 +858,14 @@
                         </div>`;
                     }).join('')}
                 </div>
+                
                 <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative mb-6">
                     <label class="text-[10px] font-bold text-yellow-600 uppercase mb-1 block"><i class="fas fa-pen-nib mr-1"></i> 今日隨筆 (One-Line Diary)</label>
                     <textarea class="w-full bg-transparent border-none text-sm text-gray-700 focus:ring-0 p-0 resize-none h-16 leading-relaxed focus:outline-none" placeholder="今天發生了什麼好笑的事？(自動儲存)" oninput="localStorage.setItem('${diaryKey}', this.value)">${savedDiary}</textarea>
                 </div>
                 <div class="h-12"></div>
             </div>`;
-} else if (activeTab === 'checklist') {
+			} else if (activeTab === 'checklist') {
             const list = checklistDB.find(c => c.id === currentChecklistFilter);
             main.innerHTML = `
             <div class="animate-slide-up glass-card rounded-3xl p-6 min-h-[60vh]">
@@ -1022,7 +1058,9 @@
             }
         }
     }
-	// ================= 3. 輔助與其他功能 =================
+	// ================= 3. 輔助與其他功能 (Helpers) =================
+    
+    // 小畫家
     let isDrawing = false; let ctx = null; let currentColor = 'black';
     window.openDrawing = () => { const modal = document.getElementById('drawing-modal'); modal.classList.add('open'); const canvas = document.getElementById('drawing-canvas'); const container = document.getElementById('canvas-container'); canvas.width = container.clientWidth; canvas.height = container.clientHeight; ctx = canvas.getContext('2d'); ctx.lineCap = 'round'; ctx.lineWidth = 5; ctx.strokeStyle = currentColor; canvas.addEventListener('touchstart', startDraw, {passive: false}); canvas.addEventListener('touchmove', draw, {passive: false}); canvas.addEventListener('touchend', endDraw); canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', endDraw); }
     window.closeDrawing = () => document.getElementById('drawing-modal').classList.remove('open');
@@ -1033,6 +1071,7 @@
     window.clearCanvas = () => { const canvas = document.getElementById('drawing-canvas'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
     window.saveDrawing = () => { const canvas = document.getElementById('drawing-canvas'); const link = document.createElement('a'); link.download = `kuku-drawing-${Date.now()}.png`; link.href = canvas.toDataURL(); link.click(); showToast("畫作已下載！"); }
 
+    // 伴手禮
     window.openGiftModal = () => { renderGiftList(); document.getElementById('gift-modal').classList.add('open'); }
     window.closeGiftModal = () => document.getElementById('gift-modal').classList.remove('open');
     window.addGift = () => { const who = document.getElementById('gift-who').value; const what = document.getElementById('gift-what').value; const budget = document.getElementById('gift-budget').value; if(who && what) { giftDB.push({ who, what, budget: budget || 0, bought: false }); saveGifts(); renderGiftList(); document.getElementById('gift-who').value = ''; document.getElementById('gift-what').value = ''; document.getElementById('gift-budget').value = ''; } else { showToast("請輸入對象和物品"); } }
@@ -1041,7 +1080,7 @@
     window.deleteGift = (idx) => { if(confirm("刪除此項目？")) { giftDB.splice(idx, 1); saveGifts(); renderGiftList(); } }
     function saveGifts() { localStorage.setItem('trip_gifts', JSON.stringify(giftDB)); }
 
-    // v14 New Features
+    // 景點彈窗與分享
     window.openSpotModal = (id) => { const spot = spotInfoDB[id]; if(!spot) return; document.getElementById('spot-title').innerText = spot.title; document.getElementById('spot-hero').style.backgroundImage = `url('${spot.image}')`; document.getElementById('spot-desc').innerText = spot.desc; document.getElementById('spot-tips').innerText = spot.tips; const tagsHtml = spot.tags.map(t => `<span class="bg-black/40 px-2 py-1 rounded text-[10px] backdrop-blur-md font-bold text-white shadow-sm border border-white/20">${t}</span>`).join(''); document.getElementById('spot-tags').innerHTML = tagsHtml; const btn = document.getElementById('spot-nav-btn'); btn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.map)}`; document.getElementById('spot-modal').classList.add('open'); }
     window.closeSpotModal = () => document.getElementById('spot-modal').classList.remove('open');
     window.openSosCard = () => document.getElementById('sos-card-modal').classList.add('open');
@@ -1049,6 +1088,7 @@
     window.setSosMsg = (type) => { const msg = sosMessages[type]; if(msg) { document.getElementById('sos-jp-text').innerText = msg.jp; document.getElementById('sos-sub-text').innerText = msg.en; if(navigator.vibrate) navigator.vibrate(100); } }
     window.shareEvent = async (title, mapcode, note) => { const shareData = { title: `奎奎行程：${title}`, text: `我們要去：${title}\nMapCode: ${mapcode || '無'}\n備註: ${note}`, }; if (navigator.share) { try { await navigator.share(shareData); } catch (err) { console.log('分享取消'); } } else { navigator.clipboard.writeText(shareData.text).then(() => showToast("已複製行程資訊！")); } }
 
+    // 聲音與互動
     window.playSound = (type) => { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); const now = ctx.currentTime; if (type === 'magic') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(1000, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'wrong') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(100, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'correct') { osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.setValueAtTime(800, now + 0.1); gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'fart') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); osc.frequency.linearRampToValueAtTime(60, now + 0.4); gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'laugh') { osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(600, now + 0.1); osc.frequency.linearRampToValueAtTime(400, now + 0.2); gain.gain.setValueAtTime(0.3, now); osc.start(now); osc.stop(now + 0.3); } else { playCoinSound(); } }
     window.spinFood = () => { const iconEl = document.getElementById('food-result'); const textEl = document.getElementById('food-text'); let count = 0; const interval = setInterval(() => { const random = foodOptions[Math.floor(Math.random() * foodOptions.length)]; iconEl.innerText = random.icon; textEl.innerText = random.name; count++; if(count > 20) { clearInterval(interval); playCoinSound(); iconEl.classList.add('animate-pop'); setTimeout(() => iconEl.classList.remove('animate-pop'), 500); } }, 80); }
     function checkDailyPopup() { const today = new Date().toISOString().split('T')[0]; const lastCheck = localStorage.getItem('last_departure_check'); const currentHour = new Date().getHours(); if (today !== lastCheck && currentHour >= 6 && currentHour <= 11) { document.getElementById('daily-check-modal').classList.add('open'); } }
@@ -1056,14 +1096,16 @@
     window.finishDailyCheck = () => { localStorage.setItem('last_departure_check', new Date().toISOString().split('T')[0]); document.getElementById('daily-check-modal').classList.remove('open'); showToast("出發！祝今天旅途愉快！🚗"); playSound('correct'); }
     window.toggleRainMode = () => { isRainyMode = !isRainyMode; localStorage.setItem('rainy_mode', isRainyMode); if(navigator.vibrate) navigator.vibrate(50); updateRainyModeUI(); renderContent(); }
     function updateRainyModeUI() { const btn = document.getElementById('rain-btn'); const icon = document.getElementById('rain-icon'); const text = document.getElementById('rain-text'); const body = document.body; if (isRainyMode) { body.classList.add('rainy-mode'); btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-blue-400/50 bg-blue-900/50"; icon.className = "fas fa-cloud-showers-heavy text-xl mb-1 block text-blue-300"; text.innerText = "雨天備案"; text.className = "text-[9px] font-bold text-blue-200"; showToast("☔ 已切換為雨天備案模式"); } else { body.classList.remove('rainy-mode'); btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-white/20"; icon.className = "fas fa-sun text-xl mb-1 block text-yellow-400"; text.innerText = "晴天"; text.className = "text-[9px] font-bold opacity-90"; showToast("☀️ 已切換為晴天模式"); } }
+    
+    // 計算機與記帳 (關鍵修復部分)
     window.addTaxItem = () => { const input = document.getElementById('taxItemInput'); const val = parseInt(input.value); if(val && val > 0) { taxBasket.push(val); input.value = ""; renderContent(); const i = document.getElementById('taxItemInput'); if(i) i.focus(); } }
     window.resetTaxBasket = () => { if(confirm("確定要清空免稅購物籃嗎？")) { taxBasket = []; renderContent(); } }
     window.fetchExchangeRate = async () => { const btn = document.getElementById('fetchRateBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); const twd = data.rates.TWD; if(twd) { updateRate(twd.toFixed(4)); document.getElementById('rateInput').value = twd.toFixed(4); showToast(`匯率已更新：${twd}`); } } catch(e) { showToast("更新失敗，請檢查網路"); } finally { btn.innerHTML = originalText; } }
     window.toggleCheck = (key) => { const v=localStorage.getItem(key); v==='1'?localStorage.removeItem(key):localStorage.setItem(key,'1'); renderContent(); }
-    function saveChecklistDB() { localStorage.setItem('trip_checklist_db', JSON.stringify(checklistDB)); }
     window.addChecklistItem = () => { const text = prompt("新增項目名稱："); if (!text) return; const sub = prompt("備註 (可不填)：") || ""; const list = checklistDB.find(c => c.id === currentChecklistFilter); list.items.push({ text: text, sub: sub }); saveChecklistDB(); renderContent(); showToast("已新增項目"); }
     window.deleteChecklistItem = (index) => { if (!confirm("刪除此項目？")) return; const list = checklistDB.find(c => c.id === currentChecklistFilter); const itemText = list.items[index].text; localStorage.removeItem(`chk_${currentChecklistFilter}_${itemText}`); list.items.splice(index, 1); saveChecklistDB(); renderContent(); showToast("已刪除項目"); }
     window.resetChecklist = (id) => { if(confirm('重置清單？')) { checklistDB.find(c=>c.id===id).items.forEach(item => localStorage.removeItem(`chk_${id}_${item.text}`)); renderContent(); showToast("已重置"); } }
+    function saveChecklistDB() { localStorage.setItem('trip_checklist_db', JSON.stringify(checklistDB)); }
     function playCoinSound() { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(987,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(1318,ctx.currentTime+0.1); g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.5); o.start(); o.stop(ctx.currentTime+0.5); }
     function playGashaSound() { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='square'; o.frequency.setValueAtTime(100,ctx.currentTime); o.frequency.linearRampToValueAtTime(800,ctx.currentTime+0.2); g.gain.setValueAtTime(0.1,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.3); o.start(); o.stop(ctx.currentTime+0.3); }
     window.toggleMission = (id) => { const d=localStorage.getItem(id)==='1'; if(d){if(confirm('取消成就？')) localStorage.removeItem(id); renderContent();}else{if(navigator.vibrate)navigator.vibrate(200); playCoinSound(); localStorage.setItem(id,'1'); showToast("🎉 獲得代幣！"); renderContent();} }
@@ -1074,6 +1116,8 @@
     window.updateRate = (v) => { if(v>0){CURRENT_RATE=parseFloat(v); localStorage.setItem('user_rate',v); convertCurrency(); renderContent();} }
     window.convertCurrency = () => { const j=parseFloat(document.getElementById('jpyInput').value); const t=document.getElementById('twdOutput'); if(isNaN(j)||j<=0){t.innerText="0";return;} t.innerText=(j*CURRENT_RATE).toFixed(j%1!==0?2:0).toLocaleString('en-US'); }
     window.setBudget = () => { const n=prompt("輸入總預算:", TOTAL_BUDGET); if(n&&!isNaN(n)){TOTAL_BUDGET=parseInt(n); localStorage.setItem('trip_budget', TOTAL_BUDGET); renderContent();} }
+    
+    // (修復) 記帳功能
     window.addExpense = () => { const n=document.getElementById('exName').value; const p=document.getElementById('exPrice').value; const c=document.querySelector('input[name="cat"]:checked')?.value||'other'; if(!n||!p){showToast("請輸入完整");return;} expenses.unshift({name:n,price:parseInt(p),cat:c}); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); showToast("已記帳"); renderContent(); }
     window.openQuickExpense = () => { document.getElementById('expense-modal').classList.add('open'); setTimeout(()=>document.getElementById('quickExPrice').focus(),100); }
     window.closeQuickExpense = () => { document.getElementById('expense-modal').classList.remove('open'); document.getElementById('quickExName').value=""; document.getElementById('quickExPrice').value=""; }
@@ -1100,10 +1144,10 @@
     window.restoreData = () => { const c=document.getElementById('importDataInput').value.trim(); if(!c)return; if(confirm("覆蓋資料？")){try{const d=JSON.parse(decodeURIComponent(atob(c))); if(d.user_rate)localStorage.setItem('user_rate',d.user_rate); if(d.trip_budget)localStorage.setItem('trip_budget',d.trip_budget); if(d.trip_expenses)localStorage.setItem('trip_expenses',d.trip_expenses); if(d.trip_gifts)localStorage.setItem('trip_gifts',d.trip_gifts); if(d.medical_data)localStorage.setItem('medical_data',d.medical_data); if(d.parking_data)localStorage.setItem('parking_data',d.parking_data); if(d.gasha_coins_used)localStorage.setItem('gasha_coins_used',d.gasha_coins_used); if(d.gasha_rewards)localStorage.setItem('gasha_rewards',d.gasha_rewards); if(d.items){for(let k in d.items)localStorage.setItem(k,d.items[k]);} alert("成功！"); location.reload();}catch(e){alert("代碼錯誤");}} }
     function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
     
-    // ================= Driver HUD Logic (v14.2 升級版) =================
+    // ================= Driver HUD Logic (v14.3 Ultimate) =================
     let hudWatchId = null, wakeLock = null, hudCurrentEventIdx = 0, hudAllEvents = [];
     let roadType = 'city';
-    let currentSpeedLimit = 50; // 預設速限 50
+    let currentSpeedLimit = 50; 
 
     function flattenEvents() { let l=[]; itineraryDB.forEach(d=>{d.events.forEach(e=>{l.push({...((isRainyMode&&e.rainy)?{...e,...e.rainy}:e), dayTitle:d.day, fullTitle:e.title});});}); return l; }
     
@@ -1155,7 +1199,6 @@
         updateHUDUI(); 
     }
     
-    // 關鍵修改：速度顯示與超速變色
     function updateHudSpeed(p) { 
         const s = p.coords.speed ? Math.round(p.coords.speed * 3.6) : 0; 
         const el = document.getElementById('hud-speed'); 
@@ -1163,30 +1206,26 @@
         
         el.innerText = s; 
         
-        // 超速判斷邏輯
         if(s > currentSpeedLimit) {
-            // 超速狀態：紅色、發光、顯示警告
             el.className = "text-[9rem] font-black text-red-500 leading-none tracking-tighter transition-all duration-200 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]";
             warn.classList.remove('opacity-0');
         } else {
-            // 正常狀態：白色
             el.className = "text-[9rem] font-black text-white leading-none tracking-tighter transition-all duration-200 drop-shadow-2xl";
             warn.classList.add('opacity-0');
         }
     }
     
-    // 關鍵修改：切換道路類型與速限
     function toggleRoadType() { 
         const b = document.getElementById('btn-road-type'); 
         if(roadType === 'city') {
             roadType = 'highway';
-            currentSpeedLimit = 80; // 高速公路速限設為 80 (沖繩自動車道)
+            currentSpeedLimit = 80; 
             b.innerText = "高速道路 (80)";
             b.className = "px-4 py-2 rounded-lg border border-green-500 bg-green-900/30 text-green-400 text-sm font-bold active:bg-green-800 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.3)]";
             showToast("🚗 切換為高速模式 (限速80)");
         } else {
             roadType = 'city';
-            currentSpeedLimit = 50; // 一般道路速限設為 50
+            currentSpeedLimit = 50; 
             b.innerText = "一般道路 (50)";
             b.className = "px-4 py-2 rounded-lg border border-blue-900 bg-blue-900/20 text-blue-400 text-sm font-bold active:bg-blue-800 transition-colors";
             showToast("🏙️ 切換為市區模式 (限速50)");
@@ -1195,7 +1234,8 @@
     
     function startHudClock() { const u=()=>{const d=new Date(); document.getElementById('hud-clock').innerText=`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`; if(!document.getElementById('driver-hud').classList.contains('hidden'))requestAnimationFrame(()=>setTimeout(u,1000));}; u(); }
     function copyHudMapCode() { const t=document.getElementById('hud-mapcode'); if(t.innerText!=="NO MAPCODE"){navigator.clipboard.writeText(t.innerText); t.style.color="#4ade80"; setTimeout(()=>t.style.color="",300); showToast("Copied");} }
-	// Start App
+
+    // Start App
     init();
 </script>
 </body>
