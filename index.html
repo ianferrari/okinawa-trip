@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v15.1 Final</title>
+    <title>奎奎全家沖繩遊 🦕 v15.2 Final Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@
         .safe-card { background: linear-gradient(135deg, #fff1f2 0%, #fff 100%); border-left: 5px solid #e11d48; }
         .parking-card { background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 2px solid #22c55e; }
 
-        /* ================= 行程時間軸樣式 ================= */
+        /* ================= 行程時間軸樣式 (重要修復) ================= */
         .timeline-connector {
             position: absolute; left: 2.2rem; top: 3.5rem; bottom: -1rem;
             border-left: 2px dashed #cbd5e1; z-index: 0;
@@ -433,7 +433,7 @@
     ];
     let rewardsDB = JSON.parse(localStorage.getItem('gasha_rewards')) || [...defaultRewards];
 
-    // 1. 景點詳細資料庫 (全景點補完版)
+    // 1. 景點詳細資料庫
     const spotInfoDB = {
         // --- Day 1 ---
         "tpe_airport": { title: "台中國際機場", tags: ["出發", "機場"], image: "https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?q=80&w=1000", desc: "旅程的起點！記得再次檢查護照效期。", tips: "💡 帶小孩通關可以走優先通道，記得先裝好水。", map: "台中國際機場" },
@@ -454,7 +454,7 @@
         "kouri_tower": { title: "古宇利海洋塔", tags: ["風景", "鳳梨車"], image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000", desc: "可以搭乘無人自動駕駛的鳳梨車上山，沿途風景優美，塔頂敲鐘可以祈求幸福。", tips: "💡 塔內的甜點店有賣「古宇利島限定」的南瓜泡芙。", map: "古宇利海洋塔" },
         "kouri_shrimp": { title: "Kouri Shrimp", tags: ["點心", "蝦蝦飯"], image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000", desc: "原本是餐車起家，現在有店面了。蒜香奶油蝦配上兩球飯，超級罪惡又好吃！", tips: "💡 用點餐機點餐，人多時可以外帶去車上或海邊吃。", map: "Kouri Shrimp" },
         "yakiniku": { title: "燒肉乃我那霸", tags: ["晚餐", "燒肉"], image: "https://images.unsplash.com/photo-1594041680508-e3873d24c271?q=80&w=1000", desc: "名護最有名的燒肉店，自家肉舖直營，阿古豬和和牛都很新鮮，價格也合理。", tips: "💡 新館座位比較寬敞乾淨，適合帶小孩。", map: "燒肉乃我那霸 新館" },
-        
+
         // --- Day 4 ---
         "dino": { title: "DINO 恐龍 PARK", tags: ["恐龍", "探險"], image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000", desc: "就在「御菓子御殿」名護店的後山，原始森林裡藏了 80 幾隻會動會叫的恐龍，非常逼真！", tips: "💡 森林路面有些起伏，推車勉強可行但建議用揹巾。出口就是土產店。", map: "DINO恐龍PARK 山原亞熱帶之森" },
         "okashi": { title: "御菓子御殿", tags: ["午餐", "伴手禮"], image: "https://images.unsplash.com/photo-1574621100236-d25a64a063f3?q=80&w=1000", desc: "紅芋塔的發源地！這裡可以參觀工廠生產線，二樓有餐廳可以吃飯，風景不錯。", tips: "💡 這裡賣的紅芋塔是最新鮮的，可以買單個現場吃。", map: "御菓子御殿 名護店" },
@@ -587,7 +587,7 @@
         { id: "m5", title: "海底尋寶", desc: "在透明地板找到魚", icon: "fa-water" }, { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying" }
     ];
 
-    // 工具資料庫 (v15.1 Ultimate: 新增 signs, orders, coins, sizes)
+    // 工具資料庫 (v15.2 Ultimate: 新增 signs, orders, coins, sizes)
     const toolsDB = {
         drive: [
             { title: "右駕口訣", content: "左轉小彎、右轉大彎<br>雨刷在左、方向燈在右", color: "bg-blue-50 text-blue-800" },
@@ -735,7 +735,7 @@
                     "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
             });
         } else if (activeTab === 'tools') {
-            // v15.0 新增 signs, coins, sizes, orders
+            // v15.2 工具選單按鈕狀態更新
             ['calc', 'drive', 'signs', 'coins', 'sizes', 'jp', 'orders', 'sos', 'sync'].forEach(t => {
                 const btn = document.getElementById(`btn-tool-${t}`);
                 if (btn) {
@@ -751,7 +751,7 @@
         }
     }
 
-    // 渲染上方子選單 (v15.0 Updated)
+    // 渲染上方子選單 (v15.2 Updated: 包含所有新工具按鈕)
     function renderHeaderSubNav() {
         const container = document.getElementById('sub-nav-container');
         if (activeTab === 'itinerary') {
@@ -761,7 +761,7 @@
             container.innerHTML = `<div class="flex glass-dark p-1 rounded-2xl mx-1">${checklistDB.map(c => `<button id="btn-chk-${c.id}" onclick="switchChecklist('${c.id}')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentChecklistFilter === c.id ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80'}">${c.title.split(' ')[1]}</button>`).join('')}</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
         } else if (activeTab === 'tools') {
-            // v15.0 工具選單大升級
+            // 工具選單按鈕 (完整版)
             container.innerHTML = `
             <div class="flex glass-dark p-1 rounded-2xl mx-1 overflow-x-auto hide-scrollbar">
                 <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
@@ -792,11 +792,11 @@
         document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
     }
 
-    // 渲染主內容 (Render Main Content) - v15.0
+    // 渲染主內容
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
-        // 1. 行程 (Itinerary)
+        // 1. 行程 (Itinerary) - 完整版
         if (activeTab === 'itinerary') {
             const d = itineraryDB[currentDayIdx];
             const diaryKey = `diary_${d.day}`;
@@ -881,44 +881,16 @@
                 <h3 class="font-bold text-xl mb-6 text-gray-800 border-b pb-4 border-gray-100 flex items-center gap-2">
                     <span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>${list.title}
                 </h3>
-                
                 <div class="space-y-3">
                     ${list.items.map((item, i) => { 
                         const key = `chk_${currentChecklistFilter}_${item.text}`; 
                         const isChecked = localStorage.getItem(key) === '1'; 
                         const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700'; 
-                        
-                        return `
-                        <div class="flex items-start gap-2 group">
-                            <label class="flex-1 flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer select-none border-slate-100 shadow-sm bg-white">
-                                <div class="relative flex items-center mt-0.5">
-                                    <input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}')">
-                                    <i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>
-                                    ${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}
-                                </div>
-                            </label>
-                            <button onclick="deleteChecklistItem(${i})" class="mt-3 w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 active:scale-90 transition-all rounded-full hover:bg-red-50">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>`; 
+                        return `<div class="flex items-start gap-2 group"><label class="flex-1 flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer select-none border-slate-100 shadow-sm bg-white"><div class="relative flex items-center mt-0.5"><input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}')"><i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i></div><div class="flex-1"><div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}</div></label><button onclick="deleteChecklistItem(${i})" class="mt-3 w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 active:scale-90 transition-all rounded-full hover:bg-red-50"><i class="fas fa-trash-alt"></i></button></div>`; 
                     }).join('')}
                 </div>
-
-                <button onclick="addChecklistItem()" class="w-full mt-4 py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-[0.98]">
-                    <i class="fas fa-plus mr-1"></i> 新增項目
-                </button>
-
-                <div class="mt-8 pt-4 border-t border-gray-100">
-                    <button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100 mb-2">
-                        <i class="fas fa-rotate-right mr-1"></i> 重置勾選狀態
-                    </button>
-                     <button onclick="openGiftModal()" class="w-full py-4 bg-red-50 text-red-500 rounded-2xl text-lg font-bold shadow-sm active:scale-95 border border-red-100">
-                        <i class="fas fa-gift mr-2"></i> 管理伴手禮清單
-                    </button>
-                </div>
+                <button onclick="addChecklistItem()" class="w-full mt-4 py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-[0.98]"><i class="fas fa-plus mr-1"></i> 新增項目</button>
+                <div class="mt-8 pt-4 border-t border-gray-100"><button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100 mb-2"><i class="fas fa-rotate-right mr-1"></i> 重置勾選狀態</button><button onclick="openGiftModal()" class="w-full py-4 bg-red-50 text-red-500 rounded-2xl text-lg font-bold shadow-sm active:scale-95 border border-red-100"><i class="fas fa-gift mr-2"></i> 管理伴手禮清單</button></div>
             </div>`;
         } else if (activeTab === 'missions') {
             const balance = getGashaBalance();
@@ -934,7 +906,6 @@
                     if (!catTotals[cat]) catTotals[cat] = 0; 
                     catTotals[cat] += e.price; 
                 }); 
-                
                 // 2. 計算預算與免稅
                 let totalTWD = Math.round(totalJPY * CURRENT_RATE); 
                 let budgetLeft = TOTAL_BUDGET - totalTWD; 
@@ -944,7 +915,6 @@
                 let taxPercent = Math.min((taxBasketTotal / 5500) * 100, 100); 
                 let taxMsg = taxDiff > 0 ? `還差 ¥${taxDiff.toLocaleString()}` : "🎉 免稅達成！"; 
                 let taxBasketItems = taxBasket.map((price) => `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-[10px] font-bold">¥${price}</span>`).join(" "); 
-                
                 // 3. 產生圓餅圖 CSS
                 let gradientStr = "conic-gradient(#e2e8f0 0deg 360deg)";
                 let legendHTML = `<div class="text-center w-full text-xs text-gray-400 mt-2">尚無資料</div>`; 
@@ -963,7 +933,6 @@
                     }); 
                     gradientStr = `conic-gradient(${gradients.join(', ')})`; 
                 } 
-                
                 // 4. 產生列表 HTML
                 let expenseListHTML = expenses.length === 0 ? 
                     `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>` : 
@@ -973,90 +942,19 @@
                         return `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-2"><div class="flex-1 flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs" style="background:${catInfo.color}"><i class="fas ${catInfo.icon}"></i></div><div><div class="font-bold text-gray-700">${item.name}</div><div class="text-xs text-gray-400">¥${item.price.toLocaleString()}</div></div></div><button onclick="deleteExpense(${idx})" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center active:scale-90"><i class="fas fa-trash-alt text-xs"></i></button></div>`; 
                     }).join('');
                 
-                // 5. 組合最終 HTML (包含圓餅圖、免稅籃、分類按鈕)
-                main.innerHTML = `
-                <div class="animate-slide-up space-y-4">
-                    <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative">
-                        <button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><i class="fas fa-sync-alt"></i></button>
-                        <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3>
-                        <div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD</div>
-                        <div class="flex flex-col gap-4">
-                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative">
-                                <label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label>
-                                <input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額" class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black">
-                            </div>
-                            <div class="bg-green-50 p-4 rounded-xl border border-green-100">
-                                <label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label>
-                                <div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-5 border-2 border-pink-200 shadow-md relative overflow-hidden">
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3>
-                            <button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button>
-                        </div>
-                        <div class="flex gap-2 mb-3">
-                            <input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 min-w-0 bg-white border-2 border-pink-100 rounded-xl px-4 py-3 text-xl font-bold focus:outline-pink-400 text-gray-700">
-                            <button onclick="addTaxItem()" class="flex-none w-16 bg-pink-500 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center"><i class="fas fa-plus text-2xl"></i></button>
-                        </div>
-                        <div class="mb-2">
-                            <div class="flex justify-between text-xs mb-1 font-bold text-gray-500"><span>目前: ¥${taxBasketTotal.toLocaleString()}</span><span class="${taxDiff > 0 ? 'text-blue-500' : 'text-orange-500'}">${taxMsg}</span></div>
-                            <div class="w-full bg-gray-200 rounded-full h-3"><div class="${taxDiff>0?'bg-blue-500':'bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse'} h-3 rounded-full transition-all duration-300" style="width: ${taxPercent}%"></div></div>
-                        </div>
-                        <div class="flex flex-wrap gap-1 min-h-[20px]">${taxBasketItems}</div>
-                    </div>
-
-                    <div class="glass-card rounded-3xl p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <div class="text-xs font-bold text-gray-500">總預算: $${TOTAL_BUDGET.toLocaleString()}</div>
-                            <div class="text-xs font-bold ${budgetLeft < 0 ? 'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-4"><div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div></div>
-                        <div class="pie-chart" style="background: ${gradientStr}"></div>
-                        <div class="flex flex-wrap justify-center mt-3 px-2">${legendHTML}</div>
-                    </div>
-
-                    <div class="glass-card rounded-3xl p-4">
-                        <h3 class="text-sm font-bold text-gray-600 mb-3"><i class="fas fa-pen mr-1"></i> 記一筆</h3>
-                        <div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1">
-                            <label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-bag-shopping"></i> 購物</div></label>
-                            <label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-utensils"></i> 餐飲</div></label>
-                            <label class="cursor-pointer"><input type="radio" name="cat" value="play" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-purple-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-ticket"></i> 娛樂</div></label>
-                            <label class="cursor-pointer"><input type="radio" name="cat" value="transport" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-car"></i> 交通</div></label>
-                            <label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-box"></i> 其他</div></label>
-                        </div>
-                        <div class="flex flex-col gap-3 mb-3">
-                            <input id="exName" type="text" placeholder="品項名稱" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500">
-                            <input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500 font-bold">
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="addExpense()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-plus-circle mr-2"></i> 新增</button>
-                            <button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-share-from-square"></i></button>
-                            <button onclick="setBudget()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-cog"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div class="pb-24">${expenseListHTML}</div>
-                </div>`; 
-                setTimeout(() => { const i = document.getElementById('jpyInput'); if(i) i.focus(); }, 100);
+                main.innerHTML = `<div class="animate-slide-up space-y-4"><div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative"><button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><i class="fas fa-sync-alt"></i></button><h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3><div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD</div><div class="flex flex-col gap-4"><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative"><label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label><input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額" class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black"></div><i class="fas fa-arrow-down text-3xl text-blue-500 animate-bounce absolute left-1/2 -translate-x-1/2 top-[52%] z-10 drop-shadow-sm"></i><div class="bg-green-50 p-4 rounded-xl border border-green-100"><label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label><div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div></div></div></div><div class="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-5 border-2 border-pink-200 shadow-md relative overflow-hidden"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3><button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button></div><div class="flex gap-2 mb-3"><input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 min-w-0 bg-white border-2 border-pink-100 rounded-xl px-4 py-3 text-xl font-bold focus:outline-pink-400 text-gray-700"><button onclick="addTaxItem()" class="flex-none w-16 bg-pink-500 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center"><i class="fas fa-plus text-2xl"></i></button></div><div class="mb-2"><div class="flex justify-between text-xs mb-1 font-bold text-gray-500"><span>目前: ¥${taxBasketTotal.toLocaleString()}</span><span class="${taxDiff > 0 ? 'text-blue-500' : 'text-orange-500'}">${taxMsg}</span></div><div class="w-full bg-gray-200 rounded-full h-3"><div class="${taxDiff>0?'bg-blue-500':'bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse'} h-3 rounded-full transition-all duration-300" style="width: ${taxPercent}%"></div></div></div><div class="flex flex-wrap gap-1 min-h-[20px]">${taxBasketItems}</div></div><div class="glass-card rounded-3xl p-4"><div class="flex justify-between items-center mb-2"><div class="text-xs font-bold text-gray-500">總預算: $${TOTAL_BUDGET.toLocaleString()}</div><div class="text-xs font-bold ${budgetLeft < 0 ? 'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div></div><div class="w-full bg-gray-200 rounded-full h-1.5 mb-4"><div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div></div><div class="pie-chart" style="background: ${gradientStr}"></div><div class="flex flex-wrap justify-center mt-3 px-2">${legendHTML}</div></div><div class="glass-card rounded-3xl p-4"><h3 class="text-sm font-bold text-gray-600 mb-3"><i class="fas fa-pen mr-1"></i> 記一筆</h3><div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1"><label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-bag-shopping"></i> 購物</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-utensils"></i> 餐飲</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="play" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-purple-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-ticket"></i> 娛樂</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="transport" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-car"></i> 交通</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-box"></i> 其他</div></label></div><div class="flex flex-col gap-3 mb-3"><input id="exName" type="text" placeholder="品項名稱" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500"><input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500 font-bold"></div><div class="flex gap-2"><button onclick="addExpense()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-plus-circle mr-2"></i> 新增</button><button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-share-from-square"></i></button><button onclick="setBudget()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-cog"></i></button></div></div><div class="pb-24">${expenseListHTML}</div></div>`; setTimeout(() => { const i = document.getElementById('jpyInput'); if(i) i.focus(); }, 100);
             } else if (currentToolFilter === 'drive') {
-                 const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><p class="text-xs text-gray-500 mb-4">停好車後按一下，不怕找不到車！</p><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-map-pin mr-2"></i> 🅿️ 我停這</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div></div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
+                 const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg mt-3"><i class="fas fa-map-pin mr-2"></i> 🅿️ 我停這</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div></div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
                  const gasHelperHTML = `<div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-1 shadow-lg mb-6 relative overflow-hidden text-white"><div class="bg-white/10 backdrop-blur-sm p-5 rounded-[1.3rem] border border-white/20"><div class="flex justify-between items-start mb-4"><div><div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">GAS STATION</div><h3 class="text-2xl font-black">加油請找 <span class="text-yellow-300">紅槍</span></h3><p class="text-xs opacity-90">Regular (レギュラー) = 92/95無鉛</p></div><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-md"><i class="fas fa-gas-pump"></i></div></div><div class="grid grid-cols-2 gap-2 text-center mb-4"><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-hand-sparkles mb-1 block opacity-70"></i><div class="text-[10px]">1.除靜電</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-credit-card mb-1 block opacity-70"></i><div class="text-[10px]">2.付錢/選油</div></div><div class="bg-red-700 rounded-lg p-2 border border-red-400"><i class="fas fa-fill-drip mb-1 block"></i><div class="text-[10px] font-bold">3.紅槍加油</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-receipt mb-1 block opacity-70"></i><div class="text-[10px]">4.拿收據</div></div></div><button onclick="showInfoCard('gas')" class="w-full bg-white text-red-600 font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"><i class="fas fa-comment-dots"></i> 給店員看 (日文)</button></div></div>`;
                  const soundBoardHTML = `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6"><h3 class="text-xs font-bold text-gray-500 uppercase mb-3"><i class="fas fa-music mr-1"></i> 安撫音效板 (Soundboard)</h3><div class="grid grid-cols-3 gap-3"><button onclick="playSound('clapping')" class="aspect-square bg-yellow-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">👏</button><button onclick="playSound('laugh')" class="aspect-square bg-pink-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">😆</button><button onclick="playSound('fart')" class="aspect-square bg-amber-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">💨</button><button onclick="playSound('magic')" class="aspect-square bg-purple-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">✨</button><button onclick="playSound('wrong')" class="aspect-square bg-red-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">❌</button><button onclick="playSound('correct')" class="aspect-square bg-green-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">⭕</button></div></div>`;
                  main.innerHTML = `<div class="animate-slide-up space-y-4"><button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4"><div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div><div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div></button>${parkingHTML}${gasHelperHTML}<div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4"><button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找廁所</span></button><button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找超商</span></button><button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-xl mb-1 block"></i><span class="text-xs font-bold">小小畫家</span></button><button onclick="document.getElementById('food-modal').classList.add('open')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-utensils text-green-600 text-xl mb-1 block"></i><span class="text-xs font-bold">吃什麼？</span></button></div>${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-card ${d.color} border border-black/5 relative overflow-hidden"><i class="fas fa-car absolute -right-2 -bottom-2 text-6xl opacity-10"></i><div class="text-xs font-bold opacity-60 mb-2 uppercase tracking-wider">${d.title}</div><div class="text-xl font-black leading-tight">${d.content}</div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'signs') {
-                // v15.0 New: 交通標誌
                 main.innerHTML = `<div class="animate-slide-up grid gap-4">${toolsDB.signs.map(s => `<div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-4"><div class="text-4xl w-16 h-16 flex items-center justify-center bg-gray-50 rounded-2xl">${s.icon}</div><div class="flex-1"><h3 class="text-lg font-black ${s.color} mb-1">${s.title}</h3><p class="text-sm text-gray-600 leading-relaxed">${s.desc}</p></div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'coins') {
-                // v15.0 New: 硬幣速查
                 main.innerHTML = `<div class="animate-slide-up space-y-4"><div class="bg-slate-800 text-white p-5 rounded-3xl text-center mb-4 shadow-lg"><h3 class="font-bold text-lg mb-1">硬幣速查盤</h3><p class="text-xs opacity-60">結帳前看一下，快速把零錢花掉！</p></div><div class="grid grid-cols-2 gap-4">${toolsDB.coins.map(c => `<div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center"><div class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-black shadow-inner mb-3 ${c.color}">${c.val}</div><div class="font-bold text-gray-800 text-lg">¥${c.val}</div><div class="text-xs text-blue-500 font-bold mb-1">約 NT$${c.twd}</div><div class="text-[10px] text-gray-400 bg-gray-50 px-2 py-1 rounded-full">${c.desc}</div></div>`).join('')}</div></div>`;
             } else if (currentToolFilter === 'sizes') {
-                // v15.0 New: 尺寸表
                 main.innerHTML = `<div class="animate-slide-up"><div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100"><div class="bg-blue-600 text-white p-4 text-center"><h3 class="font-bold text-lg"><i class="fas fa-shirt mr-2"></i>童裝童鞋尺寸對照</h3></div><table class="w-full text-sm text-center"><thead class="bg-gray-50 text-gray-500 font-bold border-b"><tr><th class="py-3">年齡</th><th class="py-3">日本身高</th><th class="py-3">美國</th><th class="py-3">鞋(cm)</th></tr></thead><tbody class="divide-y divide-gray-100">${toolsDB.sizes.map(s => `<tr><td class="py-4 font-bold text-gray-700">${s.label}</td><td class="py-4 text-blue-600 font-bold">${s.h}</td><td class="py-4 text-gray-500">${s.us}</td><td class="py-4 text-pink-500 font-bold">${s.shoe}</td></tr>`).join('')}</tbody></table></div></div>`;
             } else if (currentToolFilter === 'orders') {
-                // v15.0 New: 手指點餐
                 main.innerHTML = `<div class="animate-slide-up grid grid-cols-2 gap-4">${toolsDB.orders.map(o => `<div class="order-card" onclick="alert('${o.jp}')"><div class="text-5xl mb-2">${o.icon}</div><div class="font-black text-gray-800 text-lg mb-1">${o.title}</div><div class="text-xs text-gray-400 font-mono">${o.sub}</div><div class="mt-3 bg-blue-50 text-blue-600 font-black py-2 rounded-xl text-xl">${o.jp}</div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'jp') {
                 main.innerHTML = `<div class="animate-slide-up space-y-6"><div class="glass-card p-4 rounded-2xl text-center bg-blue-50 border border-blue-200"><div class="text-sm text-blue-800 font-bold mb-1">💡 使用教學</div><div class="text-xs text-blue-600">點擊 <i class="fas fa-volume-high mx-1 text-yellow-600"></i> 黃色按鈕，手機會直接唸出日語！</div></div>${toolsDB.jp.map(cat => `<div><h3 class="text-xs font-bold text-gray-400 uppercase mb-3 ml-2 tracking-wider border-l-2 border-blue-500 pl-2">${cat.label}</h3><div class="grid gap-3">${cat.items.map(item => `<div class="glass-card p-5 rounded-3xl border border-slate-50 transition-transform flex items-center justify-between gap-3 relative z-10"><div class="flex-1"><div class="text-xs text-gray-500 mb-1 flex items-center gap-1"><i class="fas fa-language"></i> ${item.t}</div><div class="text-xl font-black text-gray-800 mb-1 leading-tight">${item.j}</div><div class="text-xs text-blue-500 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded">${item.p}</div></div><button onclick="speak('${item.j}', this)" class="w-12 h-12 flex-shrink-0 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center shadow-lg active:scale-90 transition-transform z-20"><i class="fas fa-volume-high text-xl"></i></button></div>`).join('')}</div></div>`).join('')}</div>`;
@@ -1071,7 +969,6 @@
                         </div>
                         <i class="fas fa-exclamation-circle text-5xl"></i>
                     </button>
-
                     <div class="safe-card p-6 rounded-3xl shadow-xl relative overflow-hidden"><div class="absolute top-0 right-0 p-4 opacity-10 text-red-600"><i class="fas fa-user-shield text-8xl"></i></div><div class="relative z-10"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-black text-gray-800"><i class="fas fa-passport text-red-500 mr-2"></i>兒童安心護照</h3><button onclick="toggleEditMedical()" class="text-xs bg-white border border-gray-200 px-3 py-1 rounded-full text-gray-500 font-bold">編輯</button></div><div id="medical-view">${!medicalData.name ? `<div class="text-center py-6 text-gray-400 text-sm">⚠️ 請點擊「編輯」輸入資料</div>` : `<div class="space-y-4"><div class="bg-white/60 p-3 rounded-xl border border-red-100"><div class="text-[10px] text-gray-500 uppercase">My Name</div><div class="text-2xl font-black text-gray-800">${medicalData.name}</div></div><div class="bg-white/60 p-3 rounded-xl border border-red-100"><div class="text-[10px] text-gray-500 uppercase">Emergency Contact</div><div class="text-xl font-bold text-blue-600"><i class="fas fa-phone mr-1"></i> ${medicalData.phone}</div></div><div class="bg-white/60 p-3 rounded-xl border border-red-100"><div class="text-[10px] text-gray-500 uppercase">Allergy</div><div class="flex flex-wrap gap-1 mt-1">${allergyTags}</div></div><div class="bg-white/60 p-3 rounded-xl border border-red-100 relative"><div class="text-[10px] text-gray-500 uppercase">Hotel</div><div class="font-bold text-gray-700">${medicalData.hotel}</div><button onclick="showInfoCard('hotel', '${medicalData.hotel}')" class="absolute top-3 right-3 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow"><i class="fas fa-taxi mr-1"></i>給司機看</button></div></div>`}</div><div id="medical-edit" class="hidden space-y-3"><input id="in-name" type="text" placeholder="孩子暱稱" value="${medicalData.name}" class="w-full p-3 rounded-xl border border-gray-200 text-sm"><input id="in-phone" type="tel" placeholder="爸媽電話" value="${medicalData.phone}" class="w-full p-3 rounded-xl border border-gray-200 text-sm"><input id="in-hotel" type="text" placeholder="住宿飯店" value="${medicalData.hotel}" class="w-full p-3 rounded-xl border border-gray-200 text-sm"><div class="text-xs font-bold text-gray-500 mt-2 mb-1">過敏源</div><div class="grid grid-cols-2 gap-2">${Object.keys(allergyDict).map(k => `<label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100"><input type="checkbox" class="allergy-chk" value="${k}" ${medicalData.allergies.includes(k) ? 'checked' : ''}><span class="text-xs text-gray-600">${allergyDict[k].label}</span></label>`).join('')}</div><button onclick="saveMedical()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl mt-2">儲存</button></div></div></div><div class="space-y-3"><h3 class="text-xs font-bold text-gray-400 uppercase ml-2 tracking-wider">緊急電話</h3>${toolsDB.sos.map(s => `<a href="tel:${s.tel}" class="${s.style} p-5 rounded-3xl shadow-lg flex items-center justify-between active:scale-95 transition-transform"><div><div class="text-sm opacity-80 font-medium mb-1">${s.name}</div><div class="text-3xl font-black tracking-tighter">${s.tel}</div></div><div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center"><i class="fas fa-phone text-xl"></i></div></a>`).join('')}</div></div>`;
             } else if (currentToolFilter === 'sync') {
                  main.innerHTML = `<div class="animate-slide-up space-y-6"><div class="glass-card rounded-3xl p-6 border-l-4 border-purple-500"><div class="text-xs font-bold text-purple-600 uppercase mb-2">我是舊手機 / 傳送端</div><h3 class="text-xl font-bold text-gray-800 mb-2">備份資料</h3><p class="text-sm text-gray-500 mb-4">將資料產生代碼。</p><button onclick="backupData()" class="w-full bg-purple-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-copy mr-2"></i> 複製代碼</button></div><div class="glass-card rounded-3xl p-6 border-l-4 border-teal-500"><div class="text-xs font-bold text-teal-600 uppercase mb-2">我是新手機 / 接收端</div><h3 class="text-xl font-bold text-gray-800 mb-2">還原資料</h3><textarea id="importDataInput" placeholder="貼上代碼..." class="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs mb-3 focus:outline-teal-500"></textarea><button onclick="restoreData()" class="w-full bg-teal-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-file-import mr-2"></i> 載入</button></div></div>`;
@@ -1113,7 +1010,65 @@
     // 聲音與互動
     window.playSound = (type) => { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); const now = ctx.currentTime; if (type === 'magic') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(1000, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'wrong') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(100, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'correct') { osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.setValueAtTime(800, now + 0.1); gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'fart') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); osc.frequency.linearRampToValueAtTime(60, now + 0.4); gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'laugh') { osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(600, now + 0.1); osc.frequency.linearRampToValueAtTime(400, now + 0.2); gain.gain.setValueAtTime(0.3, now); osc.start(now); osc.stop(now + 0.3); } else { playCoinSound(); } }
     window.spinFood = () => { const iconEl = document.getElementById('food-result'); const textEl = document.getElementById('food-text'); let count = 0; const interval = setInterval(() => { const random = foodOptions[Math.floor(Math.random() * foodOptions.length)]; iconEl.innerText = random.icon; textEl.innerText = random.name; count++; if(count > 20) { clearInterval(interval); playCoinSound(); iconEl.classList.add('animate-pop'); setTimeout(() => iconEl.classList.remove('animate-pop'), 500); } }, 80); }
-    // ================= Driver HUD Logic (v15.1 Ultimate) =================
+    
+    // 每日出門檢查
+    function checkDailyPopup() { const today = new Date().toISOString().split('T')[0]; const lastCheck = localStorage.getItem('last_departure_check'); const currentHour = new Date().getHours(); if (today !== lastCheck && currentHour >= 6 && currentHour <= 11) { document.getElementById('daily-check-modal').classList.add('open'); } }
+    window.checkDailyItem = (cb) => { const all = document.querySelectorAll('#daily-check-modal input[type="checkbox"]'); const checked = document.querySelectorAll('#daily-check-modal input[type="checkbox"]:checked'); const btn = document.getElementById('daily-check-btn'); if(all.length === checked.length) { btn.disabled = false; btn.classList.remove('bg-gray-300'); btn.classList.add('bg-blue-600', 'shadow-lg'); } }
+    window.finishDailyCheck = () => { localStorage.setItem('last_departure_check', new Date().toISOString().split('T')[0]); document.getElementById('daily-check-modal').classList.remove('open'); showToast("出發！祝今天旅途愉快！🚗"); playSound('correct'); }
+    
+    // 雨天模式
+    window.toggleRainMode = () => { isRainyMode = !isRainyMode; localStorage.setItem('rainy_mode', isRainyMode); if(navigator.vibrate) navigator.vibrate(50); updateRainyModeUI(); renderContent(); }
+    function updateRainyModeUI() { const btn = document.getElementById('rain-btn'); const icon = document.getElementById('rain-icon'); const text = document.getElementById('rain-text'); const body = document.body; if (isRainyMode) { body.classList.add('rainy-mode'); btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-blue-400/50 bg-blue-900/50"; icon.className = "fas fa-cloud-showers-heavy text-xl mb-1 block text-blue-300"; text.innerText = "雨天備案"; text.className = "text-[9px] font-bold text-blue-200"; showToast("☔ 已切換為雨天備案模式"); } else { body.classList.remove('rainy-mode'); btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-white/20"; icon.className = "fas fa-sun text-xl mb-1 block text-yellow-400"; text.innerText = "晴天"; text.className = "text-[9px] font-bold opacity-90"; showToast("☀️ 已切換為晴天模式"); } }
+    
+    // 計算機與記帳邏輯 (修復確認)
+    window.addTaxItem = () => { const input = document.getElementById('taxItemInput'); const val = parseInt(input.value); if(val && val > 0) { taxBasket.push(val); input.value = ""; renderContent(); const i = document.getElementById('taxItemInput'); if(i) i.focus(); } }
+    window.resetTaxBasket = () => { if(confirm("確定要清空免稅購物籃嗎？")) { taxBasket = []; renderContent(); } }
+    window.fetchExchangeRate = async () => { const btn = document.getElementById('fetchRateBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); const twd = data.rates.TWD; if(twd) { updateRate(twd.toFixed(4)); document.getElementById('rateInput').value = twd.toFixed(4); showToast(`匯率已更新：${twd}`); } } catch(e) { showToast("更新失敗，請檢查網路"); } finally { btn.innerHTML = originalText; } }
+    window.toggleCheck = (key) => { const v=localStorage.getItem(key); v==='1'?localStorage.removeItem(key):localStorage.setItem(key,'1'); renderContent(); }
+    window.addChecklistItem = () => { const text = prompt("新增項目名稱："); if (!text) return; const sub = prompt("備註 (可不填)：") || ""; const list = checklistDB.find(c => c.id === currentChecklistFilter); list.items.push({ text: text, sub: sub }); saveChecklistDB(); renderContent(); showToast("已新增項目"); }
+    window.deleteChecklistItem = (index) => { if (!confirm("刪除此項目？")) return; const list = checklistDB.find(c => c.id === currentChecklistFilter); const itemText = list.items[index].text; localStorage.removeItem(`chk_${currentChecklistFilter}_${itemText}`); list.items.splice(index, 1); saveChecklistDB(); renderContent(); showToast("已刪除項目"); }
+    window.resetChecklist = (id) => { if(confirm('重置清單？')) { checklistDB.find(c=>c.id===id).items.forEach(item => localStorage.removeItem(`chk_${id}_${item.text}`)); renderContent(); showToast("已重置"); } }
+    function saveChecklistDB() { localStorage.setItem('trip_checklist_db', JSON.stringify(checklistDB)); }
+    
+    // 遊戲化邏輯
+    function playCoinSound() { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(987,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(1318,ctx.currentTime+0.1); g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.5); o.start(); o.stop(ctx.currentTime+0.5); }
+    function playGashaSound() { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='square'; o.frequency.setValueAtTime(100,ctx.currentTime); o.frequency.linearRampToValueAtTime(800,ctx.currentTime+0.2); g.gain.setValueAtTime(0.1,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.3); o.start(); o.stop(ctx.currentTime+0.3); }
+    window.toggleMission = (id) => { const d=localStorage.getItem(id)==='1'; if(d){if(confirm('取消成就？')) localStorage.removeItem(id); renderContent();}else{if(navigator.vibrate)navigator.vibrate(200); playCoinSound(); localStorage.setItem(id,'1'); showToast("🎉 獲得代幣！"); renderContent();} }
+    function getGashaBalance() { let c=0; missionsDB.forEach(m=>{if(localStorage.getItem(m.id)==='1')c++}); let b=c-gashaCoinsUsed; if(b<0){gashaCoinsUsed=c; localStorage.setItem('gasha_coins_used', gashaCoinsUsed); b=0;} return b; }
+    window.spinGasha = () => { if(getGashaBalance()<=0)return; playGashaSound(); document.getElementById('gasha-machine').classList.add('animate-shake'); gashaCoinsUsed++; localStorage.setItem('gasha_coins_used', gashaCoinsUsed); renderContent(); setTimeout(()=>{document.getElementById('gasha-machine').classList.remove('animate-shake'); const r=rewardsDB[Math.floor(Math.random()*rewardsDB.length)]; document.getElementById('gasha-reward-icon').innerText=r.icon; document.getElementById('gasha-reward-text').innerText=r.text; document.getElementById('gasha-modal').classList.add('open'); playCoinSound();}, 800); }
+    window.closeGashaModal = () => document.getElementById('gasha-modal').classList.remove('open');
+    
+    // 工具函式
+    window.copyMapCode = (c) => { navigator.clipboard.writeText(c).then(()=>showToast("MapCode 已複製")); }
+    window.updateRate = (v) => { if(v>0){CURRENT_RATE=parseFloat(v); localStorage.setItem('user_rate',v); convertCurrency(); renderContent();} }
+    window.convertCurrency = () => { const j=parseFloat(document.getElementById('jpyInput').value); const t=document.getElementById('twdOutput'); if(isNaN(j)||j<=0){t.innerText="0";return;} t.innerText=(j*CURRENT_RATE).toFixed(j%1!==0?2:0).toLocaleString('en-US'); }
+    window.setBudget = () => { const n=prompt("輸入總預算:", TOTAL_BUDGET); if(n&&!isNaN(n)){TOTAL_BUDGET=parseInt(n); localStorage.setItem('trip_budget', TOTAL_BUDGET); renderContent();} }
+    window.addExpense = () => { const n=document.getElementById('exName').value; const p=document.getElementById('exPrice').value; const c=document.querySelector('input[name="cat"]:checked')?.value||'other'; if(!n||!p){showToast("請輸入完整");return;} expenses.unshift({name:n,price:parseInt(p),cat:c}); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); showToast("已記帳"); renderContent(); }
+    window.openQuickExpense = () => { document.getElementById('expense-modal').classList.add('open'); setTimeout(()=>document.getElementById('quickExPrice').focus(),100); }
+    window.closeQuickExpense = () => { document.getElementById('expense-modal').classList.remove('open'); document.getElementById('quickExName').value=""; document.getElementById('quickExPrice').value=""; }
+    window.saveQuickExpense = () => { const n=document.getElementById('quickExName').value; const p=document.getElementById('quickExPrice').value; const c=document.querySelector('input[name="quick-cat"]:checked')?.value||'shopping'; if(!n||!p){showToast("請輸入完整");return;} expenses.unshift({name:n,price:parseInt(p),cat:c}); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); showToast("快速記帳成功"); if(activeTab==='tools'&&currentToolFilter==='calc')renderContent(); closeQuickExpense(); }
+    window.exportExpenses = () => { if(expenses.length===0)return; let t=0; let txt="🦕 帳務：\n"; expenses.forEach(e=>{txt+=`${e.name}: ¥${e.price}\n`;t+=e.price;}); txt+=`總計: ¥${t}`; navigator.clipboard.writeText(txt).then(()=>showToast("已複製")); }
+    window.deleteExpense = (i) => { if(confirm("刪除？")){expenses.splice(i,1); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); renderContent();} }
+    window.quickSearch = (q) => { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`,'_blank'); showToast("搜尋中..."); }
+    window.speak = (t,b) => { const o=b.innerHTML; b.innerHTML=`<div class="playing-wave"><span></span><span></span><span></span></div>`; if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=0.9;u.onend=()=>b.innerHTML=o;u.onerror=()=>{b.innerHTML=o;window.open(`https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(t)}&op=translate`,'_blank');};window.speechSynthesis.speak(u);}else{b.innerHTML=o;window.open(`https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(t)}&op=translate`,'_blank');} }
+    window.toggleEditMedical = () => { document.getElementById('medical-view').classList.toggle('hidden'); document.getElementById('medical-edit').classList.toggle('hidden'); }
+    window.saveMedical = () => { const n=document.getElementById('in-name').value; const p=document.getElementById('in-phone').value; const h=document.getElementById('in-hotel').value; const a=Array.from(document.querySelectorAll('.allergy-chk:checked')).map(c=>c.value); medicalData={name:n,phone:p,hotel:h,allergies:a}; localStorage.setItem('medical_data',JSON.stringify(medicalData)); toggleEditMedical(); renderContent(); showToast("已更新"); }
+    window.showInfoCard = (t, p) => { const m=document.getElementById('modal-overlay'); const tag=document.getElementById('modal-tag'); const tit=document.getElementById('modal-title'); const con=document.getElementById('modal-content'); const not=document.getElementById('modal-note'); if(t==='hotel'){if(!p){showToast("請先編輯");return;} tag.innerText="給司機看"; tit.innerHTML="このホテルまで<br>お願いします"; con.innerText=p; con.className="text-xl font-bold text-blue-700 mb-2"; not.innerText="請帶我去這家飯店";}else if(t==='gas'){tag.innerText="給店員"; tit.innerHTML="レギュラー満タン<br>現金で"; con.innerText="Regular Full / Cash"; con.className="text-xl font-bold text-red-600 mb-2"; not.innerText="紅槍加滿，付現";} m.classList.add('open'); }
+    window.closeModal = () => document.getElementById('modal-overlay').classList.remove('open');
+    window.openRewardEditor = () => { renderRewardList(); document.getElementById('reward-editor-modal').classList.add('open'); }
+    window.closeRewardEditor = () => document.getElementById('reward-editor-modal').classList.remove('open');
+    window.renderRewardList = () => { const list = document.getElementById('reward-list'); if(!list) return; list.innerHTML = rewardsDB.map((r, i) => `<div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100"><div class="flex items-center gap-3"><span class="text-2xl bg-white w-10 h-10 flex items-center justify-center rounded-full shadow-sm">${r.icon}</span><span class="font-bold text-gray-700 text-sm">${r.text}</span></div><button onclick="deleteReward(${i})" class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center active:bg-red-200"><i class="fas fa-trash-alt text-xs"></i></button></div>`).join(''); }
+    window.addReward = () => { const icon = document.getElementById('new-reward-icon').value; const text = document.getElementById('new-reward-text').value; if(text) { rewardsDB.push({ icon, text }); saveRewards(); renderRewardList(); document.getElementById('new-reward-text').value = ''; } else { showToast("請輸入獎品名稱"); } }
+    window.deleteReward = (idx) => { if(confirm('刪除這個獎項？')) { rewardsDB.splice(idx, 1); saveRewards(); renderRewardList(); } }
+    window.resetRewards = () => { if(confirm('恢復為預設獎勵？')) { rewardsDB = [...defaultRewards]; saveRewards(); renderRewardList(); } }
+    function saveRewards() { localStorage.setItem('gasha_rewards', JSON.stringify(rewardsDB)); }
+    window.saveParking = () => { const n=prompt("位置備註:","B1"); if(n&&navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{parkingData={lat:p.coords.latitude,lon:p.coords.longitude,note:n,time:new Date().toTimeString().slice(0,5)}; localStorage.setItem('parking_data',JSON.stringify(parkingData)); renderContent(); showToast("已記錄");});} }
+    window.findCar = () => { if(parkingData) window.open(`https://www.google.com/maps/search/?api=1&query=${parkingData.lat},${parkingData.lon}`,'_blank'); }
+    window.clearParking = () => { if(confirm("清除？")){parkingData=null; localStorage.removeItem('parking_data'); renderContent();} }
+    window.backupData = () => { const d={user_rate:localStorage.getItem('user_rate'), trip_budget:localStorage.getItem('trip_budget'), trip_expenses:localStorage.getItem('trip_expenses'), trip_gifts:localStorage.getItem('trip_gifts'), medical_data:localStorage.getItem('medical_data'), parking_data:localStorage.getItem('parking_data'), gasha_coins_used:localStorage.getItem('gasha_coins_used'), gasha_rewards:localStorage.getItem('gasha_rewards'), items:{}}; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(k.startsWith('chk_')||k.startsWith('m')||k.startsWith('diary_')||k==='last_departure_check')d.items[k]=localStorage.getItem(k);} navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(()=>showToast("代碼已複製")); }
+    window.restoreData = () => { const c=document.getElementById('importDataInput').value.trim(); if(!c)return; if(confirm("覆蓋資料？")){try{const d=JSON.parse(decodeURIComponent(atob(c))); if(d.user_rate)localStorage.setItem('user_rate',d.user_rate); if(d.trip_budget)localStorage.setItem('trip_budget',d.trip_budget); if(d.trip_expenses)localStorage.setItem('trip_expenses',d.trip_expenses); if(d.trip_gifts)localStorage.setItem('trip_gifts',d.trip_gifts); if(d.medical_data)localStorage.setItem('medical_data',d.medical_data); if(d.parking_data)localStorage.setItem('parking_data',d.parking_data); if(d.gasha_coins_used)localStorage.setItem('gasha_coins_used',d.gasha_coins_used); if(d.gasha_rewards)localStorage.setItem('gasha_rewards',d.gasha_rewards); if(d.items){for(let k in d.items)localStorage.setItem(k,d.items[k]);} alert("成功！"); location.reload();}catch(e){alert("代碼錯誤");}} }
+    function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
+    // ================= Driver HUD Logic (v15.2 Final) =================
     let hudWatchId = null, wakeLock = null, hudCurrentEventIdx = 0, hudAllEvents = [];
     let roadType = 'city';
     let currentSpeedLimit = 50; // 預設速限 50
@@ -1187,6 +1142,7 @@
             warn.classList.add('opacity-0');
         }
     }
+    
     // 關鍵邏輯：切換道路類型與速限
     function toggleRoadType() { 
         const b = document.getElementById('btn-road-type'); 
@@ -1213,4 +1169,3 @@
 </script>
 </body>
 </html>
-
