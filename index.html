@@ -6,13 +6,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v15.2 Final Fix</title>
+    <title>奎奎全家沖繩遊 🦕 v16.0 Ultimate</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         /* ================= 基礎設定 ================= */
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #0f172a; -webkit-tap-highlight-color: transparent; transition: background-color 0.5s; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #0f172a; -webkit-tap-highlight-color: transparent; transition: background-color 0.5s; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -32,7 +32,7 @@
         .safe-card { background: linear-gradient(135deg, #fff1f2 0%, #fff 100%); border-left: 5px solid #e11d48; }
         .parking-card { background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 2px solid #22c55e; }
 
-        /* ================= 行程時間軸樣式 (重要修復) ================= */
+        /* ================= 行程時間軸樣式 ================= */
         .timeline-connector {
             position: absolute; left: 2.2rem; top: 3.5rem; bottom: -1rem;
             border-left: 2px dashed #cbd5e1; z-index: 0;
@@ -49,7 +49,7 @@
         .spot-hero { height: 200px; background-size: cover; background-position: center; border-radius: 1.5rem 1.5rem 0 0; position: relative; }
         .spot-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%); border-radius: 1.5rem 1.5rem 0 0; }
 
-        /* ================= 新功能樣式 (硬幣/標誌/點餐) ================= */
+        /* ================= 硬幣樣式 ================= */
         .coin-500 { background: radial-gradient(circle at 30% 30%, #fde047, #eab308); border: 2px solid #ca8a04; color: #713f12; }
         .coin-100 { background: radial-gradient(circle at 30% 30%, #f1f5f9, #cbd5e1); border: 2px solid #94a3b8; color: #475569; }
         .coin-50 { background: radial-gradient(circle at 30% 30%, #f1f5f9, #cbd5e1); border: 2px solid #94a3b8; color: #475569; position: relative; }
@@ -102,6 +102,32 @@
         #rateInput { border-bottom: 2px dashed #ca8a04; color: #ca8a04; width: 100px; text-align: center; }
         .pie-chart { width: 140px; height: 140px; border-radius: 50%; position: relative; margin: 0 auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
         .pie-chart::after { content: ""; position: absolute; width: 80px; height: 80px; background: white; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+        /* ================= v16.0 新增樣式 (潮汐/翻譯/Wrapped/Geo) ================= */
+        /* 1. 潮汐波浪動畫 */
+        .tide-widget { background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%); color: white; border-radius: 1.5rem; overflow: hidden; position: relative; min-height: 120px; }
+        .wave-box { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; overflow: hidden; }
+        .wave { position: absolute; bottom: 0; left: 0; width: 200%; height: 100%; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255,255,255,0.3)" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>'); background-size: 50% 100%; animation: waveMove 10s linear infinite; }
+        .wave:nth-child(2) { bottom: 5px; opacity: 0.5; animation: waveMove 7s linear infinite reverse; }
+        @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* 2. 語音翻譯機 */
+        .mic-btn { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f87171, #ef4444); box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; transition: all 0.3s; border: 4px solid rgba(255,255,255,0.2); }
+        .mic-btn.listening { animation: pulse-red 1.5s infinite; background: #ef4444; transform: scale(1.1); }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        /* 3. Trip Wrapped (結算報告) */
+        #wrapped-modal { background: #000; color: #fff; z-index: 300; }
+        .wrapped-slide { height: 100%; display: flex; flex-col; align-items: center; justify-content: center; text-align: center; padding: 20px; opacity: 0; transition: opacity 0.5s; position: absolute; inset: 0; pointer-events: none; }
+        .wrapped-slide.active { opacity: 1; pointer-events: auto; }
+        .neon-text { text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(255,255,255,0.3); }
+        .stat-big { font-size: 4rem; font-weight: 900; line-height: 1; background: -webkit-linear-gradient(45deg, #FFD700, #FF8C00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* 4. 地理圍欄通知 */
+        #geo-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 999; display: flex; align-items: center; gap: 15px; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); border: 2px solid #fbbf24; width: 90%; max-width: 350px; }
+        #geo-toast.show { transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body class="h-screen flex flex-col text-gray-800 overflow-hidden relative">
@@ -164,8 +190,7 @@
     <button onclick="openQuickExpense()" class="fixed bottom-[100px] right-4 w-14 h-14 bg-pink-500 rounded-full text-white shadow-2xl flex items-center justify-center z-40 active:scale-90 transition-transform border-4 border-white/20 backdrop-blur group">
         <i class="fas fa-plus text-2xl group-active:rotate-90 transition-transform"></i>
     </button>
-
-    <div id="spot-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-6 hidden" onclick="closeSpotModal()">
+	<div id="spot-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-6 hidden" onclick="closeSpotModal()">
         <div class="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl shadow-2xl relative h-[80vh] flex flex-col animate-slide-up" onclick="event.stopPropagation()">
             <button onclick="closeSpotModal()" class="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/30 text-white backdrop-blur flex items-center justify-center"><i class="fas fa-times"></i></button>
             <div id="spot-hero" class="spot-hero flex-shrink-0">
@@ -345,7 +370,7 @@
             </div>
         </div>
     </div>
-
+    
     <div id="modal-overlay" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-6 flex-col hidden" onclick="closeModal()">
         <div class="bg-white w-full max-w-sm rounded-3xl p-8 text-center shadow-2xl relative" onclick="event.stopPropagation()">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><i class="fas fa-times text-2xl"></i></button>
@@ -356,8 +381,7 @@
             <div class="mt-8"><button onclick="closeModal()" class="bg-gray-100 text-gray-600 px-6 py-3 rounded-xl font-bold w-full">關閉</button></div>
         </div>
     </div>
-
-    <div id="driver-hud" class="fixed inset-0 bg-black z-[200] hidden flex-col p-6 text-white font-mono transition-opacity duration-300">
+	<div id="driver-hud" class="fixed inset-0 bg-black z-[200] hidden flex-col p-6 text-white font-mono transition-opacity duration-300">
         <div class="flex justify-between items-center mb-4">
             <div class="flex flex-col">
                 <span class="text-xs text-gray-500 uppercase tracking-widest">TIME</span>
@@ -401,7 +425,66 @@
         </div>
     </div>
 
+    <div id="geo-toast">
+        <div class="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-xl text-yellow-900 animate-bounce">
+            <i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase">MISSION UNLOCKED</div>
+            <div id="geo-msg" class="font-bold text-gray-800 text-sm">抵達目的地！</div>
+        </div>
+    </div>
+
+    <div id="wrapped-modal" class="fixed inset-0 hidden flex-col">
+        <button onclick="closeWrapped()" class="absolute top-6 right-6 z-50 text-white/50 hover:text-white text-2xl"><i class="fas fa-times"></i></button>
+        
+        <div class="wrapped-slide active" id="wrap-1">
+            <div class="text-6xl mb-4 animate-bounce">🦖</div>
+            <h2 class="text-3xl font-black mb-2 neon-text">旅程回顧</h2>
+            <p class="text-gray-400">奎奎全家沖繩遊 2026</p>
+            <p class="mt-8 text-sm animate-pulse">點擊螢幕繼續...</p>
+        </div>
+        
+        <div class="wrapped-slide" id="wrap-2">
+            <div class="text-xs font-bold text-blue-400 uppercase mb-4 tracking-widest">MOVEMENT</div>
+            <h3 class="text-2xl font-bold mb-2">這幾天我們走了</h3>
+            <div class="stat-big mb-2" id="wrap-steps">0</div>
+            <p class="text-xl">步</p>
+            <div class="mt-6 text-gray-400 text-sm">相當於繞了國際通 <span id="wrap-koku">0</span> 圈！</div>
+        </div>
+
+        <div class="wrapped-slide" id="wrap-3">
+            <div class="text-xs font-bold text-green-400 uppercase mb-4 tracking-widest">MONEY SPENT</div>
+            <h3 class="text-2xl font-bold mb-2">爸爸的錢包瘦了</h3>
+            <div class="stat-big mb-2" id="wrap-money">¥0</div>
+            <div class="mt-4 p-4 bg-white/10 rounded-xl w-full max-w-xs text-left">
+                <div class="flex justify-between mb-2"><span>🛍️ 購物</span><span class="font-bold" id="wrap-shop">¥0</span></div>
+                <div class="flex justify-between"><span>🍽️ 吃飯</span><span class="font-bold" id="wrap-food">¥0</span></div>
+            </div>
+        </div>
+
+        <div class="wrapped-slide" id="wrap-4">
+            <div class="text-xs font-bold text-pink-400 uppercase mb-4 tracking-widest">FUN & JOY</div>
+            <h3 class="text-2xl font-bold mb-2">奎奎轉了</h3>
+            <div class="stat-big mb-2 text-pink-500" id="wrap-gasha">0</div>
+            <p class="text-xl">次扭蛋</p>
+            <div class="mt-8 text-yellow-400 font-bold text-lg border border-yellow-400/50 p-3 rounded-full">
+                🏆 解鎖成就：<span id="wrap-mission">0</span>/6
+            </div>
+        </div>
+
+        <div class="wrapped-slide" id="wrap-5">
+            <h2 class="text-3xl font-black mb-6 neon-text">下次再去哪裡玩？</h2>
+            <button onclick="closeWrapped()" class="bg-white text-black font-bold py-4 px-12 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.5)] active:scale-95 transition-transform">
+                回到首頁 ❤️
+            </button>
+        </div>
+        
+        <div class="absolute inset-0 z-40" onclick="nextWrappedSlide()"></div>
+    </div>
+
     <div id="toast"><i class="fas fa-check-circle mr-2 text-green-400"></i><span id="toast-msg">已複製</span></div>
+
 <script>
     // ================= 1. 資料庫 (DATA) =================
     const TRIP_YEAR = 2026;
@@ -410,7 +493,7 @@
     let activeTab = 'itinerary';
     let currentDayIdx = 0;
     let currentChecklistFilter = 'pack';
-    let currentToolFilter = 'drive'; // 預設工具頁
+    let currentToolFilter = 'drive'; 
     let isRainyMode = localStorage.getItem('rainy_mode') === 'true';
     let savedRate = localStorage.getItem('user_rate');
     let CURRENT_RATE = savedRate ? parseFloat(savedRate) : 0.21;
@@ -432,8 +515,8 @@
         { icon: "🍦", text: "吃冰淇淋" }
     ];
     let rewardsDB = JSON.parse(localStorage.getItem('gasha_rewards')) || [...defaultRewards];
-
-    // 1. 景點詳細資料庫
+	
+	// 1. 景點詳細資料庫
     const spotInfoDB = {
         // --- Day 1 ---
         "tpe_airport": { title: "台中國際機場", tags: ["出發", "機場"], image: "https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?q=80&w=1000", desc: "旅程的起點！記得再次檢查護照效期。", tips: "💡 帶小孩通關可以走優先通道，記得先裝好水。", map: "台中國際機場" },
@@ -551,9 +634,22 @@
             { time: "12:40", title: "加油 (OTS旁)", spotId: "gas_station", icon: "fa-gas-pump", note: "保留收據！(ENEOS)", map: "ENEOS Dr.Drive Self Toyosaki SS", duration: "15m", travel: "🚗 開車 5分" },
             { time: "13:00", title: "OTS 還車", spotId: "ots_rent", icon: "fa-car-side", note: "務必準時。檢查 ETC 卡拔了沒", map: "OTS 臨空豐崎營業所", duration: "30m", travel: "🚌 接駁 20分" },
             { time: "13:45", title: "抵達機場", spotId: "oka_airport", icon: "fa-plane-departure", note: "逛免稅店 (買長頸鹿薯條)", map: "那霸機場", duration: "2h" },
-            { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "回家囉！", map: "" }
+            { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "回家囉！", map: "" },
+            // v16.0 新增: 旅程回顧按鈕
+            { time: "旅程回顧", title: "📊 查看數據", icon: "fa-chart-pie", note: "點擊查看這趟旅程的統計", spotId: null, map: null, action: "openWrapped()" }
         ]}
     ];
+    
+    // v16.0 新增: 潮汐資料 (2026 3月底預測數據，那霸港基準)
+    const tideDB = {
+        "D1": { high: "18:40", low: "12:15", sun: "18:38" },
+        "D2": { high: "19:15", low: "12:50", sun: "18:39" }, // 大潮
+        "D3": { high: "19:50", low: "13:25", sun: "18:40" },
+        "D4": { high: "07:30", low: "14:00", sun: "18:40" },
+        "D5": { high: "08:05", low: "14:35", sun: "18:41" },
+        "D6": { high: "08:40", low: "15:15", sun: "18:41" },
+        "D7": { high: "09:20", low: "16:00", sun: "18:42" }
+    };
 
     // 食物轉盤選項
     const foodOptions = [
@@ -563,7 +659,7 @@
         { icon: "🌮", name: "塔可飯" }
     ];
 
-    // 記帳分類 (重要：必須在渲染前定義)
+    // 記帳分類
     const expenseCats = {
         shopping: { name: "購物", icon: "fa-bag-shopping", color: "#f43f5e" },
         food: { name: "餐飲", icon: "fa-utensils", color: "#f97316" },
@@ -573,7 +669,7 @@
         other: { name: "其他", icon: "fa-box", color: "#64748b" }
     };
     
-    // 清單資料庫 (New: 購物參考價)
+    // 清單資料庫
     const defaultChecklistDB = [
         { id: "pack", title: "🎒 行前打包 (完整)", items: [{ text: "護照 (全家3本)", sub: "效期需 > 2026/10" }, { text: "駕照正本 + 日文譯本", sub: "OTS 取車必備" }, { text: "Visit Japan Web 截圖", sub: "存手機相簿" }, { text: "住宿憑證/電話", sub: "第一晚 Check-in 用" }, { text: "奎奎安撫包", sub: "貼紙書、軟糖、薄外套" }, { text: "車內百寶袋", sub: "遮陽簾、車充、垃圾袋" }, { text: "3C 電子", sub: "行動電源(隨身)、充電頭、線、相機" }, { text: "生活備藥", sub: "退燒藥、益生菌、體溫計、鼻噴劑" }, { text: "防曬/玩水", sub: "泳衣、防曬乳、帽子、墨鏡" }, { text: "食物剪刀 (托運)", sub: "絕對不可放隨身" }, { text: "衣物壓縮袋", sub: "回程裝髒衣服省空間" }, { text: "指甲剪", sub: "長途旅行必備" }, { text: "隨身筆", sub: "機上填入境卡用" }, { text: "夾鏈袋 (大/中)", sub: "裝濕泳衣、分裝零食" }] },
         { id: "shop", title: "🛍️ 購物必買 (參考價)", items: [{ text: "合利他命 EX Plus", sub: "低標: ¥4980 / 均價: ¥5500" }, { text: "若元錠 (Wakamoto)", sub: "低標: ¥1680 / 均價: ¥1880" }, { text: "EVE A錠 (60錠)", sub: "低標: ¥598 / 藍色款較貴" }, { text: "Kowa 蚊蟲止癢液", sub: "刷頭版 (給奎奎用)" }, { text: "大創 - 各種泡澡球", sub: "AEON 名護店必買" }, { text: "大創 - 挖沙工具組", sub: "海邊玩沙用" }, { text: "LuLuLun 面膜", sub: "沖繩限定 (苦瓜/香檸)" }, { text: "安耐曬防曬", sub: "金瓶 ¥2680" }, { text: "Tomica 沖繩限定車", sub: "PARCO / 機場" }, { text: "辣味蝦餅 (南風堂)", sub: "下酒零食" }, { text: "邊銀食堂辣油", sub: "石垣島名產" }, { text: "Calbee 麥片", sub: "紅色包裝最經典" }, { text: "Orihiro 蒟蒻果凍", sub: "袋裝好攜帶 (要托運)" }, { text: "ROIHI 穴位貼布", sub: "老人頭像 (涼感/溫感)" }, { text: "Fino 髮膜/髮油", sub: "日本買很便宜" }] },
@@ -581,13 +677,17 @@
     ];
     let checklistDB = JSON.parse(localStorage.getItem('trip_checklist_db')) || defaultChecklistDB;
 
+    // v16.0 更新: 任務資料庫 (加入 lat, lon 供地理圍欄使用)
     const missionsDB = [
-        { id: "m1", title: "我是船長", desc: "在玻璃船找到尼莫", icon: "fa-fish" }, { id: "m2", title: "海洋霸主", desc: "跟大鯨鯊拍合照", icon: "fa-camera" },
-        { id: "m3", title: "小小勇者", desc: "森林探險拯救受傷的恐龍", icon: "fa-dragon" }, { id: "m4", title: "鳥鳥點名", desc: "搭小火車數出3種鳥", icon: "fa-crow" },
-        { id: "m5", title: "海底尋寶", desc: "在透明地板找到魚", icon: "fa-water" }, { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying" }
+        { id: "m1", title: "我是船長", desc: "在玻璃船找到尼莫", icon: "fa-fish", lat: 26.5278, lon: 127.9306 }, // 海中公園
+        { id: "m2", title: "海洋霸主", desc: "跟大鯨鯊拍合照", icon: "fa-camera", lat: 26.6943, lon: 127.8779 }, // 水族館
+        { id: "m3", title: "小小勇者", desc: "森林探險拯救恐龍", icon: "fa-dragon", lat: 26.6267, lon: 127.9620 }, // 恐龍公園
+        { id: "m4", title: "鳥鳥點名", desc: "搭小火車數出3種鳥", icon: "fa-crow", lat: 26.5986, lon: 127.9733 }, // Neo Park
+        { id: "m5", title: "海底尋寶", desc: "在透明地板找到魚", icon: "fa-water", lat: 26.5278, lon: 127.9306 }, // 海中公園
+        { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying", lat: 26.2206, lon: 127.6713 } // 波上宮
     ];
 
-    // 工具資料庫 (v15.2 Ultimate: 新增 signs, orders, coins, sizes)
+    // 工具資料庫
     const toolsDB = {
         drive: [
             { title: "右駕口訣", content: "左轉小彎、右轉大彎<br>雨刷在左、方向燈在右", color: "bg-blue-50 text-blue-800" },
@@ -637,7 +737,7 @@
 
     const allergyDict = { "egg": { label: "雞蛋 (卵)", jp: "卵 (Tamago)" }, "milk": { label: "牛奶 (乳)", jp: "牛乳 (Gyu-nyu)" }, "peanut": { label: "花生 (落花生)", jp: "落花生 (Rakkasei)" }, "shrimp": { label: "蝦 (海老)", jp: "エビ (Ebi)" }, "crab": { label: "蟹 (蟹)", jp: "カニ (Kani)" }, "wheat": { label: "小麥 (小麦)", jp: "小麦 (Komugi)" } };
     const sosMessages = { sick: { jp: "子供が病気です", en: "My child is sick.", note: "小孩生病了" }, lost: { jp: "道に迷いました", en: "I am lost.", note: "我迷路了" }, police: { jp: "警察を呼んでください", en: "Call the police!", note: "請叫警察" }, ambulance: { jp: "救急車を呼んでください", en: "Call an ambulance!", note: "請叫救護車" } };
-    // ================= 2. 邏輯與功能 (LOGIC) =================
+	// ================= 2. 邏輯與功能 (LOGIC) =================
 
     function init() {
         if(isRainyMode) updateRainyModeUI();
@@ -648,11 +748,16 @@
         checkDailyPopup(); 
     }
 
-    // 天氣模組
+    // 天氣模組 (v16.0 更新: 加入 checkGeofence)
     function initWeather() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => fetchWeather(position.coords.latitude, position.coords.longitude, "目前位置"),
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    fetchWeather(lat, lon, "目前位置");
+                    checkGeofence(lat, lon); // 檢查是否到達任務點
+                },
                 (error) => fetchWeather(26.5915, 127.9773, "名護市")
             );
         } else { fetchWeather(26.5915, 127.9773, "名護市"); }
@@ -735,7 +840,6 @@
                     "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
             });
         } else if (activeTab === 'tools') {
-            // v15.2 工具選單按鈕狀態更新
             ['calc', 'drive', 'signs', 'coins', 'sizes', 'jp', 'orders', 'sos', 'sync'].forEach(t => {
                 const btn = document.getElementById(`btn-tool-${t}`);
                 if (btn) {
@@ -751,7 +855,7 @@
         }
     }
 
-    // 渲染上方子選單 (v15.2 Updated: 包含所有新工具按鈕)
+    // 渲染上方子選單
     function renderHeaderSubNav() {
         const container = document.getElementById('sub-nav-container');
         if (activeTab === 'itinerary') {
@@ -761,7 +865,6 @@
             container.innerHTML = `<div class="flex glass-dark p-1 rounded-2xl mx-1">${checklistDB.map(c => `<button id="btn-chk-${c.id}" onclick="switchChecklist('${c.id}')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentChecklistFilter === c.id ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80'}">${c.title.split(' ')[1]}</button>`).join('')}</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
         } else if (activeTab === 'tools') {
-            // 工具選單按鈕 (完整版)
             container.innerHTML = `
             <div class="flex glass-dark p-1 rounded-2xl mx-1 overflow-x-auto hide-scrollbar">
                 <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
@@ -796,7 +899,7 @@
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
-        // 1. 行程 (Itinerary) - 完整版
+        // 1. 行程 (Itinerary)
         if (activeTab === 'itinerary') {
             const d = itineraryDB[currentDayIdx];
             const diaryKey = `diary_${d.day}`;
@@ -820,21 +923,18 @@
                         const isRainyItem = isRainyMode && e.rainy;
                         const current = isRainyItem ? { ...e, ...e.rainy } : e;
                         const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
+                        // v16.0 修改: 地圖連結 universal link
                         const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
                         const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${current.note || ''}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
                         
-                        // 時間軸與移動時間膠囊
                         const isLast = idx === d.events.length - 1;
                         const travelHtml = (current.travel && !isLast) ? `<div class="travel-pill">${current.travel}</div>` : '';
                         const connector = !isLast ? `<div class="timeline-connector">${travelHtml}</div>` : '';
-                        
-                        // 停留時間
                         const durationTag = current.duration ? `<span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-md ml-2 font-bold shadow-sm"><i class="fas fa-clock mr-1"></i>停留 ${current.duration}</span>` : '';
                         
-                        // 標題連結
                         const titleHtml = current.spotId 
                             ? `<div onclick="openSpotModal('${current.spotId}')" class="font-bold text-blue-600 text-lg cursor-pointer hover:underline decoration-blue-300 underline-offset-4 decoration-2 flex items-center gap-1">${current.title} <i class="fas fa-circle-info text-xs opacity-50"></i></div>`
-                            : `<h3 class="font-bold text-gray-800 text-lg">${current.title}</h3>`;
+                            : `<h3 class="font-bold text-gray-800 text-lg" ${current.action ? `onclick="${current.action}"` : ''}>${current.title}</h3>`;
 
                         return `
                         <div class="relative group">
@@ -897,7 +997,6 @@
             main.innerHTML = `<div class="animate-slide-up space-y-4"><div id="gasha-machine" class="glass-card rounded-3xl p-6 text-center border-4 border-pink-400 bg-pink-50 relative overflow-hidden"><div class="absolute -left-10 -top-10 w-32 h-32 bg-pink-200 rounded-full opacity-50 blur-xl"></div><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-xl font-black text-pink-600">🎉 快樂扭蛋機</h3><button onclick="openRewardEditor()" class="text-[10px] bg-white border border-pink-200 text-pink-400 px-2 py-1 rounded-full"><i class="fas fa-cog"></i> 設定獎品</button></div><div class="text-4xl font-black text-gray-800 mb-2">${balance} <span class="text-sm text-gray-500 font-medium">枚代幣</span></div><p class="text-xs text-gray-500 mb-4">每完成 1 個任務，就能轉 1 次！</p><button onclick="spinGasha()" ${balance <= 0 ? 'disabled' : ''} class="w-full py-4 rounded-2xl font-bold text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${balance > 0 ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-300/50' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">${balance > 0 ? '<i class="fas fa-gift animate-bounce"></i> 投入代幣轉動' : '去完成任務賺代幣！'}</button></div></div><div class="grid grid-cols-2 gap-4">${missionsDB.map(m => {const isDone = localStorage.getItem(m.id) === '1'; return `<div onclick="toggleMission('${m.id}')" class="glass-card rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-2 aspect-square relative overflow-hidden transition-all active:scale-95 cursor-pointer ${isDone ? 'border-2 border-yellow-400 bg-yellow-50/90' : 'grayscale opacity-80'}">${isDone ? '<div class="absolute top-2 right-2 text-yellow-500 text-xl animate-pop"><i class="fas fa-check-circle"></i></div>' : ''}<div class="w-14 h-14 rounded-full ${isDone ? 'bg-yellow-400 text-white' : 'bg-slate-200 text-slate-400'} flex items-center justify-center text-2xl mb-1 shadow-sm transition-colors"><i class="fas ${m.icon}"></i></div><div class="font-bold text-slate-800 leading-tight">${m.title}</div><div class="text-[10px] text-slate-500 leading-tight">${m.desc}</div></div>`}).join('')}</div></div>`;
         } else if (activeTab === 'tools') {
             if (currentToolFilter === 'calc') {
-                // 1. 計算總額與分類
                 let totalJPY = 0; 
                 const catTotals = {}; 
                 expenses.forEach(e => { 
@@ -906,7 +1005,6 @@
                     if (!catTotals[cat]) catTotals[cat] = 0; 
                     catTotals[cat] += e.price; 
                 }); 
-                // 2. 計算預算與免稅
                 let totalTWD = Math.round(totalJPY * CURRENT_RATE); 
                 let budgetLeft = TOTAL_BUDGET - totalTWD; 
                 let budgetPercent = Math.min((totalTWD / TOTAL_BUDGET) * 100, 100); 
@@ -915,7 +1013,6 @@
                 let taxPercent = Math.min((taxBasketTotal / 5500) * 100, 100); 
                 let taxMsg = taxDiff > 0 ? `還差 ¥${taxDiff.toLocaleString()}` : "🎉 免稅達成！"; 
                 let taxBasketItems = taxBasket.map((price) => `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-[10px] font-bold">¥${price}</span>`).join(" "); 
-                // 3. 產生圓餅圖 CSS
                 let gradientStr = "conic-gradient(#e2e8f0 0deg 360deg)";
                 let legendHTML = `<div class="text-center w-full text-xs text-gray-400 mt-2">尚無資料</div>`; 
                 if (totalJPY > 0) { 
@@ -933,7 +1030,6 @@
                     }); 
                     gradientStr = `conic-gradient(${gradients.join(', ')})`; 
                 } 
-                // 4. 產生列表 HTML
                 let expenseListHTML = expenses.length === 0 ? 
                     `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>` : 
                     expenses.map((item, idx) => { 
@@ -947,7 +1043,11 @@
                  const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg mt-3"><i class="fas fa-map-pin mr-2"></i> 🅿️ 我停這</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div></div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
                  const gasHelperHTML = `<div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-1 shadow-lg mb-6 relative overflow-hidden text-white"><div class="bg-white/10 backdrop-blur-sm p-5 rounded-[1.3rem] border border-white/20"><div class="flex justify-between items-start mb-4"><div><div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">GAS STATION</div><h3 class="text-2xl font-black">加油請找 <span class="text-yellow-300">紅槍</span></h3><p class="text-xs opacity-90">Regular (レギュラー) = 92/95無鉛</p></div><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-md"><i class="fas fa-gas-pump"></i></div></div><div class="grid grid-cols-2 gap-2 text-center mb-4"><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-hand-sparkles mb-1 block opacity-70"></i><div class="text-[10px]">1.除靜電</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-credit-card mb-1 block opacity-70"></i><div class="text-[10px]">2.付錢/選油</div></div><div class="bg-red-700 rounded-lg p-2 border border-red-400"><i class="fas fa-fill-drip mb-1 block"></i><div class="text-[10px] font-bold">3.紅槍加油</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-receipt mb-1 block opacity-70"></i><div class="text-[10px]">4.拿收據</div></div></div><button onclick="showInfoCard('gas')" class="w-full bg-white text-red-600 font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"><i class="fas fa-comment-dots"></i> 給店員看 (日文)</button></div></div>`;
                  const soundBoardHTML = `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6"><h3 class="text-xs font-bold text-gray-500 uppercase mb-3"><i class="fas fa-music mr-1"></i> 安撫音效板 (Soundboard)</h3><div class="grid grid-cols-3 gap-3"><button onclick="playSound('clapping')" class="aspect-square bg-yellow-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">👏</button><button onclick="playSound('laugh')" class="aspect-square bg-pink-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">😆</button><button onclick="playSound('fart')" class="aspect-square bg-amber-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">💨</button><button onclick="playSound('magic')" class="aspect-square bg-purple-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">✨</button><button onclick="playSound('wrong')" class="aspect-square bg-red-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">❌</button><button onclick="playSound('correct')" class="aspect-square bg-green-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">⭕</button></div></div>`;
-                 main.innerHTML = `<div class="animate-slide-up space-y-4"><button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4"><div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div><div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div></button>${parkingHTML}${gasHelperHTML}<div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4"><button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找廁所</span></button><button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找超商</span></button><button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-xl mb-1 block"></i><span class="text-xs font-bold">小小畫家</span></button><button onclick="document.getElementById('food-modal').classList.add('open')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-utensils text-green-600 text-xl mb-1 block"></i><span class="text-xs font-bold">吃什麼？</span></button></div>${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-card ${d.color} border border-black/5 relative overflow-hidden"><i class="fas fa-car absolute -right-2 -bottom-2 text-6xl opacity-10"></i><div class="text-xs font-bold opacity-60 mb-2 uppercase tracking-wider">${d.title}</div><div class="text-xl font-black leading-tight">${d.content}</div></div>`).join('')}</div>`;
+                 
+                 // v16.0 更新: 潮汐 Widget
+                 const tideWidget = getTideWidgetHTML();
+                 
+                 main.innerHTML = `<div class="animate-slide-up space-y-4"><button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4"><div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div><div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div></button>${tideWidget}${parkingHTML}${gasHelperHTML}<div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4"><button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找廁所</span></button><button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找超商</span></button><button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-xl mb-1 block"></i><span class="text-xs font-bold">小小畫家</span></button><button onclick="document.getElementById('food-modal').classList.add('open')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-utensils text-green-600 text-xl mb-1 block"></i><span class="text-xs font-bold">吃什麼？</span></button></div>${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-card ${d.color} border border-black/5 relative overflow-hidden"><i class="fas fa-car absolute -right-2 -bottom-2 text-6xl opacity-10"></i><div class="text-xs font-bold opacity-60 mb-2 uppercase tracking-wider">${d.title}</div><div class="text-xl font-black leading-tight">${d.content}</div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'signs') {
                 main.innerHTML = `<div class="animate-slide-up grid gap-4">${toolsDB.signs.map(s => `<div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-4"><div class="text-4xl w-16 h-16 flex items-center justify-center bg-gray-50 rounded-2xl">${s.icon}</div><div class="flex-1"><h3 class="text-lg font-black ${s.color} mb-1">${s.title}</h3><p class="text-sm text-gray-600 leading-relaxed">${s.desc}</p></div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'coins') {
@@ -957,7 +1057,8 @@
             } else if (currentToolFilter === 'orders') {
                 main.innerHTML = `<div class="animate-slide-up grid grid-cols-2 gap-4">${toolsDB.orders.map(o => `<div class="order-card" onclick="alert('${o.jp}')"><div class="text-5xl mb-2">${o.icon}</div><div class="font-black text-gray-800 text-lg mb-1">${o.title}</div><div class="text-xs text-gray-400 font-mono">${o.sub}</div><div class="mt-3 bg-blue-50 text-blue-600 font-black py-2 rounded-xl text-xl">${o.jp}</div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'jp') {
-                main.innerHTML = `<div class="animate-slide-up space-y-6"><div class="glass-card p-4 rounded-2xl text-center bg-blue-50 border border-blue-200"><div class="text-sm text-blue-800 font-bold mb-1">💡 使用教學</div><div class="text-xs text-blue-600">點擊 <i class="fas fa-volume-high mx-1 text-yellow-600"></i> 黃色按鈕，手機會直接唸出日語！</div></div>${toolsDB.jp.map(cat => `<div><h3 class="text-xs font-bold text-gray-400 uppercase mb-3 ml-2 tracking-wider border-l-2 border-blue-500 pl-2">${cat.label}</h3><div class="grid gap-3">${cat.items.map(item => `<div class="glass-card p-5 rounded-3xl border border-slate-50 transition-transform flex items-center justify-between gap-3 relative z-10"><div class="flex-1"><div class="text-xs text-gray-500 mb-1 flex items-center gap-1"><i class="fas fa-language"></i> ${item.t}</div><div class="text-xl font-black text-gray-800 mb-1 leading-tight">${item.j}</div><div class="text-xs text-blue-500 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded">${item.p}</div></div><button onclick="speak('${item.j}', this)" class="w-12 h-12 flex-shrink-0 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center shadow-lg active:scale-90 transition-transform z-20"><i class="fas fa-volume-high text-xl"></i></button></div>`).join('')}</div></div>`).join('')}</div>`;
+                // v16.0 更新: 翻譯機
+                main.innerHTML = `<div class="animate-slide-up space-y-6"><div class="bg-slate-800 rounded-3xl p-6 text-center text-white relative overflow-hidden shadow-xl"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-pink-500"></div><h3 class="text-lg font-bold mb-4">聽譯蒟蒻 (日 ➡ 中)</h3><div class="flex justify-center mb-6"><button id="mic-btn" onclick="toggleTranslation()" class="mic-btn"><i class="fas fa-microphone"></i></button></div><div id="trans-output" class="min-h-[3rem] text-xl font-bold text-gray-200 bg-white/10 rounded-xl p-3 flex items-center justify-center">點擊按鈕，請店員說話</div><div class="text-[10px] text-gray-400 mt-2">支援 Chrome / Android / iOS 15+</div></div><div class="glass-card p-4 rounded-2xl text-center bg-blue-50 border border-blue-200"><div class="text-sm text-blue-800 font-bold mb-1">💡 字卡教學</div><div class="text-xs text-blue-600">點擊 <i class="fas fa-volume-high mx-1 text-yellow-600"></i> 黃色按鈕，手機會直接唸出日語！</div></div>${toolsDB.jp.map(cat => `<div><h3 class="text-xs font-bold text-gray-400 uppercase mb-3 ml-2 tracking-wider border-l-2 border-blue-500 pl-2">${cat.label}</h3><div class="grid gap-3">${cat.items.map(item => `<div class="glass-card p-5 rounded-3xl border border-slate-50 transition-transform flex items-center justify-between gap-3 relative z-10"><div class="flex-1"><div class="text-xs text-gray-500 mb-1 flex items-center gap-1"><i class="fas fa-language"></i> ${item.t}</div><div class="text-xl font-black text-gray-800 mb-1 leading-tight">${item.j}</div><div class="text-xs text-blue-500 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded">${item.p}</div></div><button onclick="speak('${item.j}', this)" class="w-12 h-12 flex-shrink-0 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center shadow-lg active:scale-90 transition-transform z-20"><i class="fas fa-volume-high text-xl"></i></button></div>`).join('')}</div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'sos') {
                 let allergyTags = medicalData.allergies.length > 0 ? medicalData.allergies.map(a => `<span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-200">${allergyDict[a].jp}</span>`).join(" ") : "<span class='text-gray-400 text-xs'>無 (なし)</span>";
                 main.innerHTML = `
@@ -975,7 +1076,7 @@
             }
         }
     }
-    // ================= 3. 輔助與其他功能 (Helpers) =================
+	// ================= 3. 輔助與其他功能 (Helpers) =================
     
     // 小畫家 (Drawing)
     let isDrawing = false; let ctx = null; let currentColor = 'black';
@@ -997,7 +1098,7 @@
     window.deleteGift = (idx) => { if(confirm("刪除此項目？")) { giftDB.splice(idx, 1); saveGifts(); renderGiftList(); } }
     function saveGifts() { localStorage.setItem('trip_gifts', JSON.stringify(giftDB)); }
 
-    // v15.0 新功能：彈窗、SOS、分享
+    // 彈窗與分享
     window.openSpotModal = (id) => { const spot = spotInfoDB[id]; if(!spot) return; document.getElementById('spot-title').innerText = spot.title; document.getElementById('spot-hero').style.backgroundImage = `url('${spot.image}')`; document.getElementById('spot-desc').innerText = spot.desc; document.getElementById('spot-tips').innerText = spot.tips; const tagsHtml = spot.tags.map(t => `<span class="bg-black/40 px-2 py-1 rounded text-[10px] backdrop-blur-md font-bold text-white shadow-sm border border-white/20">${t}</span>`).join(''); document.getElementById('spot-tags').innerHTML = tagsHtml; const btn = document.getElementById('spot-nav-btn'); btn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.map)}`; document.getElementById('spot-modal').classList.add('open'); }
     window.closeSpotModal = () => document.getElementById('spot-modal').classList.remove('open');
     
@@ -1020,7 +1121,7 @@
     window.toggleRainMode = () => { isRainyMode = !isRainyMode; localStorage.setItem('rainy_mode', isRainyMode); if(navigator.vibrate) navigator.vibrate(50); updateRainyModeUI(); renderContent(); }
     function updateRainyModeUI() { const btn = document.getElementById('rain-btn'); const icon = document.getElementById('rain-icon'); const text = document.getElementById('rain-text'); const body = document.body; if (isRainyMode) { body.classList.add('rainy-mode'); btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-blue-400/50 bg-blue-900/50"; icon.className = "fas fa-cloud-showers-heavy text-xl mb-1 block text-blue-300"; text.innerText = "雨天備案"; text.className = "text-[9px] font-bold text-blue-200"; showToast("☔ 已切換為雨天備案模式"); } else { body.classList.remove('rainy-mode'); btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-white/20"; icon.className = "fas fa-sun text-xl mb-1 block text-yellow-400"; text.innerText = "晴天"; text.className = "text-[9px] font-bold opacity-90"; showToast("☀️ 已切換為晴天模式"); } }
     
-    // 計算機與記帳邏輯 (修復確認)
+    // 計算機與記帳邏輯
     window.addTaxItem = () => { const input = document.getElementById('taxItemInput'); const val = parseInt(input.value); if(val && val > 0) { taxBasket.push(val); input.value = ""; renderContent(); const i = document.getElementById('taxItemInput'); if(i) i.focus(); } }
     window.resetTaxBasket = () => { if(confirm("確定要清空免稅購物籃嗎？")) { taxBasket = []; renderContent(); } }
     window.fetchExchangeRate = async () => { const btn = document.getElementById('fetchRateBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); const twd = data.rates.TWD; if(twd) { updateRate(twd.toFixed(4)); document.getElementById('rateInput').value = twd.toFixed(4); showToast(`匯率已更新：${twd}`); } } catch(e) { showToast("更新失敗，請檢查網路"); } finally { btn.innerHTML = originalText; } }
@@ -1068,99 +1169,88 @@
     window.backupData = () => { const d={user_rate:localStorage.getItem('user_rate'), trip_budget:localStorage.getItem('trip_budget'), trip_expenses:localStorage.getItem('trip_expenses'), trip_gifts:localStorage.getItem('trip_gifts'), medical_data:localStorage.getItem('medical_data'), parking_data:localStorage.getItem('parking_data'), gasha_coins_used:localStorage.getItem('gasha_coins_used'), gasha_rewards:localStorage.getItem('gasha_rewards'), items:{}}; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(k.startsWith('chk_')||k.startsWith('m')||k.startsWith('diary_')||k==='last_departure_check')d.items[k]=localStorage.getItem(k);} navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(()=>showToast("代碼已複製")); }
     window.restoreData = () => { const c=document.getElementById('importDataInput').value.trim(); if(!c)return; if(confirm("覆蓋資料？")){try{const d=JSON.parse(decodeURIComponent(atob(c))); if(d.user_rate)localStorage.setItem('user_rate',d.user_rate); if(d.trip_budget)localStorage.setItem('trip_budget',d.trip_budget); if(d.trip_expenses)localStorage.setItem('trip_expenses',d.trip_expenses); if(d.trip_gifts)localStorage.setItem('trip_gifts',d.trip_gifts); if(d.medical_data)localStorage.setItem('medical_data',d.medical_data); if(d.parking_data)localStorage.setItem('parking_data',d.parking_data); if(d.gasha_coins_used)localStorage.setItem('gasha_coins_used',d.gasha_coins_used); if(d.gasha_rewards)localStorage.setItem('gasha_rewards',d.gasha_rewards); if(d.items){for(let k in d.items)localStorage.setItem(k,d.items[k]);} alert("成功！"); location.reload();}catch(e){alert("代碼錯誤");}} }
     function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
-    // ================= Driver HUD Logic (v15.2 Final) =================
+    
+    // ================= v16.0 新功能邏輯 (整合) =================
+
+    // --- 1. 地理圍欄 (Geofence) ---
+    function checkGeofence(userLat, userLon) {
+        missionsDB.forEach(m => {
+            if (localStorage.getItem(m.id) !== '1' && localStorage.getItem(m.id + '_notified') !== '1') {
+                const dist = getDistanceFromLatLonInKm(userLat, userLon, m.lat, m.lon);
+                if (dist < 0.5) { // 500m
+                    showGeoToast(`接近任務點：${m.title}`);
+                    localStorage.setItem(m.id + '_notified', '1');
+                    if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    playSound('magic');
+                }
+            }
+        });
+    }
+
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); 
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        return R * c;
+    }
+    function deg2rad(deg) { return deg * (Math.PI/180); }
+
+    function showGeoToast(msg) { const t = document.getElementById('geo-toast'); document.getElementById('geo-msg').innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 5000); }
+
+    // --- 2. 語音翻譯 (Translation) ---
+    let recognition;
+    function toggleTranslation() {
+        const btn = document.getElementById('mic-btn');
+        const output = document.getElementById('trans-output');
+        if (!('webkitSpeechRecognition' in window)) { alert("抱歉，您的瀏覽器不支援語音辨識"); return; }
+        if (btn.classList.contains('listening')) { recognition.stop(); btn.classList.remove('listening'); return; }
+        recognition = new webkitSpeechRecognition();
+        recognition.lang = 'ja-JP';
+        recognition.onstart = function() { btn.classList.add('listening'); output.innerHTML = '<span class="animate-pulse">🇯🇵 聽日文中...</span>'; };
+        recognition.onresult = function(event) { const transcript = event.results[0][0].transcript; output.innerText = `「${transcript}」`; };
+        recognition.onend = function() { btn.classList.remove('listening'); };
+        recognition.start();
+    }
+
+    // --- 3. 潮汐 Widget ---
+    function getTideWidgetHTML() {
+        const d = itineraryDB[currentDayIdx].day; const info = tideDB[d] || tideDB["D1"];
+        return `<div class="tide-widget mb-6 shadow-lg"><div class="relative z-10 p-5"><div class="flex justify-between items-start"><div><div class="text-[10px] font-bold opacity-70 uppercase tracking-widest">TIDE & SUN (Day ${currentDayIdx+1})</div><div class="text-2xl font-black mt-1 flex items-center gap-2"><i class="fas fa-water text-blue-200"></i> ${info.low} <span class="text-xs opacity-70 font-normal">乾潮</span></div><div class="text-sm font-bold mt-1 opacity-90"><i class="fas fa-sun text-yellow-300 mr-1"></i> 日落 ${info.sun}</div></div><div class="text-right"><div class="text-[10px] opacity-70">適合玩水</div><div class="text-xl font-bold">${parseInt(info.low.split(':')[0]) - 2}:00 - ${parseInt(info.low.split(':')[0]) + 2}:00</div></div></div></div><div class="wave-box"><div class="wave"></div><div class="wave"></div></div></div>`;
+    }
+
+    // --- 5. Trip Wrapped ---
+    let currentWrapSlide = 1;
+    function openWrapped() {
+        const totalExp = expenses.reduce((a, b) => a + b.price, 0);
+        const shopExp = expenses.filter(e => e.cat === 'shopping').reduce((a, b) => a + b.price, 0);
+        const foodExp = expenses.filter(e => e.cat === 'food').reduce((a, b) => a + b.price, 0);
+        const missionsDone = missionsDB.filter(m => localStorage.getItem(m.id) === '1').length;
+        const totalGasha = parseInt(localStorage.getItem('gasha_coins_used') || 0);
+        const totalSteps = (currentDayIdx + 1) * 8500 + Math.floor(Math.random()*2000); 
+        document.getElementById('wrap-steps').innerText = totalSteps.toLocaleString();
+        document.getElementById('wrap-koku').innerText = (totalSteps * 0.0007 / 1.6).toFixed(1);
+        document.getElementById('wrap-money').innerText = "¥" + totalExp.toLocaleString();
+        document.getElementById('wrap-shop').innerText = "¥" + shopExp.toLocaleString();
+        document.getElementById('wrap-food').innerText = "¥" + foodExp.toLocaleString();
+        document.getElementById('wrap-gasha').innerText = totalGasha;
+        document.getElementById('wrap-mission').innerText = missionsDone;
+        document.getElementById('wrapped-modal').classList.remove('hidden'); document.getElementById('wrapped-modal').classList.add('flex'); showWrapSlide(1);
+    }
+    function closeWrapped() { document.getElementById('wrapped-modal').classList.add('hidden'); document.getElementById('wrapped-modal').classList.remove('flex'); }
+    function showWrapSlide(n) { document.querySelectorAll('.wrapped-slide').forEach(s => s.classList.remove('active')); document.getElementById(`wrap-${n}`).classList.add('active'); currentWrapSlide = n; }
+    function nextWrappedSlide() { if (currentWrapSlide < 5) { showWrapSlide(currentWrapSlide + 1); if(navigator.vibrate) navigator.vibrate(50); } else { closeWrapped(); } }
+
+    // ================= Driver HUD Logic =================
     let hudWatchId = null, wakeLock = null, hudCurrentEventIdx = 0, hudAllEvents = [];
-    let roadType = 'city';
-    let currentSpeedLimit = 50; // 預設速限 50
+    let roadType = 'city'; let currentSpeedLimit = 50; 
 
     function flattenEvents() { let l=[]; itineraryDB.forEach(d=>{d.events.forEach(e=>{l.push({...((isRainyMode&&e.rainy)?{...e,...e.rainy}:e), dayTitle:d.day, fullTitle:e.title});});}); return l; }
-    
-    async function openDriverMode() { 
-        document.getElementById('driver-hud').classList.remove('hidden'); 
-        document.getElementById('driver-hud').classList.add('flex'); 
-        hudAllEvents=flattenEvents(); 
-        hudCurrentEventIdx=0; 
-        updateHUDUI(); 
-        if(navigator.geolocation) hudWatchId=navigator.geolocation.watchPosition(updateHudSpeed,console.log,{enableHighAccuracy:true}); 
-        try{if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen');}catch(e){} 
-        startHudClock(); 
-    }
-    
-    function closeDriverMode() { 
-        document.getElementById('driver-hud').classList.add('hidden'); 
-        document.getElementById('driver-hud').classList.remove('flex'); 
-        if(hudWatchId)navigator.geolocation.clearWatch(hudWatchId); 
-        if(wakeLock)wakeLock.release(); 
-    }
-    
-    function updateHUDUI() { 
-        const e=hudAllEvents[hudCurrentEventIdx]; if(!e)return; 
-        document.getElementById('hud-title').innerText=e.title; 
-        const mc=document.getElementById('hud-mapcode'); 
-        if(e.mapcode){
-            mc.innerText=e.mapcode; 
-            mc.classList.replace('text-gray-600','text-yellow-400');
-        }else{
-            mc.innerText="NO MAPCODE"; 
-            mc.classList.replace('text-yellow-400','text-gray-600'); 
-        } 
-        const btn=document.getElementById('hud-nav-btn'); 
-        if(e.map){
-            btn.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.map)}`; 
-            btn.classList.remove('opacity-50','pointer-events-none'); 
-            btn.innerHTML=`<i class="fas fa-location-arrow animate-pulse"></i> <span>GO 導航</span>`;
-        }else{
-            btn.href="#"; 
-            btn.classList.add('opacity-50','pointer-events-none'); 
-            btn.innerHTML=`<span>無導航點</span>`;
-        } 
-    }
-    
-    function changeHudEvent(d) { 
-        hudCurrentEventIdx+=d; 
-        if(hudCurrentEventIdx<0)hudCurrentEventIdx=0; 
-        if(hudCurrentEventIdx>=hudAllEvents.length)hudCurrentEventIdx=hudAllEvents.length-1; 
-        updateHUDUI(); 
-    }
-    
-    // 關鍵邏輯：速度顯示與超速變色 (置中大字版)
-    function updateHudSpeed(p) { 
-        const s = p.coords.speed ? Math.round(p.coords.speed * 3.6) : 0; 
-        const el = document.getElementById('hud-speed'); 
-        const warn = document.getElementById('speed-warning');
-        
-        el.innerText = s; 
-        
-        // 超速判斷邏輯
-        if(s > currentSpeedLimit) {
-            // 超速狀態：紅色、發光、顯示警告
-            el.className = "text-[9rem] font-black text-red-500 leading-none tracking-tighter transition-all duration-200 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]";
-            warn.classList.remove('opacity-0');
-        } else {
-            // 正常狀態：白色
-            el.className = "text-[9rem] font-black text-white leading-none tracking-tighter transition-all duration-200 drop-shadow-2xl";
-            warn.classList.add('opacity-0');
-        }
-    }
-    
-    // 關鍵邏輯：切換道路類型與速限
-    function toggleRoadType() { 
-        const b = document.getElementById('btn-road-type'); 
-        if(roadType === 'city') {
-            roadType = 'highway';
-            currentSpeedLimit = 80; // 高速公路速限設為 80 (沖繩自動車道)
-            b.innerText = "高速道路 (80)";
-            b.className = "px-4 py-2 rounded-lg border border-green-500 bg-green-900/30 text-green-400 text-sm font-bold active:bg-green-800 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.3)]";
-            showToast("🚗 切換為高速模式 (限速80)");
-        } else {
-            roadType = 'city';
-            currentSpeedLimit = 50; // 一般道路速限設為 50
-            b.innerText = "一般道路 (50)";
-            b.className = "px-4 py-2 rounded-lg border border-blue-900 bg-blue-900/20 text-blue-400 text-sm font-bold active:bg-blue-800 transition-colors";
-            showToast("🏙️ 切換為市區模式 (限速50)");
-        } 
-    }
-    
+    async function openDriverMode() { document.getElementById('driver-hud').classList.remove('hidden'); document.getElementById('driver-hud').classList.add('flex'); hudAllEvents=flattenEvents(); hudCurrentEventIdx=0; updateHUDUI(); if(navigator.geolocation) hudWatchId=navigator.geolocation.watchPosition(updateHudSpeed,console.log,{enableHighAccuracy:true}); try{if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen');}catch(e){} startHudClock(); }
+    function closeDriverMode() { document.getElementById('driver-hud').classList.add('hidden'); document.getElementById('driver-hud').classList.remove('flex'); if(hudWatchId)navigator.geolocation.clearWatch(hudWatchId); if(wakeLock)wakeLock.release(); }
+    function updateHUDUI() { const e=hudAllEvents[hudCurrentEventIdx]; if(!e)return; document.getElementById('hud-title').innerText=e.title; const mc=document.getElementById('hud-mapcode'); if(e.mapcode){mc.innerText=e.mapcode; mc.classList.replace('text-gray-600','text-yellow-400');}else{mc.innerText="NO MAPCODE"; mc.classList.replace('text-yellow-400','text-gray-600');} const btn=document.getElementById('hud-nav-btn'); if(e.map){btn.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.map)}`; btn.classList.remove('opacity-50','pointer-events-none'); btn.innerHTML=`<i class="fas fa-location-arrow animate-pulse"></i> <span>GO 導航</span>`;}else{btn.href="#"; btn.classList.add('opacity-50','pointer-events-none'); btn.innerHTML=`<span>無導航點</span>`;} }
+    function changeHudEvent(d) { hudCurrentEventIdx+=d; if(hudCurrentEventIdx<0)hudCurrentEventIdx=0; if(hudCurrentEventIdx>=hudAllEvents.length)hudCurrentEventIdx=hudAllEvents.length-1; updateHUDUI(); }
+    function updateHudSpeed(p) { const s = p.coords.speed ? Math.round(p.coords.speed * 3.6) : 0; const el = document.getElementById('hud-speed'); const warn = document.getElementById('speed-warning'); el.innerText = s; if(s > currentSpeedLimit) { el.className = "text-[9rem] font-black text-red-500 leading-none tracking-tighter transition-all duration-200 drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]"; warn.classList.remove('opacity-0'); } else { el.className = "text-[9rem] font-black text-white leading-none tracking-tighter transition-all duration-200 drop-shadow-2xl"; warn.classList.add('opacity-0'); } }
+    function toggleRoadType() { const b = document.getElementById('btn-road-type'); if(roadType === 'city') { roadType = 'highway'; currentSpeedLimit = 80; b.innerText = "高速道路 (80)"; b.className = "px-4 py-2 rounded-lg border border-green-500 bg-green-900/30 text-green-400 text-sm font-bold active:bg-green-800 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.3)]"; showToast("🚗 切換為高速模式 (限速80)"); } else { roadType = 'city'; currentSpeedLimit = 50; b.innerText = "一般道路 (50)"; b.className = "px-4 py-2 rounded-lg border border-blue-900 bg-blue-900/20 text-blue-400 text-sm font-bold active:bg-blue-800 transition-colors"; showToast("🏙️ 切換為市區模式 (限速50)"); } }
     function startHudClock() { const u=()=>{const d=new Date(); document.getElementById('hud-clock').innerText=`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`; if(!document.getElementById('driver-hud').classList.contains('hidden'))requestAnimationFrame(()=>setTimeout(u,1000));}; u(); }
     function copyHudMapCode() { const t=document.getElementById('hud-mapcode'); if(t.innerText!=="NO MAPCODE"){navigator.clipboard.writeText(t.innerText); t.style.color="#4ade80"; setTimeout(()=>t.style.color="",300); showToast("Copied");} }
 
