@@ -1197,21 +1197,63 @@
 
     function showGeoToast(msg) { const t = document.getElementById('geo-toast'); document.getElementById('geo-msg').innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 5000); }
 
-    // --- 2. 語音翻譯 (Translation) ---
+   // --- 2. 語音翻譯 (Translation) - 除錯增強版 ---
     let recognition;
     function toggleTranslation() {
         const btn = document.getElementById('mic-btn');
         const output = document.getElementById('trans-output');
-        if (!('webkitSpeechRecognition' in window)) { alert("抱歉，您的瀏覽器不支援語音辨識"); return; }
-        if (btn.classList.contains('listening')) { recognition.stop(); btn.classList.remove('listening'); return; }
-        recognition = new webkitSpeechRecognition();
-        recognition.lang = 'ja-JP';
-        recognition.onstart = function() { btn.classList.add('listening'); output.innerHTML = '<span class="animate-pulse">🇯🇵 聽日文中...</span>'; };
-        recognition.onresult = function(event) { const transcript = event.results[0][0].transcript; output.innerText = `「${transcript}」`; };
-        recognition.onend = function() { btn.classList.remove('listening'); };
-        recognition.start();
-    }
+        
+        // 檢查瀏覽器支援
+        if (!('webkitSpeechRecognition' in window)) {
+            output.innerHTML = '<span class="text-red-400">❌ 此瀏覽器不支援</span>';
+            return;
+        }
 
+        if (btn.classList.contains('listening')) {
+            if(recognition) recognition.stop();
+            btn.classList.remove('listening');
+            output.innerText = "點擊按鈕，請店員說話";
+            return;
+        }
+
+        try {
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'ja-JP'; // 設定為聽日文
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                btn.classList.add('listening');
+                output.innerHTML = '<span class="animate-pulse">🇯🇵 聽日文中...</span>';
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                output.innerText = `「${transcript}」`;
+            };
+
+            // ★★★ 新增錯誤顯示功能 ★★★
+            recognition.onerror = function(event) {
+                console.error("Speech Err:", event.error);
+                let msg = event.error;
+                if(event.error === 'not-allowed') msg = "麥克風權限被拒 (請檢查設定)";
+                if(event.error === 'network') msg = "網路不穩，無法連線翻譯";
+                if(event.error === 'no-speech') msg = "沒聽到聲音，請再試一次";
+                
+                output.innerHTML = `<span class="text-red-400 text-sm font-bold">❌ 錯誤: ${msg}</span>`;
+                btn.classList.remove('listening');
+            };
+
+            recognition.onend = function() {
+                btn.classList.remove('listening');
+            };
+            
+            recognition.start();
+        } catch (e) {
+            output.innerHTML = '<span class="text-red-400">❌ 啟動失敗</span>';
+        }
+    }
+   
     // --- 3. 潮汐 Widget ---
     function getTideWidgetHTML() {
         const d = itineraryDB[currentDayIdx].day; const info = tideDB[d] || tideDB["D1"];
