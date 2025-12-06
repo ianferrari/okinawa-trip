@@ -1230,13 +1230,17 @@
             recognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
             
-            // 修改這裡：顯示日文原文 + 翻譯按鈕
+            // ★ 強制修正排版：改成垂直排列 (flex-col)，增加內距
+            output.className = "w-full bg-white/10 rounded-xl p-4 flex flex-col items-center justify-center gap-3 animate-pop";
+            
             output.innerHTML = `
-                <div class="text-2xl mb-3 font-black">「${transcript}」</div>
+                <div class="text-2xl font-black text-white tracking-widest">「${transcript}」</div>
+                
                 <a href="https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(transcript)}&op=translate" 
                    target="_blank" 
-                   class="inline-block bg-blue-600 text-white text-sm px-6 py-2 rounded-full font-bold shadow-lg active:scale-95 transition-transform border border-blue-400">
-                   <i class="fas fa-language mr-1"></i> 翻譯成中文
+                   style="text-decoration: none;"
+                   class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-8 py-3 rounded-full font-bold shadow-lg active:scale-95 transition-transform flex items-center gap-2 border-2 border-blue-400/50">
+                   <span>🦖 翻譯成中文</span>
                 </a>
             `;
         };
