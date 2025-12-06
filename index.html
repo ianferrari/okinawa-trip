@@ -6,10 +6,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v16.0 Ultimate</title>
+    <title>奎奎全家沖繩遊 🦕 v17.0 Ultimate</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
     <style>
         /* ================= 基礎設定 ================= */
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #0f172a; -webkit-tap-highlight-color: transparent; transition: background-color 0.5s; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
@@ -68,10 +70,12 @@
         @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
         @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 50% { transform: rotate(0eg); } 75% { transform: rotate(-5deg); } 100% { transform: rotate(0deg); } }
         @keyframes wave { 0%, 100% { height: 40%; } 50% { height: 100%; } }
-        
+        @keyframes dinoWalk { 0% { transform: translateY(0) rotate(0deg); } 25% { transform: translateY(-3px) rotate(2deg); } 50% { transform: translateY(0) rotate(0deg); } 75% { transform: translateY(-3px) rotate(-2deg); } 100% { transform: translateY(0) rotate(0deg); } }
+
         .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-pop { animation: pop 0.4s ease-in-out; }
         .animate-shake { animation: shake 0.3s ease-in-out 3; }
+        .animate-dino { animation: dinoWalk 0.6s infinite linear; }
         .pulse-dot { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); animation: pulse-blue 2s infinite; }
 
         .playing-wave { display: inline-flex; align-items: center; gap: 2px; height: 12px; }
@@ -85,7 +89,9 @@
         .tab-inactive { background: rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255,255,255,0.1); }
         .custom-checkbox:checked + div { background-color: #2563eb; border-color: #2563eb; }
         
-        #drawing-modal { display: none; } #drawing-modal.open { display: flex; }
+        #drawing-modal, #camera-modal, #ruler-modal { display: none; } 
+        #drawing-modal.open, #camera-modal.open, #ruler-modal.open { display: flex; }
+        
         canvas { touch-action: none; cursor: crosshair; }
         .color-btn.active { transform: scale(1.2); border: 2px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3); }
         
@@ -105,60 +111,93 @@
 
         .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
 
-        /* ================= v16.0 新增樣式 (潮汐/翻譯/Wrapped/Geo) ================= */
-        /* 1. 潮汐波浪動畫 */
+        /* ================= v16.0 既有樣式 (潮汐/翻譯/Wrapped/Geo) ================= */
         .tide-widget { background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%); color: white; border-radius: 1.5rem; overflow: hidden; position: relative; min-height: 120px; }
         .wave-box { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; overflow: hidden; }
         .wave { position: absolute; bottom: 0; left: 0; width: 200%; height: 100%; background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255,255,255,0.3)" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>'); background-size: 50% 100%; animation: waveMove 10s linear infinite; }
         .wave:nth-child(2) { bottom: 5px; opacity: 0.5; animation: waveMove 7s linear infinite reverse; }
         @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* 2. 語音翻譯機 */
         .mic-btn { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #f87171, #ef4444); box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; transition: all 0.3s; border: 4px solid rgba(255,255,255,0.2); }
         .mic-btn.listening { animation: pulse-red 1.5s infinite; background: #ef4444; transform: scale(1.1); }
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
-        /* 3. Trip Wrapped (結算報告) */
         #wrapped-modal { background: #000; color: #fff; z-index: 300; }
         .wrapped-slide { height: 100%; display: flex; flex-col; align-items: center; justify-content: center; text-align: center; padding: 20px; opacity: 0; transition: opacity 0.5s; position: absolute; inset: 0; pointer-events: none; }
         .wrapped-slide.active { opacity: 1; pointer-events: auto; }
         .neon-text { text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(255,255,255,0.3); }
         .stat-big { font-size: 4rem; font-weight: 900; line-height: 1; background: -webkit-linear-gradient(45deg, #FFD700, #FF8C00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* 4. 地理圍欄通知 */
         #geo-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 999; display: flex; align-items: center; gap: 15px; transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); border: 2px solid #fbbf24; width: 90%; max-width: 350px; }
         #geo-toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* ================= v17.0 新增樣式 ================= */
+        /* 1. 隨身尺規 (Ruler) */
+        .ruler-container { background: #fff; overflow-x: auto; overflow-y: hidden; white-space: nowrap; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); border-radius: 8px; border: 1px solid #e2e8f0; height: 100px; display: flex; align-items: flex-end; padding-left: 20px; padding-right: 20px; }
+        .ruler-tick { width: 1px; background: #334155; display: inline-block; margin-right: 0; position: relative; flex-shrink: 0; }
+        .ruler-tick.major { height: 40px; background: #0f172a; width: 2px; }
+        .ruler-tick.minor { height: 20px; opacity: 0.6; }
+        .ruler-tick.medium { height: 30px; opacity: 0.8; }
+        .ruler-num { position: absolute; top: -25px; left: -10px; width: 20px; text-align: center; font-size: 12px; font-weight: bold; color: #0f172a; }
+
+        /* 2. 小恐龍進度條 (Kids GPS) */
+        .dino-progress-container { position: relative; height: 36px; background: rgba(255,255,255,0.2); border-radius: 18px; border: 1px solid rgba(255,255,255,0.3); margin-top: 5px; overflow: visible; }
+        .dino-track { position: absolute; top: 50%; left: 10px; right: 10px; height: 4px; background: rgba(255,255,255,0.3); transform: translateY(-50%); border-radius: 2px; }
+        .dino-fill { position: absolute; top: 0; left: 0; height: 100%; background: #fbbf24; border-radius: 2px; width: 0%; transition: width 0.5s; box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+        .dino-icon { position: absolute; top: 50%; left: 0%; width: 32px; height: 32px; transform: translate(-50%, -50%); transition: left 0.5s; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        .dino-flag { position: absolute; top: 50%; right: 0; transform: translate(50%, -80%); font-size: 16px; z-index: 5; }
+
+        /* 3. 浮水印相機 (Memory Cam) */
+        #camera-video { width: 100%; height: 100%; object-fit: cover; }
+        .cam-viewport { position: relative; overflow: hidden; background: #000; border-radius: 1.5rem; aspect-ratio: 3/4; width: 100%; }
+        .cam-overlay-text { position: absolute; bottom: 20px; right: 20px; text-align: right; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.8); z-index: 10; pointer-events: none; }
+        .cam-date { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1rem; color: #fbbf24; letter-spacing: 1px; }
+        .cam-loc { font-size: 0.8rem; font-weight: 500; opacity: 0.9; }
+        .cam-weather { font-size: 0.8rem; font-weight: 500; opacity: 0.9; }
+        .cam-badge { position: absolute; top: 20px; left: 20px; background: #ef4444; color: white; padding: 2px 8px; font-size: 10px; font-weight: bold; transform: rotate(-5deg); box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+        /* 4. 美食指指通 (Food Board) */
+        .food-grid-item { position: relative; border-radius: 1rem; overflow: hidden; aspect-ratio: 1; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.1s; }
+        .food-grid-item:active { transform: scale(0.95); }
+        .food-grid-img { width: 100%; height: 100%; object-fit: cover; }
+        .food-grid-label { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 20px 8px 8px; color: white; font-size: 12px; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body class="h-screen flex flex-col text-gray-800 overflow-hidden relative">
-
     <div id="bg-layer" class="absolute inset-0 z-0 bg-cover bg-center transition-all duration-700 transform scale-105" 
          style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop');">
         <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/10 to-slate-100/90"></div>
     </div>
 
     <div class="z-10 pt-safe-top px-5 pb-2 flex-shrink-0">
-        <div class="flex justify-between items-start pt-6 mb-4 text-white">
-            <div>
-                <div class="flex items-center gap-2 mb-2">
+        <div class="flex justify-between items-start pt-6 mb-2 text-white">
+            <div class="flex-1 mr-2">
+                <div class="flex items-center gap-2 mb-1">
                     <span class="bg-blue-600 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase shadow-lg border border-blue-400/30">2026 TRIP</span>
                     <div id="countdown" class="text-[10px] font-mono font-medium opacity-90 bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10">計算中...</div>
                 </div>
+                
                 <h1 class="text-3xl font-black tracking-tight drop-shadow-lg leading-tight">奎奎全家<br>沖繩遊 🦕</h1>
-                <p class="text-sm opacity-95 font-medium mt-2 text-blue-100 drop-shadow-md"><i class="fas fa-calendar-alt mr-1"></i>3/28 (六) - 4/3 (五)</p>
+
+                <p id="date-info" class="text-sm opacity-95 font-medium mt-2 text-blue-100 drop-shadow-md"><i class="fas fa-calendar-alt mr-1"></i>3/28 (六) - 4/3 (五)</p>
             </div>
             
-            <div class="flex gap-2">
-                <button onclick="toggleRainMode()" id="rain-btn" class="glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-white/20">
-                    <i id="rain-icon" class="fas fa-sun text-xl mb-1 block text-yellow-400"></i>
-                    <span id="rain-text" class="text-[9px] font-bold opacity-90">晴天</span>
-                </button>
+            <div class="flex gap-2 flex-col items-end">
+                <div class="flex gap-2">
+                    <button onclick="toggleRainMode()" id="rain-btn" class="glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-white/20">
+                        <i id="rain-icon" class="fas fa-sun text-xl mb-1 block text-yellow-400"></i>
+                        <span id="rain-text" class="text-[9px] font-bold opacity-90">晴天</span>
+                    </button>
 
-                <div class="glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[70px] active:scale-95 transition-transform cursor-pointer" onclick="initWeather()">
-                    <i id="weather-icon" class="fas fa-spinner fa-spin text-xl mb-1 block text-blue-300"></i>
-                    <span id="weather-temp" class="text-sm font-bold">...</span>
-                    <div id="weather-loc" class="text-[9px] opacity-70 mt-0.5">重整</div>
+                    <div class="glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[70px] active:scale-95 transition-transform cursor-pointer" onclick="initWeather()">
+                        <i id="weather-icon" class="fas fa-spinner fa-spin text-xl mb-1 block text-blue-300"></i>
+                        <span id="weather-temp" class="text-sm font-bold">...</span>
+                        <div id="weather-loc" class="text-[9px] opacity-70 mt-0.5">重整</div>
+                    </div>
                 </div>
+                <button onclick="toggleVoiceMemo()" class="glass-dark w-10 h-10 rounded-full flex items-center justify-center active:bg-pink-500 transition-colors border border-white/20">
+                     <i class="fas fa-microphone text-white"></i>
+                </button>
             </div>
         </div>
 
@@ -166,8 +205,7 @@
     </div>
     
     <div id="main-scroll" class="flex-1 overflow-y-auto p-4 pb-32 z-10 scroll-smooth rounded-t-[2.5rem] bg-slate-50 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] relative top-2">
-    </div>
-
+        </div>
     <div class="fixed bottom-0 w-full glass flex justify-around items-center pb-safe-bottom h-[85px] z-50 rounded-t-[2rem] shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
         <button onclick="switchTab('itinerary')" class="nav-btn flex flex-col items-center justify-center w-full h-full group" id="btn-itinerary">
             <div class="icon-box p-2 rounded-2xl mb-1 transition-all duration-300 group-active:scale-90"><i class="fas fa-map-location-dot text-xl text-blue-600"></i></div>
@@ -190,7 +228,65 @@
     <button onclick="openQuickExpense()" class="fixed bottom-[100px] right-4 w-14 h-14 bg-pink-500 rounded-full text-white shadow-2xl flex items-center justify-center z-40 active:scale-90 transition-transform border-4 border-white/20 backdrop-blur group">
         <i class="fas fa-plus text-2xl group-active:rotate-90 transition-transform"></i>
     </button>
-	<div id="spot-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-6 hidden" onclick="closeSpotModal()">
+
+    <div id="camera-modal" class="fixed inset-0 z-[200] bg-black flex flex-col hidden">
+        <div class="flex justify-between items-center p-4 z-20 absolute top-0 w-full pt-safe-top">
+            <button onclick="toggleCameraFacing()" class="text-white bg-black/30 w-10 h-10 rounded-full backdrop-blur flex items-center justify-center"><i class="fas fa-sync-alt"></i></button>
+            <button onclick="closeCamera()" class="text-white bg-black/30 w-10 h-10 rounded-full backdrop-blur flex items-center justify-center"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="flex-1 flex items-center justify-center bg-black relative">
+            <div class="cam-viewport relative">
+                <video id="camera-video" autoplay playsinline muted></video>
+                <canvas id="camera-canvas" class="hidden"></canvas>
+                <div id="cam-overlay" class="absolute inset-0 pointer-events-none hidden">
+                    <div class="cam-badge">DAY <span id="cam-day-val">1</span></div>
+                    <div class="cam-overlay-text">
+                        <div class="cam-date" id="cam-date-val">2026/03/28</div>
+                        <div class="cam-loc"><i class="fas fa-map-marker-alt mr-1 text-red-400"></i><span id="cam-loc-val">Okinawa</span></div>
+                        <div class="cam-weather"><i class="fas fa-sun mr-1 text-yellow-400"></i><span id="cam-weather-val">24°C</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-32 bg-black flex items-center justify-center pb-safe-bottom gap-8">
+            <button onclick="openGallery()" class="text-white opacity-50 flex flex-col items-center"><i class="fas fa-images text-2xl mb-1"></i><span class="text-[10px]">相簿</span></button>
+            <button onclick="takePhoto()" class="w-16 h-16 rounded-full bg-white border-4 border-gray-300 active:scale-90 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.5)]"></button>
+            <div class="w-8"></div> </div>
+    </div>
+
+    <div id="ruler-modal" class="fixed inset-0 z-[150] bg-white flex flex-col hidden animate-slide-up">
+        <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-slate-50">
+            <h3 class="font-black text-xl text-gray-800"><i class="fas fa-ruler-combined text-blue-500 mr-2"></i>隨身量量看</h3>
+            <button onclick="closeRuler()" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="flex-1 flex flex-col items-center justify-center p-4 bg-slate-50 relative overflow-hidden">
+            <div class="text-center mb-8">
+                <div class="text-6xl font-black text-blue-600 mb-2 font-mono" id="ruler-display-val">0.0</div>
+                <div class="text-sm text-gray-400 font-bold">cm</div>
+            </div>
+            
+            <div id="ruler-scroll-area" class="w-full overflow-x-auto hide-scrollbar touch-pan-x bg-white border-y-2 border-blue-200 h-32 relative flex items-end pt-5 shadow-inner">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-full bg-red-500 z-10 opacity-70"></div>
+                <div id="ruler-ticks" class="flex items-end pl-[50vw] pr-[50vw]">
+                    </div>
+            </div>
+            <p class="text-xs text-gray-400 mt-4"><i class="fas fa-hand-pointer mr-1"></i> 左右滑動刻度來測量</p>
+        </div>
+
+        <div class="p-4 bg-white border-t border-gray-100 pb-safe-bottom">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold text-gray-500">校正 (調整比例)</span>
+                <button onclick="resetRulerScale()" class="text-[10px] bg-gray-100 px-2 py-1 rounded text-gray-500">重置</button>
+            </div>
+            <input type="range" id="ruler-scale" min="0.5" max="2.0" step="0.01" value="1.0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600" oninput="updateRulerScale(this.value)">
+            <div class="text-[10px] text-gray-400 mt-1 text-center">如果不準，請拿信用卡或硬幣對照刻度調整</div>
+        </div>
+    </div>
+
+    <div id="spot-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-6 hidden" onclick="closeSpotModal()">
         <div class="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl shadow-2xl relative h-[80vh] flex flex-col animate-slide-up" onclick="event.stopPropagation()">
             <button onclick="closeSpotModal()" class="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/30 text-white backdrop-blur flex items-center justify-center"><i class="fas fa-times"></i></button>
             <div id="spot-hero" class="spot-hero flex-shrink-0">
@@ -224,7 +320,6 @@
             <button onclick="setSosMsg('ambulance')" class="bg-white/20 border-2 border-white/40 p-4 rounded-xl font-bold active:bg-white/40">叫救護車<br>救急車！</button>
         </div>
     </div>
-
     <div id="drawing-modal" class="fixed inset-0 z-[200] bg-white flex flex-col hidden">
         <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-white z-10">
             <h3 class="font-black text-xl text-gray-800"><i class="fas fa-palette text-purple-500 mr-2"></i>小小畫家</h3>
@@ -381,7 +476,8 @@
             <div class="mt-8"><button onclick="closeModal()" class="bg-gray-100 text-gray-600 px-6 py-3 rounded-xl font-bold w-full">關閉</button></div>
         </div>
     </div>
-	<div id="driver-hud" class="fixed inset-0 bg-black z-[200] hidden flex-col p-6 text-white font-mono transition-opacity duration-300">
+
+    <div id="driver-hud" class="fixed inset-0 bg-black z-[200] hidden flex-col p-6 text-white font-mono transition-opacity duration-300">
         <div class="flex justify-between items-center mb-4">
             <div class="flex flex-col">
                 <span class="text-xs text-gray-500 uppercase tracking-widest">TIME</span>
@@ -487,6 +583,7 @@
 
 <script>
     // ================= 1. 資料庫 (DATA) =================
+    // 這邊開始 JS 邏輯，接續到下一段...
     const TRIP_YEAR = 2026;
     
     // 狀態變數
@@ -579,68 +676,80 @@
         SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
     };
 
-    // 2. 行程資料庫 (新增 travel 欄位 與 spotId 連結)
+    // 2. 行程資料庫 (v17.0 更新: 加入 lat, lon 供 Dino GPS 計算)
     const itineraryDB = [
         { day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, events: [
             { time: "13:15", title: "星宇 JX302 起飛", spotId: "tpe_airport", icon: "fa-plane-departure", note: "給奎奎吃軟糖平衡耳壓", map: "台中國際機場", duration: "2.5h", travel: "✈️ 飛行 90分" },
-            { time: "15:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane-arrival", note: "1F Lawson 買鮮奶/成長奶", map: "", duration: "45m", travel: "🚌 接駁 20分" },
+            { time: "15:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane-arrival", note: "1F Lawson 買鮮奶/成長奶", map: "", duration: "45m", travel: "🚌 接駁 20分", lat: 26.2048, lon: 127.6458 },
             { time: "16:30", title: "搭接駁車往 OTS", icon: "fa-bus", note: "1F 大廳外找 OTS 旗幟 (10-A月台)", map: "", duration: "30m", travel: "🚌 移動 15分" },
-            { time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "檢查車況、裝汽座。導航設飯店", map: "OTS 臨空豐崎營業所", duration: "1h", travel: "🚗 開車 60分" },
+            { time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "檢查車況、裝汽座。導航設飯店", map: "OTS 臨空豐崎營業所", duration: "1h", travel: "🚗 開車 60分", lat: 26.1558, lon: 127.6534 },
             { time: "18:00", title: "高速公路北上", icon: "fa-road", note: "中途停：中城PA或伊芸SA &記得買水 ", map: "", duration: "1.5h", travel: "🚗 開車 30分" },
-            { time: "19:30", title: "飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western Kouki Beach", map: "Best Western Okinawa Kouki Beach", mapcode: "206 473 354*11", travel: "🚶 走路 5分" },
+            { time: "19:30", title: "飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western Kouki Beach", map: "Best Western Okinawa Kouki Beach", mapcode: "206 473 354*11", travel: "🚶 走路 5分", lat: 26.5414, lon: 127.9458 },
             { time: "20:00", title: "晚餐：名護在地", spotId: "dinner_d1", icon: "fa-utensils", note: "美拉花別邸 / 哥倫布牛排 / 全家", map: "Restaurant Columbin", duration: "1.5h" }
         ]},
         { day: "D2", date: "3/29 (日)", title: "玻璃船 & 補給", highlights: "海中公園 / AEON 掃貨 / 玩沙", bg: bgImages.D2, events: [
-            { time: "09:30", title: "部瀨名海中公園", spotId: "busena", icon: "fa-water", note: "搭玻璃底船找尼莫 🐠", map: "部瀨名海中公園", mapcode: "206 442 077*71", duration: "1.5h", travel: "🚗 開車 15分", rainy: { title: "名護鳳梨園 (室內)", icon: "fa-leaf", note: "☔ 雨天備案：搭無人車看恐龍", map: "Nago Pineapple Park", mapcode: "206 716 467*85" } },
-            { time: "12:00", title: "午餐：Hama 壽司", spotId: "hama_sushi", icon: "fa-bowl-rice", note: "名護店，平價迴轉壽司", map: "HAMA壽司 名護店", duration: "1h", travel: "🚗 開車 10分" },
-            { time: "13:30", title: "AEON 名護店", spotId: "aeon_nago", icon: "fa-cart-shopping", note: "大創買玩沙組、超市買水", map: "AEON 名護店", mapcode: "206 626 669*52", duration: "1.5h", travel: "🚗 開車 10分" },
-            { time: "15:00", title: "許田休息站", spotId: "kyoda", icon: "fa-ticket", note: "買水族館優惠票 (只收現金)", map: "道の駅 許田", duration: "30m", travel: "🚗 開車 20分" },
-            { time: "16:00", title: "飯店沙灘玩沙", spotId: "hotel_nago", icon: "fa-umbrella-beach", note: "拿出大創買的玩具", map: "", duration: "1.5h", travel: "🚶 走路 5分", rainy: { title: "飯店室內/房間休息", icon: "fa-bed", note: "☔ 雨天備案：吃零食看電視" } },
+            { time: "09:30", title: "部瀨名海中公園", spotId: "busena", icon: "fa-water", note: "搭玻璃底船找尼莫 🐠", map: "部瀨名海中公園", mapcode: "206 442 077*71", duration: "1.5h", travel: "🚗 開車 15分", lat: 26.5278, lon: 127.9306, rainy: { title: "名護鳳梨園 (室內)", icon: "fa-leaf", note: "☔ 雨天備案：搭無人車看恐龍", map: "Nago Pineapple Park", mapcode: "206 716 467*85" } },
+            { time: "12:00", title: "午餐：Hama 壽司", spotId: "hama_sushi", icon: "fa-bowl-rice", note: "名護店，平價迴轉壽司", map: "HAMA壽司 名護店", duration: "1h", travel: "🚗 開車 10分", lat: 26.5960, lon: 127.9830 },
+            { time: "13:30", title: "AEON 名護店", spotId: "aeon_nago", icon: "fa-cart-shopping", note: "大創買玩沙組、超市買水", map: "AEON 名護店", mapcode: "206 626 669*52", duration: "1.5h", travel: "🚗 開車 10分", lat: 26.5960, lon: 127.9830 },
+            { time: "15:00", title: "許田休息站", spotId: "kyoda", icon: "fa-ticket", note: "買水族館優惠票 (只收現金)", map: "道の駅 許田", duration: "30m", travel: "🚗 開車 20分", lat: 26.5222, lon: 127.9620 },
+            { time: "16:00", title: "飯店沙灘玩沙", spotId: "hotel_nago", icon: "fa-umbrella-beach", note: "拿出大創買的玩具", map: "", duration: "1.5h", travel: "🚶 走路 5分", lat: 26.5414, lon: 127.9458, rainy: { title: "飯店室內/房間休息", icon: "fa-bed", note: "☔ 雨天備案：吃零食看電視" } },
             { time: "18:00", title: "晚餐：美拉花別邸", spotId: "dinner_d1", icon: "fa-utensils", note: "走路去吃，榻榻米包廂", map: "美拉花", duration: "1.5h" }
         ]},
         { day: "D3", date: "3/30 (一)", title: "美麗海 & 古宇利", highlights: "鯨鯊 / 跨海大橋 / 蝦蝦飯", bg: bgImages.D3, events: [
-            { time: "09:30", title: "美麗海水族館", spotId: "churaumi", icon: "fa-fish", note: "停 P7 立體停車場最快，直衝黑潮之海", map: "海洋博公園P7立體停車場", mapcode: "553 075 797*77", duration: "3h", travel: "🚗 開車 40分" },
+            { time: "09:30", title: "美麗海水族館", spotId: "churaumi", icon: "fa-fish", note: "停 P7 立體停車場最快，直衝黑潮之海", map: "海洋博公園P7立體停車場", mapcode: "553 075 797*77", duration: "3h", travel: "🚗 開車 40分", lat: 26.6943, lon: 127.8779 },
             { time: "13:30", title: "前往古宇利島", spotId: "kouri_drive", icon: "fa-car-side", note: "車上讓奎奎午睡", map: "", duration: "1h", travel: "🚗 開車 10分", rainy: { title: "前往水果樂園 (室內)", icon: "fa-car", note: "☔ 雨天改去室內景點", map: "OKINAWA fruits land" } },
-            { time: "14:30", title: "古宇利海洋塔", spotId: "kouri_tower", icon: "fa-tower-observation", note: "搭無人鳳梨車", map: "古宇利海洋塔", duration: "1.5h", travel: "🚗 開車 5分", rainy: { title: "沖繩水果樂園", icon: "fa-lemon", note: "☔ 雨天備案：室內解謎遊戲", map: "OKINAWA fruits land", mapcode: "206 716 585*22" } },
-            { time: "16:00", title: "點心：蝦蝦飯", spotId: "kouri_shrimp", icon: "fa-shrimp", note: "Kouri Shrimp (橋旁)", map: "Kouri Shrimp", duration: "30m", travel: "🚗 開車 2分" },
+            { time: "14:30", title: "古宇利海洋塔", spotId: "kouri_tower", icon: "fa-tower-observation", note: "搭無人鳳梨車", map: "古宇利海洋塔", duration: "1.5h", travel: "🚗 開車 5分", lat: 26.7042, lon: 128.0286, rainy: { title: "沖繩水果樂園", icon: "fa-lemon", note: "☔ 雨天備案：室內解謎遊戲", map: "OKINAWA fruits land", mapcode: "206 716 585*22" } },
+            { time: "16:00", title: "點心：蝦蝦飯", spotId: "kouri_shrimp", icon: "fa-shrimp", note: "Kouri Shrimp (橋旁)", map: "Kouri Shrimp", duration: "30m", travel: "🚗 開車 2分", lat: 26.6970, lon: 128.0220 },
             { time: "16:30", title: "橋下沙灘", spotId: "kouri_drive", icon: "fa-camera", note: "拍全家福", map: "古宇利海灘", duration: "30m", travel: "🚗 開車 40分", rainy: { title: "AEON 逛街/休息", icon: "fa-shop", note: "☔ 雨天取消沙灘行程" } },
             { time: "18:00", title: "晚餐：名護七選一", spotId: "yakiniku", icon: "fa-fire-burner", note: "大家 / 燒肉乃我那霸 / 藏壽司", map: "燒肉乃我那霸 新館", duration: "1.5h" }
         ]},
         { day: "D4", date: "3/31 (二)", title: "恐龍 & 公園", highlights: "DINO Park / 甜甜圈 / 溜滑梯", bg: bgImages.D4, events: [
-            { time: "10:00", title: "DINO 恐龍 PARK", spotId: "dino", icon: "fa-dragon", note: "⚠️ 爸爸請用揹巾，找80隻恐龍", map: "DINO恐龍PARK 山原亞熱帶之森", mapcode: "206 745 056*82", duration: "1.5h", travel: "🚶 走路 5分", rainy: { title: "AEON 名護店 (二刷)", icon: "fa-gamepad", note: "☔ 恐龍公園下雨泥濘，改室內遊樂場", map: "AEON 名護店" } },
+            { time: "10:00", title: "DINO 恐龍 PARK", spotId: "dino", icon: "fa-dragon", note: "⚠️ 爸爸請用揹巾，找80隻恐龍", map: "DINO恐龍PARK 山原亞熱帶之森", mapcode: "206 745 056*82", duration: "1.5h", travel: "🚶 走路 5分", lat: 26.6267, lon: 127.9620, rainy: { title: "AEON 名護店 (二刷)", icon: "fa-gamepad", note: "☔ 恐龍公園下雨泥濘，改室內遊樂場", map: "AEON 名護店" } },
             { time: "11:30", title: "午餐：御菓子御殿", spotId: "okashi", icon: "fa-bowl-food", note: "就在恐龍公園樓上", map: "", duration: "1h", travel: "🚗 開車 15分" },
-            { time: "13:00", title: "島豆腐甜甜圈", spotId: "shima_donuts", icon: "fa-cookie-bite", note: "Shima Donuts (賣完吃 A&W)", map: "Shima Donuts", duration: "30m", travel: "🚗 開車 15分" },
-            { time: "15:00", title: "21世紀之森公園", spotId: "park_21", icon: "fa-child-reaching", note: "看黑色火車頭、長溜滑梯", map: "21世紀之森公園", mapcode: "206 626 779*74", duration: "1h", travel: "🚗 開車 10分", rainy: { title: "名護博物館", icon: "fa-building-columns", note: "☔ 雨天備案：看鯨魚骨骼標本", map: "Nago Museum" } },
+            { time: "13:00", title: "島豆腐甜甜圈", spotId: "shima_donuts", icon: "fa-cookie-bite", note: "Shima Donuts (賣完吃 A&W)", map: "Shima Donuts", duration: "30m", travel: "🚗 開車 15分", lat: 26.6110, lon: 127.9730 },
+            { time: "15:00", title: "21世紀之森公園", spotId: "park_21", icon: "fa-child-reaching", note: "看黑色火車頭、長溜滑梯", map: "21世紀之森公園", mapcode: "206 626 779*74", duration: "1h", travel: "🚗 開車 10分", lat: 26.5866, lon: 127.9700, rainy: { title: "名護博物館", icon: "fa-building-columns", note: "☔ 雨天備案：看鯨魚骨骼標本", map: "Nago Museum" } },
             { time: "16:30", title: "Blue Seal 冰淇淋", spotId: "blue_seal", icon: "fa-ice-cream", note: "名護店，吃 Kids Size", map: "Blue Seal Nago", duration: "30m" }
         ]},
         { day: "D5", date: "4/01 (三)", title: "動物 & 放空", highlights: "Neo Park 小火車 / 飯店泳池", bg: bgImages.D5, events: [
-            { time: "10:00", title: "Neo Park 動植物園", spotId: "neopark", icon: "fa-crow", note: "進門先搭復古小火車", map: "名護自然動植物公園", mapcode: "206 689 725*11", duration: "2h", travel: "🚗 開車 5分", rainy: { title: "美麗海 (二刷)", icon: "fa-fish", note: "☔ 雨天備案：回去水族館看海牛/海龜", map: "美麗海水族館" } },
+            { time: "10:00", title: "Neo Park 動植物園", spotId: "neopark", icon: "fa-crow", note: "進門先搭復古小火車", map: "名護自然動植物公園", mapcode: "206 689 725*11", duration: "2h", travel: "🚗 開車 5分", lat: 26.5986, lon: 127.9733, rainy: { title: "美麗海 (二刷)", icon: "fa-fish", note: "☔ 雨天備案：回去水族館看海牛/海龜", map: "美麗海水族館" } },
             { time: "12:30", title: "午餐：Cookhal", spotId: "cookhal", icon: "fa-leaf", note: "或吃 幸醬沖繩麵 (榻榻米)", map: "Cookhal", duration: "1h", travel: "🚗 開車 20分" },
-            { time: "15:30", title: "飯店泳池/沙灘", spotId: "hotel_nago", icon: "fa-person-swimming", note: "大人放空，小孩徹底放電", map: "", duration: "2h", travel: "🚗 開車 15分", rainy: { title: "飯店室內設施", icon: "fa-hotel", note: "☔ 下雨就好好享受飯店吧" } },
-            { time: "18:00", title: "晚餐：百年古家 大家", spotId: "ufuya", icon: "fa-house", note: "必吃阿古豬火鍋 (已預約)", map: "百年古家 大家", duration: "2h", travel: "🚗 開車 15分" },
+            { time: "15:30", title: "飯店泳池/沙灘", spotId: "hotel_nago", icon: "fa-person-swimming", note: "大人放空，小孩徹底放電", map: "", duration: "2h", travel: "🚗 開車 15分", lat: 26.5414, lon: 127.9458, rainy: { title: "飯店室內設施", icon: "fa-hotel", note: "☔ 下雨就好好享受飯店吧" } },
+            { time: "18:00", title: "晚餐：百年古家 大家", spotId: "ufuya", icon: "fa-house", note: "必吃阿古豬火鍋 (已預約)", map: "百年古家 大家", duration: "2h", travel: "🚗 開車 15分", lat: 26.6115, lon: 127.9818 },
             { time: "20:00", title: "打包行李", spotId: "hotel_nago", icon: "fa-suitcase", note: "明天要退房往南了", map: "", duration: "1h" }
         ]},
         { day: "D6", date: "4/02 (四)", title: "移動 & 購物", highlights: "PARCO CITY / DMM / 住那霸", bg: bgImages.D6, events: [
             { time: "10:30", title: "退房往南", icon: "fa-car", note: "直奔浦添 (約1小時)", map: "", duration: "1h", travel: "🚗 開車 60分" },
-            { time: "11:30", title: "PARCO CITY", spotId: "parco", icon: "fa-bag-shopping", note: "午餐(2F) & 購物", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 062*55", duration: "3h", travel: "🚗 開車 15分" },
-            { time: "15:00", title: "DMM 水族館", spotId: "dmm", icon: "fa-fish-fins", note: "位於 iias 商場，看樹懶、摸魚", map: "DMM Kariyushi Aquarium", mapcode: "232 543 400*25", duration: "2h", travel: "🚗 開車 30分" },
-            { time: "17:40", title: "那霸 Check-in", spotId: "daiwa", icon: "fa-building", note: "Daiwa Roynet 國際通 (車停3F)", map: "Daiwa Roynet Hotel Naha Kokusai-dori", duration: "1h", travel: "🚶 走路 5分" },
+            { time: "11:30", title: "PARCO CITY", spotId: "parco", icon: "fa-bag-shopping", note: "午餐(2F) & 購物", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 062*55", duration: "3h", travel: "🚗 開車 15分", lat: 26.2642, lon: 127.6934 },
+            { time: "15:00", title: "DMM 水族館", spotId: "dmm", icon: "fa-fish-fins", note: "位於 iias 商場，看樹懶、摸魚", map: "DMM Kariyushi Aquarium", mapcode: "232 543 400*25", duration: "2h", travel: "🚗 開車 30分", lat: 26.1557, lon: 127.6533 },
+            { time: "17:40", title: "那霸 Check-in", spotId: "daiwa", icon: "fa-building", note: "Daiwa Roynet 國際通 (車停3F)", map: "Daiwa Roynet Hotel Naha Kokusai-dori", duration: "1h", travel: "🚶 走路 5分", lat: 26.2163, lon: 127.6917 },
             { time: "19:00", title: "晚餐：麥當勞", spotId: "mcdonalds", icon: "fa-burger", note: "國際通牧志店 (小孩的救贖)", map: "McDonald's Kokusai Dori Makishi", duration: "1h", travel: "🚶 走路 5分" },
             { time: "20:30", title: "Fontana Gelato", spotId: "fontana", icon: "fa-ice-cream", note: "彩虹冰淇淋", map: "Fontana Gelato", duration: "30m" }
         ]},
         { day: "D7", date: "4/03 (五)", title: "祈願 & 返家", highlights: "波上宮 / Outlet / 13:00還車", bg: bgImages.D7, events: [
-            { time: "09:20", title: "波上宮", spotId: "naminoue", icon: "fa-torii-gate", note: "懸崖上的神社，買御守", map: "波上宮", duration: "1h", travel: "🚗 開車 30分", rainy: { title: "系滿魚市場", icon: "fa-fish", note: "☔ 雨天備案：有遮雨棚，吃海鮮", map: "糸満漁民食堂" } },
-            { time: "11:10", title: "ASHIBINAA Outlet", spotId: "ashibinaa", icon: "fa-shirt", note: "午餐(美食街) & 最後衝刺", map: "ASHIBINAA Outlet", mapcode: "232 544 452*22", duration: "1.5h", travel: "🚗 開車 5分" },
+            { time: "09:20", title: "波上宮", spotId: "naminoue", icon: "fa-torii-gate", note: "懸崖上的神社，買御守", map: "波上宮", duration: "1h", travel: "🚗 開車 30分", lat: 26.2206, lon: 127.6713, rainy: { title: "系滿魚市場", icon: "fa-fish", note: "☔ 雨天備案：有遮雨棚，吃海鮮", map: "糸満漁民食堂" } },
+            { time: "11:10", title: "ASHIBINAA Outlet", spotId: "ashibinaa", icon: "fa-shirt", note: "午餐(美食街) & 最後衝刺", map: "ASHIBINAA Outlet", mapcode: "232 544 452*22", duration: "1.5h", travel: "🚗 開車 5分", lat: 26.1585, lon: 127.6570 },
             { time: "12:40", title: "加油 (OTS旁)", spotId: "gas_station", icon: "fa-gas-pump", note: "保留收據！(ENEOS)", map: "ENEOS Dr.Drive Self Toyosaki SS", duration: "15m", travel: "🚗 開車 5分" },
-            { time: "13:00", title: "OTS 還車", spotId: "ots_rent", icon: "fa-car-side", note: "務必準時。檢查 ETC 卡拔了沒", map: "OTS 臨空豐崎營業所", duration: "30m", travel: "🚌 接駁 20分" },
-            { time: "13:45", title: "抵達機場", spotId: "oka_airport", icon: "fa-plane-departure", note: "逛免稅店 (買長頸鹿薯條)", map: "那霸機場", duration: "2h" },
+            { time: "13:00", title: "OTS 還車", spotId: "ots_rent", icon: "fa-car-side", note: "務必準時。檢查 ETC 卡拔了沒", map: "OTS 臨空豐崎營業所", duration: "30m", travel: "🚌 接駁 20分", lat: 26.1558, lon: 127.6534 },
+            { time: "13:45", title: "抵達機場", spotId: "oka_airport", icon: "fa-plane-departure", note: "逛免稅店 (買長頸鹿薯條)", map: "那霸機場", duration: "2h", lat: 26.2048, lon: 127.6458 },
             { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "回家囉！", map: "" },
-            // v16.0 新增: 旅程回顧按鈕
             { time: "旅程回顧", title: "📊 查看數據", icon: "fa-chart-pie", note: "點擊查看這趟旅程的統計", spotId: null, map: null, action: "openWrapped()" }
         ]}
     ];
-    
-    // v16.0 新增: 潮汐資料 (2026 3月底預測數據，那霸港基準)
+
+    // v17.0 新增: 美食指指通資料庫
+    const foodBoardDB = [
+        { name: "沖繩麵", img: "https://images.unsplash.com/photo-1623800366624-9426f04c0df6?q=80&w=400", jp: "沖縄そばをください", note: "Okinawa Soba" },
+        { name: "塔可飯", img: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?q=80&w=400", jp: "タコライスをください", note: "Taco Rice" },
+        { name: "炸豬排", img: "https://images.unsplash.com/photo-1599354607481-e27c50074219?q=80&w=400", jp: "とんかつをください", note: "Tonkatsu" },
+        { name: "苦瓜炒蛋", img: "https://images.unsplash.com/photo-1627889987823-3756372d8076?q=80&w=400", jp: "ゴーヤーチャンプルーをください", note: "Goya Chanpuru" },
+        { name: "海葡萄", img: "https://images.unsplash.com/photo-1582236967732-c7f394c03837?q=80&w=400", jp: "海ぶどうをください", note: "Umi Budo" },
+        { name: "炸薯條", img: "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?q=80&w=400", jp: "フライドポテトをください", note: "Potato" },
+        { name: "炒飯", img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=400", jp: "チャーハンをください", note: "Cha-han" },
+        { name: "炸雞", img: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?q=80&w=400", jp: "唐揚げをください", note: "Karaage" },
+        { name: "兒童餐", img: "https://images.unsplash.com/photo-1595155459343-690a78619623?q=80&w=400", jp: "お子様セットをください", note: "Kids Meal" },
+        { name: "冰開水", img: "https://images.unsplash.com/photo-1560697728-661d9a04a371?q=80&w=400", jp: "お水をください", note: "Water" }
+    ];
+    // 潮汐資料 (2026 3月底預測數據，那霸港基準)
     const tideDB = {
         "D1": { high: "18:40", low: "12:15", sun: "18:38" },
         "D2": { high: "19:15", low: "12:50", sun: "18:39" }, // 大潮
@@ -651,15 +760,7 @@
         "D7": { high: "09:20", low: "16:00", sun: "18:42" }
     };
 
-    // 食物轉盤選項
-    const foodOptions = [
-        { icon: "🍜", name: "沖繩麵 / 拉麵" }, { icon: "🥩", name: "燒肉 / 牛排" },
-        { icon: "🍣", name: "壽司 / 生魚片" }, { icon: "🍔", name: "A&W 漢堡" },
-        { icon: "🍚", name: "丼飯 / 定食" }, { icon: "🏪", name: "便利商店大餐" }, 
-        { icon: "🌮", name: "塔可飯" }
-    ];
-
-    // 記帳分類
+    // 記帳分類定義
     const expenseCats = {
         shopping: { name: "購物", icon: "fa-bag-shopping", color: "#f43f5e" },
         food: { name: "餐飲", icon: "fa-utensils", color: "#f97316" },
@@ -677,7 +778,7 @@
     ];
     let checklistDB = JSON.parse(localStorage.getItem('trip_checklist_db')) || defaultChecklistDB;
 
-    // v16.0 更新: 任務資料庫 (加入 lat, lon 供地理圍欄使用)
+    // 任務資料庫 (含 GPS 座標)
     const missionsDB = [
         { id: "m1", title: "我是船長", desc: "在玻璃船找到尼莫", icon: "fa-fish", lat: 26.5278, lon: 127.9306 }, // 海中公園
         { id: "m2", title: "海洋霸主", desc: "跟大鯨鯊拍合照", icon: "fa-camera", lat: 26.6943, lon: 127.8779 }, // 水族館
@@ -687,7 +788,7 @@
         { id: "m6", title: "誠心祈福", desc: "在神社投硬幣說謝謝", icon: "fa-hands-praying", lat: 26.2206, lon: 127.6713 } // 波上宮
     ];
 
-    // 工具資料庫
+    // 工具資料庫 (靜態內容)
     const toolsDB = {
         drive: [
             { title: "右駕口訣", content: "左轉小彎、右轉大彎<br>雨刷在左、方向燈在右", color: "bg-blue-50 text-blue-800" },
@@ -745,7 +846,8 @@
         updateCountdown();
         setInterval(updateCountdown, 60000);
         initWeather();
-        checkDailyPopup(); 
+        checkDailyPopup();
+        // v17.0: 如果有儲存的日記，可以在這裡預載 (目前是 localStorage 自動讀取)
     }
 
     // 天氣模組 (v16.0 更新: 加入 checkGeofence)
@@ -757,6 +859,7 @@
                     const lon = position.coords.longitude;
                     fetchWeather(lat, lon, "目前位置");
                     checkGeofence(lat, lon); // 檢查是否到達任務點
+                    updateDinoGPS(lat, lon); // v17.0: 更新小恐龍位置
                 },
                 (error) => fetchWeather(26.5915, 127.9773, "名護市")
             );
@@ -776,6 +879,9 @@
             else if (code <= 3) iconEl.className = "fas fa-cloud-sun text-xl mb-1 block text-yellow-400";
             else if (code <= 65) iconEl.className = "fas fa-cloud-rain text-xl mb-1 block text-blue-300";
             else iconEl.className = "fas fa-bolt text-xl mb-1 block text-yellow-500";
+            
+            // v17.0: 更新相機浮水印的天氣
+            document.getElementById('cam-weather-val').innerText = `${temp}°C`;
         } catch (e) {
             document.getElementById('weather-temp').innerText = "24°C";
             document.getElementById('weather-loc').innerText = "預報";
@@ -823,6 +929,7 @@
                 box.className = 'icon-box p-2 rounded-2xl mb-1 transition-all';
             }
         });
+        
         renderHeaderSubNav();
         if (shouldRender) renderContent();
         setTimeout(updateSubNavStyle, 50);
@@ -840,13 +947,14 @@
                     "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
             });
         } else if (activeTab === 'tools') {
-            ['calc', 'drive', 'signs', 'coins', 'sizes', 'jp', 'orders', 'sos', 'sync'].forEach(t => {
+            ['calc', 'drive', 'food', 'signs', 'coins', 'sizes', 'jp', 'orders', 'sos', 'sync'].forEach(t => { // v17.0 加入 food
                 const btn = document.getElementById(`btn-tool-${t}`);
                 if (btn) {
                     let c = "bg-white text-blue-600";
                     if (t === 'calc') c = "bg-white text-yellow-600";
                     if (t === 'sos') c = "bg-white text-red-600";
                     if (t === 'sync') c = "bg-white text-purple-600";
+                    if (t === 'food') c = "bg-white text-orange-600"; // v17.0
                     btn.className = currentToolFilter === t ?
                         `flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${c} shadow-sm` :
                         "flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all text-white/80";
@@ -865,10 +973,12 @@
             container.innerHTML = `<div class="flex glass-dark p-1 rounded-2xl mx-1">${checklistDB.map(c => `<button id="btn-chk-${c.id}" onclick="switchChecklist('${c.id}')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentChecklistFilter === c.id ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80'}">${c.title.split(' ')[1]}</button>`).join('')}</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
         } else if (activeTab === 'tools') {
+            // v17.0: 新增 "美食 (food)" 按鈕
             container.innerHTML = `
             <div class="flex glass-dark p-1 rounded-2xl mx-1 overflow-x-auto hide-scrollbar">
                 <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
                 <button id="btn-tool-drive" onclick="switchTool('drive')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
+                <button id="btn-tool-food" onclick="switchTool('food')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='food'?'bg-white text-orange-600':'text-white/80'}">🍱 點餐</button>
                 <button id="btn-tool-signs" onclick="switchTool('signs')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='signs'?'bg-white text-blue-600':'text-white/80'}">🛑 標誌</button>
                 <button id="btn-tool-coins" onclick="switchTool('coins')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='coins'?'bg-white text-blue-600':'text-white/80'}">🪙 硬幣</button>
                 <button id="btn-tool-sizes" onclick="switchTool('sizes')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='sizes'?'bg-white text-blue-600':'text-white/80'}">👕 尺寸</button>
@@ -881,6 +991,7 @@
             if (currentToolFilter === 'calc') bg = bgImages.CALC;
             if (currentToolFilter === 'sync') bg = bgImages.SYNC;
             if (currentToolFilter === 'sos') bg = bgImages.SOS;
+            if (currentToolFilter === 'food') bg = "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?q=80&w=1000&fit=crop"; // Food BG
             document.getElementById('bg-layer').style.backgroundImage = `url('${bg}')`;
         } else if (activeTab === 'missions') {
             container.innerHTML = `<div class="text-center text-white/90 text-sm font-bold pt-2 drop-shadow-md">完成任務獲得代幣！</div>`;
@@ -893,6 +1004,10 @@
             btn.className = `day-btn flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-all duration-300 ${i === currentDayIdx ? 'tab-active' : 'tab-inactive'}`;
         });
         document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
+        // v17.0: 刷新小恐龍位置
+        if(navigator.geolocation) {
+             navigator.geolocation.getCurrentPosition((p) => updateDinoGPS(p.coords.latitude, p.coords.longitude));
+        }
     }
 
     // 渲染主內容
@@ -923,8 +1038,9 @@
                         const isRainyItem = isRainyMode && e.rainy;
                         const current = isRainyItem ? { ...e, ...e.rainy } : e;
                         const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
-                        // v16.0 修改: 地圖連結 universal link
-                        const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
+                        // v17.0 修正: 使用 Google Maps Universal Link
+                        const mapLink = current.map ? `http://maps.google.com/?q=${encodeURIComponent(current.map)}` : null;
+
                         const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${current.note || ''}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
                         
                         const isLast = idx === d.events.length - 1;
@@ -970,7 +1086,8 @@
                 
                 <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative mb-6">
                     <label class="text-[10px] font-bold text-yellow-600 uppercase mb-1 block"><i class="fas fa-pen-nib mr-1"></i> 今日隨筆 (One-Line Diary)</label>
-                    <textarea class="w-full bg-transparent border-none text-sm text-gray-700 focus:ring-0 p-0 resize-none h-16 leading-relaxed focus:outline-none" placeholder="今天發生了什麼好笑的事？(自動儲存)" oninput="localStorage.setItem('${diaryKey}', this.value)">${savedDiary}</textarea>
+                    <textarea id="diary-textarea" class="w-full bg-transparent border-none text-sm text-gray-700 focus:ring-0 p-0 resize-none h-16 leading-relaxed focus:outline-none" placeholder="今天發生了什麼好笑的事？(自動儲存)" oninput="localStorage.setItem('${diaryKey}', this.value)">${savedDiary}</textarea>
+                    <div class="text-right mt-1"><button onclick="toggleVoiceMemo()" class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full"><i class="fas fa-microphone mr-1"></i>語音輸入</button></div>
                 </div>
                 <div class="h-12"></div>
             </div>`;
@@ -1040,14 +1157,52 @@
                 
                 main.innerHTML = `<div class="animate-slide-up space-y-4"><div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative"><button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><i class="fas fa-sync-alt"></i></button><h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3><div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD</div><div class="flex flex-col gap-4"><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative"><label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label><input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額" class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black"></div><i class="fas fa-arrow-down text-3xl text-blue-500 animate-bounce absolute left-1/2 -translate-x-1/2 top-[52%] z-10 drop-shadow-sm"></i><div class="bg-green-50 p-4 rounded-xl border border-green-100"><label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label><div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div></div></div></div><div class="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-5 border-2 border-pink-200 shadow-md relative overflow-hidden"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3><button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button></div><div class="flex gap-2 mb-3"><input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 min-w-0 bg-white border-2 border-pink-100 rounded-xl px-4 py-3 text-xl font-bold focus:outline-pink-400 text-gray-700"><button onclick="addTaxItem()" class="flex-none w-16 bg-pink-500 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center"><i class="fas fa-plus text-2xl"></i></button></div><div class="mb-2"><div class="flex justify-between text-xs mb-1 font-bold text-gray-500"><span>目前: ¥${taxBasketTotal.toLocaleString()}</span><span class="${taxDiff > 0 ? 'text-blue-500' : 'text-orange-500'}">${taxMsg}</span></div><div class="w-full bg-gray-200 rounded-full h-3"><div class="${taxDiff>0?'bg-blue-500':'bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse'} h-3 rounded-full transition-all duration-300" style="width: ${taxPercent}%"></div></div></div><div class="flex flex-wrap gap-1 min-h-[20px]">${taxBasketItems}</div></div><div class="glass-card rounded-3xl p-4"><div class="flex justify-between items-center mb-2"><div class="text-xs font-bold text-gray-500">總預算: $${TOTAL_BUDGET.toLocaleString()}</div><div class="text-xs font-bold ${budgetLeft < 0 ? 'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div></div><div class="w-full bg-gray-200 rounded-full h-1.5 mb-4"><div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div></div><div class="pie-chart" style="background: ${gradientStr}"></div><div class="flex flex-wrap justify-center mt-3 px-2">${legendHTML}</div></div><div class="glass-card rounded-3xl p-4"><h3 class="text-sm font-bold text-gray-600 mb-3"><i class="fas fa-pen mr-1"></i> 記一筆</h3><div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1"><label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-bag-shopping"></i> 購物</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-utensils"></i> 餐飲</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="play" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-purple-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-ticket"></i> 娛樂</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="transport" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-car"></i> 交通</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-box"></i> 其他</div></label></div><div class="flex flex-col gap-3 mb-3"><input id="exName" type="text" placeholder="品項名稱" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500"><input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500 font-bold"></div><div class="flex gap-2"><button onclick="addExpense()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-plus-circle mr-2"></i> 新增</button><button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-share-from-square"></i></button><button onclick="setBudget()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-cog"></i></button></div></div><div class="pb-24">${expenseListHTML}</div></div>`; setTimeout(() => { const i = document.getElementById('jpyInput'); if(i) i.focus(); }, 100);
             } else if (currentToolFilter === 'drive') {
-                 const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg mt-3"><i class="fas fa-map-pin mr-2"></i> 🅿️ 我停這</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div></div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
+                 // v17.0: 停車照片顯示邏輯
+                 const parkingPhotoHtml = (parkingData && parkingData.photo) ? `<div class="mt-3 relative group"><img src="${parkingData.photo}" class="w-full rounded-xl border border-green-300 shadow-sm" onclick="showParkingPhotoFull('${parkingData.photo}')"><div class="absolute bottom-2 right-2 text-[10px] bg-black/50 text-white px-2 py-1 rounded backdrop-blur">點擊放大</div></div>` : '';
+                 const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><p class="text-xs text-gray-400 mb-3">停好車記得拍張照！</p><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg mt-3"><i class="fas fa-camera mr-2"></i> 📷 記錄車位</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div>${parkingPhotoHtml}</div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
                  const gasHelperHTML = `<div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-1 shadow-lg mb-6 relative overflow-hidden text-white"><div class="bg-white/10 backdrop-blur-sm p-5 rounded-[1.3rem] border border-white/20"><div class="flex justify-between items-start mb-4"><div><div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">GAS STATION</div><h3 class="text-2xl font-black">加油請找 <span class="text-yellow-300">紅槍</span></h3><p class="text-xs opacity-90">Regular (レギュラー) = 92/95無鉛</p></div><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-md"><i class="fas fa-gas-pump"></i></div></div><div class="grid grid-cols-2 gap-2 text-center mb-4"><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-hand-sparkles mb-1 block opacity-70"></i><div class="text-[10px]">1.除靜電</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-credit-card mb-1 block opacity-70"></i><div class="text-[10px]">2.付錢/選油</div></div><div class="bg-red-700 rounded-lg p-2 border border-red-400"><i class="fas fa-fill-drip mb-1 block"></i><div class="text-[10px] font-bold">3.紅槍加油</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-receipt mb-1 block opacity-70"></i><div class="text-[10px]">4.拿收據</div></div></div><button onclick="showInfoCard('gas')" class="w-full bg-white text-red-600 font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"><i class="fas fa-comment-dots"></i> 給店員看 (日文)</button></div></div>`;
                  const soundBoardHTML = `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6"><h3 class="text-xs font-bold text-gray-500 uppercase mb-3"><i class="fas fa-music mr-1"></i> 安撫音效板 (Soundboard)</h3><div class="grid grid-cols-3 gap-3"><button onclick="playSound('clapping')" class="aspect-square bg-yellow-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">👏</button><button onclick="playSound('laugh')" class="aspect-square bg-pink-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">😆</button><button onclick="playSound('fart')" class="aspect-square bg-amber-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">💨</button><button onclick="playSound('magic')" class="aspect-square bg-purple-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">✨</button><button onclick="playSound('wrong')" class="aspect-square bg-red-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">❌</button><button onclick="playSound('correct')" class="aspect-square bg-green-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">⭕</button></div></div>`;
-                 
-                 // v16.0 更新: 潮汐 Widget
                  const tideWidget = getTideWidgetHTML();
                  
-                 main.innerHTML = `<div class="animate-slide-up space-y-4"><button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4"><div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div><div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div></button>${tideWidget}${parkingHTML}${gasHelperHTML}<div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4"><button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找廁所</span></button><button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 text-xl mb-1 block"></i><span class="text-xs font-bold">找超商</span></button><button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-xl mb-1 block"></i><span class="text-xs font-bold">小小畫家</span></button><button onclick="document.getElementById('food-modal').classList.add('open')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-utensils text-green-600 text-xl mb-1 block"></i><span class="text-xs font-bold">吃什麼？</span></button></div>${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-card ${d.color} border border-black/5 relative overflow-hidden"><i class="fas fa-car absolute -right-2 -bottom-2 text-6xl opacity-10"></i><div class="text-xs font-bold opacity-60 mb-2 uppercase tracking-wider">${d.title}</div><div class="text-xl font-black leading-tight">${d.content}</div></div>`).join('')}</div>`;
+                 // v17.0: 快速工具區新增 "隨身尺規" 按鈕
+                 main.innerHTML = `<div class="animate-slide-up space-y-4"><button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4"><div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div><div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div></button>${tideWidget}${parkingHTML}${gasHelperHTML}
+<div class="grid grid-cols-3 gap-2 mb-6">
+    <button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">找廁所</span></button>
+    <button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">找超商</span></button>
+    <button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">小小畫家</span></button>
+    <button onclick="openCamera()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-yellow-100"><i class="fas fa-camera text-yellow-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">回憶相機</span></button>
+    <button onclick="openRuler()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-blue-100"><i class="fas fa-ruler-combined text-blue-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">隨身尺規</span></button>
+    <div class="opacity-0"></div>
+</div>
+${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-card ${d.color} border border-black/5 relative overflow-hidden"><i class="fas fa-car absolute -right-2 -bottom-2 text-6xl opacity-10"></i><div class="text-xs font-bold opacity-60 mb-2 uppercase tracking-wider">${d.title}</div><div class="text-xl font-black leading-tight">${d.content}</div></div>`).join('')}</div>`;
+            } else if (currentToolFilter === 'food') {
+                // v17.0: 美食指指通渲染 (Food Board)
+                main.innerHTML = `
+                <div class="animate-slide-up space-y-4">
+                    <div class="bg-orange-50 border border-orange-200 rounded-3xl p-5 text-center">
+                        <h3 class="text-lg font-black text-orange-800 mb-1"><i class="fas fa-utensils mr-2"></i>手指點餐通</h3>
+                        <p class="text-xs text-orange-600">點擊圖片，手機幫你說日文！</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        ${foodBoardDB.map(f => `
+                            <div class="food-grid-item" onclick="speak('${f.jp}', this)">
+                                <img src="${f.img}" class="food-grid-img" loading="lazy">
+                                <div class="food-grid-label">
+                                    <div class="text-lg">${f.name}</div>
+                                    <div class="text-[10px] font-normal opacity-80">${f.note}</div>
+                                </div>
+                                <div class="absolute top-2 right-2 bg-white/90 rounded-full w-8 h-8 flex items-center justify-center text-orange-500 shadow-md">
+                                    <i class="fas fa-volume-high"></i>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mt-4">
+                        <button onclick="speak('辛いですか？ (Karai desuka?)', this)" class="bg-red-100 text-red-700 py-4 rounded-2xl font-bold active:scale-95 transition-transform text-sm"><i class="fas fa-pepper-hot mr-1"></i> 這會辣嗎？</button>
+                        <button onclick="speak('卵や牛乳は入っていますか？ (Tamago ya gyunyu wa...)', this)" class="bg-yellow-100 text-yellow-700 py-4 rounded-2xl font-bold active:scale-95 transition-transform text-sm"><i class="fas fa-exclamation-triangle mr-1"></i> 含蛋/奶嗎？</button>
+                    </div>
+                </div>`;
             } else if (currentToolFilter === 'signs') {
                 main.innerHTML = `<div class="animate-slide-up grid gap-4">${toolsDB.signs.map(s => `<div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-4"><div class="text-4xl w-16 h-16 flex items-center justify-center bg-gray-50 rounded-2xl">${s.icon}</div><div class="flex-1"><h3 class="text-lg font-black ${s.color} mb-1">${s.title}</h3><p class="text-sm text-gray-600 leading-relaxed">${s.desc}</p></div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'coins') {
@@ -1057,7 +1212,6 @@
             } else if (currentToolFilter === 'orders') {
                 main.innerHTML = `<div class="animate-slide-up grid grid-cols-2 gap-4">${toolsDB.orders.map(o => `<div class="order-card" onclick="alert('${o.jp}')"><div class="text-5xl mb-2">${o.icon}</div><div class="font-black text-gray-800 text-lg mb-1">${o.title}</div><div class="text-xs text-gray-400 font-mono">${o.sub}</div><div class="mt-3 bg-blue-50 text-blue-600 font-black py-2 rounded-xl text-xl">${o.jp}</div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'jp') {
-                // v16.0 更新: 翻譯機
                 main.innerHTML = `<div class="animate-slide-up space-y-6"><div class="bg-slate-800 rounded-3xl p-6 text-center text-white relative overflow-hidden shadow-xl"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-pink-500"></div><h3 class="text-lg font-bold mb-4">聽譯蒟蒻 (日 ➡ 中)</h3><div class="flex justify-center mb-6"><button id="mic-btn" onclick="toggleTranslation()" class="mic-btn"><i class="fas fa-microphone"></i></button></div><div id="trans-output" class="min-h-[3rem] text-xl font-bold text-gray-200 bg-white/10 rounded-xl p-3 flex items-center justify-center">點擊按鈕，請店員說話</div><div class="text-[10px] text-gray-400 mt-2">支援 Chrome / Android / iOS 15+</div></div><div class="glass-card p-4 rounded-2xl text-center bg-blue-50 border border-blue-200"><div class="text-sm text-blue-800 font-bold mb-1">💡 字卡教學</div><div class="text-xs text-blue-600">點擊 <i class="fas fa-volume-high mx-1 text-yellow-600"></i> 黃色按鈕，手機會直接唸出日語！</div></div>${toolsDB.jp.map(cat => `<div><h3 class="text-xs font-bold text-gray-400 uppercase mb-3 ml-2 tracking-wider border-l-2 border-blue-500 pl-2">${cat.label}</h3><div class="grid gap-3">${cat.items.map(item => `<div class="glass-card p-5 rounded-3xl border border-slate-50 transition-transform flex items-center justify-between gap-3 relative z-10"><div class="flex-1"><div class="text-xs text-gray-500 mb-1 flex items-center gap-1"><i class="fas fa-language"></i> ${item.t}</div><div class="text-xl font-black text-gray-800 mb-1 leading-tight">${item.j}</div><div class="text-xs text-blue-500 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded">${item.p}</div></div><button onclick="speak('${item.j}', this)" class="w-12 h-12 flex-shrink-0 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center shadow-lg active:scale-90 transition-transform z-20"><i class="fas fa-volume-high text-xl"></i></button></div>`).join('')}</div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'sos') {
                 let allergyTags = medicalData.allergies.length > 0 ? medicalData.allergies.map(a => `<span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-200">${allergyDict[a].jp}</span>`).join(" ") : "<span class='text-gray-400 text-xs'>無 (なし)</span>";
@@ -1078,7 +1232,7 @@
     }
 	// ================= 3. 輔助與其他功能 (Helpers) =================
     
-    // 小畫家 (Drawing)
+    // --- 1. 小小畫家 (Drawing) ---
     let isDrawing = false; let ctx = null; let currentColor = 'black';
     window.openDrawing = () => { const modal = document.getElementById('drawing-modal'); modal.classList.add('open'); const canvas = document.getElementById('drawing-canvas'); const container = document.getElementById('canvas-container'); canvas.width = container.clientWidth; canvas.height = container.clientHeight; ctx = canvas.getContext('2d'); ctx.lineCap = 'round'; ctx.lineWidth = 5; ctx.strokeStyle = currentColor; canvas.addEventListener('touchstart', startDraw, {passive: false}); canvas.addEventListener('touchmove', draw, {passive: false}); canvas.addEventListener('touchend', endDraw); canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', endDraw); }
     window.closeDrawing = () => document.getElementById('drawing-modal').classList.remove('open');
@@ -1089,7 +1243,280 @@
     window.clearCanvas = () => { const canvas = document.getElementById('drawing-canvas'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
     window.saveDrawing = () => { const canvas = document.getElementById('drawing-canvas'); const link = document.createElement('a'); link.download = `kuku-drawing-${Date.now()}.png`; link.href = canvas.toDataURL(); link.click(); showToast("畫作已下載！"); }
 
-    // 伴手禮 (Gifts)
+    // --- 2. v17.0 新功能: 隨身尺規 (Smart Ruler) ---
+    let rulerScale = 1.0; // 校正比例
+    const basePPI = 96; // 基準 PPI (假設值，靠校正調整)
+    
+    window.openRuler = () => {
+        document.getElementById('ruler-modal').classList.add('open');
+        renderRulerTicks();
+    }
+    window.closeRuler = () => document.getElementById('ruler-modal').classList.remove('open');
+    window.updateRulerScale = (val) => {
+        rulerScale = parseFloat(val);
+        renderRulerTicks();
+    }
+    window.resetRulerScale = () => {
+        document.getElementById('ruler-scale').value = 1.0;
+        updateRulerScale(1.0);
+    }
+    
+    function renderRulerTicks() {
+        const container = document.getElementById('ruler-ticks');
+        container.innerHTML = '';
+        const pxPerCm = (basePPI / 2.54) * rulerScale;
+        
+        // 生成 30 公分的刻度
+        for (let i = 0; i <= 30; i++) {
+            // 主刻度 (cm)
+            const tick = document.createElement('div');
+            tick.className = 'ruler-tick major';
+            tick.style.marginRight = `${pxPerCm / 10 - 2}px`; // 減去 border 寬度
+            
+            const num = document.createElement('div');
+            num.className = 'ruler-num';
+            num.innerText = i;
+            tick.appendChild(num);
+            container.appendChild(tick);
+
+            if (i < 30) {
+                // 生成毫米刻度 (mm)
+                for (let j = 1; j < 10; j++) {
+                    const subTick = document.createElement('div');
+                    subTick.className = j === 5 ? 'ruler-tick medium' : 'ruler-tick minor';
+                    // 最後一個毫米不需要 margin，因為下一個是主刻度
+                    const margin = (pxPerCm / 10) - 1; 
+                    subTick.style.marginRight = `${margin}px`;
+                    container.appendChild(subTick);
+                }
+            }
+        }
+        document.getElementById('ruler-display-val').innerText = (rulerScale * 10).toFixed(1); // 顯示目前校正參數供參考
+    }
+    // 監聽尺規捲動，更新數值顯示 (模擬測量讀數)
+    document.getElementById('ruler-scroll-area')?.addEventListener('scroll', (e) => {
+        const pxPerCm = (basePPI / 2.54) * rulerScale;
+        const scrollLeft = e.target.scrollLeft;
+        const cm = (scrollLeft / pxPerCm).toFixed(1);
+        document.getElementById('ruler-display-val').innerText = cm;
+    });
+
+    // --- 3. v17.0 新功能: 回憶浮水印相機 (Memory Cam) ---
+    let stream = null;
+    let videoTrack = null;
+    let facingMode = 'environment'; // 預設後鏡頭
+
+    window.openCamera = async () => {
+        document.getElementById('camera-modal').classList.remove('hidden'); // 這裡用 hidden class 控制
+        document.getElementById('camera-modal').classList.add('flex');
+        
+        // 更新浮水印資料
+        const today = new Date();
+        document.getElementById('cam-day-val').innerText = currentDayIdx + 1;
+        document.getElementById('cam-date-val').innerText = `${today.getFullYear()}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getDate().toString().padStart(2,'0')}`;
+        document.getElementById('cam-loc-val').innerText = "Okinawa"; // 預設
+        
+        // 嘗試取得地點
+        if(navigator.geolocation) {
+             navigator.geolocation.getCurrentPosition(p => {
+                 // 簡單反查 (這裡簡化，實際可 call API)
+                 // 若在名護附近
+                 if(p.coords.latitude > 26.5) document.getElementById('cam-loc-val').innerText = "Nago, Okinawa";
+                 else document.getElementById('cam-loc-val').innerText = "Naha, Okinawa";
+             });
+        }
+        
+        startCamera();
+    }
+
+    async function startCamera() {
+        const video = document.getElementById('camera-video');
+        try {
+            if (stream) { stream.getTracks().forEach(track => track.stop()); }
+            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
+            video.srcObject = stream;
+            document.getElementById('cam-overlay').classList.remove('hidden');
+        } catch (err) {
+            alert("無法啟動相機，請確認權限。\n(iOS請使用Safari開啟)");
+            closeCamera();
+        }
+    }
+
+    window.closeCamera = () => {
+        const video = document.getElementById('camera-video');
+        if (stream) { stream.getTracks().forEach(track => track.stop()); }
+        video.srcObject = null;
+        document.getElementById('camera-modal').classList.add('hidden');
+        document.getElementById('camera-modal').classList.remove('flex');
+    }
+
+    window.toggleCameraFacing = () => {
+        facingMode = facingMode === 'user' ? 'environment' : 'user';
+        startCamera();
+    }
+
+    window.takePhoto = () => {
+        const video = document.getElementById('camera-video');
+        const canvas = document.getElementById('camera-canvas');
+        const overlay = document.getElementById('cam-overlay');
+        
+        // 設定 Canvas 大小與影片一致
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        
+        // 1. 繪製影像 (水平翻轉處理自拍)
+        if (facingMode === 'user') {
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+        }
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        if (facingMode === 'user') ctx.setTransform(1, 0, 0, 1, 0, 0); // 重置矩陣
+
+        // 2. 繪製浮水印 (模擬 HTML overlay 的樣式)
+        // 這裡簡化繪製邏輯，直接畫文字
+        const scale = canvas.width / 800; // 響應式縮放
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.shadowBlur = 4 * scale;
+        
+        // 日期
+        ctx.fillStyle = "#fbbf24";
+        ctx.font = `bold ${30 * scale}px monospace`;
+        ctx.textAlign = "right";
+        const dateText = document.getElementById('cam-date-val').innerText;
+        ctx.fillText(dateText, canvas.width - (20 * scale), canvas.height - (70 * scale));
+        
+        // 地點
+        ctx.fillStyle = "white";
+        ctx.font = `${20 * scale}px sans-serif`;
+        const locText = "📍 " + document.getElementById('cam-loc-val').innerText;
+        ctx.fillText(locText, canvas.width - (20 * scale), canvas.height - (45 * scale));
+
+        // 天氣
+        const weatherText = "☀️ " + document.getElementById('cam-weather-val').innerText;
+        ctx.fillText(weatherText, canvas.width - (20 * scale), canvas.height - (20 * scale));
+
+        // Day Badge
+        ctx.save();
+        ctx.translate(30 * scale, 40 * scale);
+        ctx.rotate(-5 * Math.PI / 180);
+        ctx.fillStyle = "#ef4444";
+        ctx.fillRect(0, 0, 100 * scale, 30 * scale);
+        ctx.fillStyle = "white";
+        ctx.font = `bold ${20 * scale}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillText(`DAY ${currentDayIdx+1}`, 50 * scale, 22 * scale);
+        ctx.restore();
+
+        // 3. 下載圖片
+        const link = document.createElement('a');
+        link.download = `kuku-memory-${Date.now()}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.9);
+        link.click();
+        
+        // 閃光特效
+        const flash = document.createElement('div');
+        flash.className = "fixed inset-0 bg-white z-[300] transition-opacity duration-300";
+        document.body.appendChild(flash);
+        setTimeout(() => { flash.style.opacity = 0; setTimeout(() => flash.remove(), 300); }, 50);
+        
+        showToast("📸 照片已儲存！");
+    }
+    
+    // 開啟相簿 (觸發 input file)
+    window.openGallery = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            // 這裡可以做讀取照片後加浮水印的功能，目前 v17.0 先單純打開
+            showToast("功能開發中：匯入照片加框");
+        };
+        input.click();
+    }
+    
+    // v17.0: 綁定首頁相機按鈕 (在 Part 3 之前未定義，這裡動態綁定或直接在 HTML 增加)
+    // 註：在 tools 頁面我們已經有按鈕可以 call openCamera()
+
+    // --- 4. v17.0 新功能: 小恐龍 GPS (Dino Tracker) ---
+    function updateDinoGPS(lat, lon) {
+        const d = itineraryDB[currentDayIdx];
+        if (!d.events || d.events.length < 2) return;
+        
+        // 找出當天第一個和最後一個有座標的點，作為起點和終點
+        const points = d.events.filter(e => e.lat);
+        if (points.length < 2) return;
+        
+        const start = points[0];
+        const end = points[points.length - 1];
+        
+        // 計算總距離
+        const totalDist = getDistanceFromLatLonInKm(start.lat, start.lon, end.lat, end.lon);
+        // 計算目前距離起點的距離
+        const currentDist = getDistanceFromLatLonInKm(start.lat, start.lon, lat, lon);
+        
+        // 計算進度 (0% - 100%)
+        let progress = (currentDist / totalDist) * 100;
+        if (progress < 0) progress = 0;
+        if (progress > 100) progress = 100;
+        
+        // 更新 UI
+        const bar = document.getElementById('dino-fill-bar');
+        const marker = document.getElementById('dino-marker');
+        const status = document.getElementById('dino-status-text');
+        
+        if(bar && marker) {
+            bar.style.width = `${progress}%`;
+            marker.style.left = `${progress}%`;
+            status.innerText = progress > 90 ? "快到了！加油！" : `旅程進行中 (${Math.round(progress)}%)`;
+        }
+    }
+
+    // --- 5. v17.0 新功能: 語音日記 (Voice Memo) ---
+    function toggleVoiceMemo() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert("你的手機不支援語音輸入 😭 (請用 Chrome)");
+            return;
+        }
+        
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'zh-TW'; // 聽中文
+        recognition.interimResults = false;
+        
+        recognition.onstart = function() {
+            showToast("🎙️ 請開始說話...");
+        };
+        
+        recognition.onresult = function(event) {
+            const text = event.results[0][0].transcript;
+            const textarea = document.getElementById('diary-textarea');
+            if(textarea) {
+                const original = textarea.value;
+                textarea.value = original ? original + "\n" + text : text;
+                // 觸發 input event 以儲存
+                textarea.dispatchEvent(new Event('input'));
+                showToast("✅ 已寫入日記！");
+            }
+        };
+        
+        recognition.onerror = function(e) {
+            showToast("❌ 聽不清楚，請再試一次");
+        };
+        
+        recognition.start();
+    }
+    
+    // --- 6. v17.0 新功能: 顯示停車大圖 ---
+    window.showParkingPhotoFull = (src) => {
+        // 簡單用一個全螢幕 div 顯示
+        const div = document.createElement('div');
+        div.className = "fixed inset-0 z-[300] bg-black flex items-center justify-center p-2";
+        div.onclick = () => div.remove();
+        div.innerHTML = `<img src="${src}" class="max-w-full max-h-full rounded-lg shadow-2xl border-2 border-white">`;
+        document.body.appendChild(div);
+    }
+
+    // --- 伴手禮 (Gifts) ---
     window.openGiftModal = () => { renderGiftList(); document.getElementById('gift-modal').classList.add('open'); }
     window.closeGiftModal = () => document.getElementById('gift-modal').classList.remove('open');
     window.addGift = () => { const who = document.getElementById('gift-who').value; const what = document.getElementById('gift-what').value; const budget = document.getElementById('gift-budget').value; if(who && what) { giftDB.push({ who, what, budget: budget || 0, bought: false }); saveGifts(); renderGiftList(); document.getElementById('gift-who').value = ''; document.getElementById('gift-what').value = ''; document.getElementById('gift-budget').value = ''; } else { showToast("請輸入對象和物品"); } }
@@ -1097,9 +1524,8 @@
     window.toggleGift = (idx) => { giftDB[idx].bought = !giftDB[idx].bought; saveGifts(); renderGiftList(); if(giftDB[idx].bought) showToast("已標記為購買！"); }
     window.deleteGift = (idx) => { if(confirm("刪除此項目？")) { giftDB.splice(idx, 1); saveGifts(); renderGiftList(); } }
     function saveGifts() { localStorage.setItem('trip_gifts', JSON.stringify(giftDB)); }
-
-    // 彈窗與分享
-    window.openSpotModal = (id) => { const spot = spotInfoDB[id]; if(!spot) return; document.getElementById('spot-title').innerText = spot.title; document.getElementById('spot-hero').style.backgroundImage = `url('${spot.image}')`; document.getElementById('spot-desc').innerText = spot.desc; document.getElementById('spot-tips').innerText = spot.tips; const tagsHtml = spot.tags.map(t => `<span class="bg-black/40 px-2 py-1 rounded text-[10px] backdrop-blur-md font-bold text-white shadow-sm border border-white/20">${t}</span>`).join(''); document.getElementById('spot-tags').innerHTML = tagsHtml; const btn = document.getElementById('spot-nav-btn'); btn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot.map)}`; document.getElementById('spot-modal').classList.add('open'); }
+    // --- 彈窗與分享 (Modals & Share) ---
+    window.openSpotModal = (id) => { const spot = spotInfoDB[id]; if(!spot) return; document.getElementById('spot-title').innerText = spot.title; document.getElementById('spot-hero').style.backgroundImage = `url('${spot.image}')`; document.getElementById('spot-desc').innerText = spot.desc; document.getElementById('spot-tips').innerText = spot.tips; const tagsHtml = spot.tags.map(t => `<span class="bg-black/40 px-2 py-1 rounded text-[10px] backdrop-blur-md font-bold text-white shadow-sm border border-white/20">${t}</span>`).join(''); document.getElementById('spot-tags').innerHTML = tagsHtml; const btn = document.getElementById('spot-nav-btn'); btn.href = `http://maps.google.com/?q=${encodeURIComponent(spot.map)}`; document.getElementById('spot-modal').classList.add('open'); }
     window.closeSpotModal = () => document.getElementById('spot-modal').classList.remove('open');
     
     window.openSosCard = () => document.getElementById('sos-card-modal').classList.add('open');
@@ -1108,20 +1534,20 @@
     
     window.shareEvent = async (title, mapcode, note) => { const shareData = { title: `奎奎行程：${title}`, text: `我們要去：${title}\nMapCode: ${mapcode || '無'}\n備註: ${note}`, }; if (navigator.share) { try { await navigator.share(shareData); } catch (err) { console.log('分享取消'); } } else { navigator.clipboard.writeText(shareData.text).then(() => showToast("已複製行程資訊！")); } }
 
-    // 聲音與互動
-    window.playSound = (type) => { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); const now = ctx.currentTime; if (type === 'magic') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(1000, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'wrong') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(100, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'correct') { osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.setValueAtTime(800, now + 0.1); gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'fart') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); osc.frequency.linearRampToValueAtTime(60, now + 0.4); gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'laugh') { osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(600, now + 0.1); osc.frequency.linearRampToValueAtTime(400, now + 0.2); gain.gain.setValueAtTime(0.3, now); osc.start(now); osc.stop(now + 0.3); } else { playCoinSound(); } }
-    window.spinFood = () => { const iconEl = document.getElementById('food-result'); const textEl = document.getElementById('food-text'); let count = 0; const interval = setInterval(() => { const random = foodOptions[Math.floor(Math.random() * foodOptions.length)]; iconEl.innerText = random.icon; textEl.innerText = random.name; count++; if(count > 20) { clearInterval(interval); playCoinSound(); iconEl.classList.add('animate-pop'); setTimeout(() => iconEl.classList.remove('animate-pop'), 500); } }, 80); }
+    // --- 聲音與互動 (Sound & Games) ---
+    window.playSound = (type) => { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); const now = ctx.currentTime; if (type === 'magic') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(1000, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'wrong') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(100, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'correct') { osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.setValueAtTime(800, now + 0.1); gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'fart') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); osc.frequency.linearRampToValueAtTime(60, now + 0.4); gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'laugh') { osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(600, now + 0.1); osc.frequency.linearRampToValueAtTime(400, now + 0.2); gain.gain.setValueAtTime(0.3, now); osc.start(now); osc.stop(now + 0.3); } else if (type === 'clapping') { /* 簡化掌聲 */ const o=ctx.createOscillator();o.type='triangle';o.frequency.setValueAtTime(150,now);const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(0.5,now);g.gain.exponentialRampToValueAtTime(0.01,now+0.5);o.start(now);o.stop(now+0.5); } else { playCoinSound(); } }
+    window.spinFood = () => { /* 保留舊版吃什麼功能 */ const iconEl = document.getElementById('food-result'); const textEl = document.getElementById('food-text'); let count = 0; const interval = setInterval(() => { const opts = [{icon:"🍜",name:"拉麵"},{icon:"🥩",name:"燒肉"},{icon:"🍣",name:"壽司"},{icon:"🍔",name:"漢堡"}]; const random = opts[Math.floor(Math.random() * opts.length)]; iconEl.innerText = random.icon; textEl.innerText = random.name; count++; if(count > 20) { clearInterval(interval); playCoinSound(); iconEl.classList.add('animate-pop'); setTimeout(() => iconEl.classList.remove('animate-pop'), 500); } }, 80); }
     
-    // 每日出門檢查
+    // --- 每日出門檢查 (Daily Check) ---
     function checkDailyPopup() { const today = new Date().toISOString().split('T')[0]; const lastCheck = localStorage.getItem('last_departure_check'); const currentHour = new Date().getHours(); if (today !== lastCheck && currentHour >= 6 && currentHour <= 11) { document.getElementById('daily-check-modal').classList.add('open'); } }
     window.checkDailyItem = (cb) => { const all = document.querySelectorAll('#daily-check-modal input[type="checkbox"]'); const checked = document.querySelectorAll('#daily-check-modal input[type="checkbox"]:checked'); const btn = document.getElementById('daily-check-btn'); if(all.length === checked.length) { btn.disabled = false; btn.classList.remove('bg-gray-300'); btn.classList.add('bg-blue-600', 'shadow-lg'); } }
     window.finishDailyCheck = () => { localStorage.setItem('last_departure_check', new Date().toISOString().split('T')[0]); document.getElementById('daily-check-modal').classList.remove('open'); showToast("出發！祝今天旅途愉快！🚗"); playSound('correct'); }
     
-    // 雨天模式
+    // --- 雨天模式 (Rain Mode) ---
     window.toggleRainMode = () => { isRainyMode = !isRainyMode; localStorage.setItem('rainy_mode', isRainyMode); if(navigator.vibrate) navigator.vibrate(50); updateRainyModeUI(); renderContent(); }
     function updateRainyModeUI() { const btn = document.getElementById('rain-btn'); const icon = document.getElementById('rain-icon'); const text = document.getElementById('rain-text'); const body = document.body; if (isRainyMode) { body.classList.add('rainy-mode'); btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-blue-400/50 bg-blue-900/50"; icon.className = "fas fa-cloud-showers-heavy text-xl mb-1 block text-blue-300"; text.innerText = "雨天備案"; text.className = "text-[9px] font-bold text-blue-200"; showToast("☔ 已切換為雨天備案模式"); } else { body.classList.remove('rainy-mode'); btn.className = "glass-dark px-3 py-2 rounded-2xl text-center shadow-lg min-w-[50px] active:scale-95 transition-all border border-white/20"; icon.className = "fas fa-sun text-xl mb-1 block text-yellow-400"; text.innerText = "晴天"; text.className = "text-[9px] font-bold opacity-90"; showToast("☀️ 已切換為晴天模式"); } }
     
-    // 計算機與記帳邏輯
+    // --- 計算機與記帳 (Calc) ---
     window.addTaxItem = () => { const input = document.getElementById('taxItemInput'); const val = parseInt(input.value); if(val && val > 0) { taxBasket.push(val); input.value = ""; renderContent(); const i = document.getElementById('taxItemInput'); if(i) i.focus(); } }
     window.resetTaxBasket = () => { if(confirm("確定要清空免稅購物籃嗎？")) { taxBasket = []; renderContent(); } }
     window.fetchExchangeRate = async () => { const btn = document.getElementById('fetchRateBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); const twd = data.rates.TWD; if(twd) { updateRate(twd.toFixed(4)); document.getElementById('rateInput').value = twd.toFixed(4); showToast(`匯率已更新：${twd}`); } } catch(e) { showToast("更新失敗，請檢查網路"); } finally { btn.innerHTML = originalText; } }
@@ -1131,7 +1557,7 @@
     window.resetChecklist = (id) => { if(confirm('重置清單？')) { checklistDB.find(c=>c.id===id).items.forEach(item => localStorage.removeItem(`chk_${id}_${item.text}`)); renderContent(); showToast("已重置"); } }
     function saveChecklistDB() { localStorage.setItem('trip_checklist_db', JSON.stringify(checklistDB)); }
     
-    // 遊戲化邏輯
+    // --- 遊戲化 (Game Logic) ---
     function playCoinSound() { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(987,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(1318,ctx.currentTime+0.1); g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.5); o.start(); o.stop(ctx.currentTime+0.5); }
     function playGashaSound() { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='square'; o.frequency.setValueAtTime(100,ctx.currentTime); o.frequency.linearRampToValueAtTime(800,ctx.currentTime+0.2); g.gain.setValueAtTime(0.1,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.3); o.start(); o.stop(ctx.currentTime+0.3); }
     window.toggleMission = (id) => { const d=localStorage.getItem(id)==='1'; if(d){if(confirm('取消成就？')) localStorage.removeItem(id); renderContent();}else{if(navigator.vibrate)navigator.vibrate(200); playCoinSound(); localStorage.setItem(id,'1'); showToast("🎉 獲得代幣！"); renderContent();} }
@@ -1139,7 +1565,7 @@
     window.spinGasha = () => { if(getGashaBalance()<=0)return; playGashaSound(); document.getElementById('gasha-machine').classList.add('animate-shake'); gashaCoinsUsed++; localStorage.setItem('gasha_coins_used', gashaCoinsUsed); renderContent(); setTimeout(()=>{document.getElementById('gasha-machine').classList.remove('animate-shake'); const r=rewardsDB[Math.floor(Math.random()*rewardsDB.length)]; document.getElementById('gasha-reward-icon').innerText=r.icon; document.getElementById('gasha-reward-text').innerText=r.text; document.getElementById('gasha-modal').classList.add('open'); playCoinSound();}, 800); }
     window.closeGashaModal = () => document.getElementById('gasha-modal').classList.remove('open');
     
-    // 工具函式
+    // --- 一般工具 (Utils) ---
     window.copyMapCode = (c) => { navigator.clipboard.writeText(c).then(()=>showToast("MapCode 已複製")); }
     window.updateRate = (v) => { if(v>0){CURRENT_RATE=parseFloat(v); localStorage.setItem('user_rate',v); convertCurrency(); renderContent();} }
     window.convertCurrency = () => { const j=parseFloat(document.getElementById('jpyInput').value); const t=document.getElementById('twdOutput'); if(isNaN(j)||j<=0){t.innerText="0";return;} t.innerText=(j*CURRENT_RATE).toFixed(j%1!==0?2:0).toLocaleString('en-US'); }
@@ -1150,8 +1576,18 @@
     window.saveQuickExpense = () => { const n=document.getElementById('quickExName').value; const p=document.getElementById('quickExPrice').value; const c=document.querySelector('input[name="quick-cat"]:checked')?.value||'shopping'; if(!n||!p){showToast("請輸入完整");return;} expenses.unshift({name:n,price:parseInt(p),cat:c}); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); showToast("快速記帳成功"); if(activeTab==='tools'&&currentToolFilter==='calc')renderContent(); closeQuickExpense(); }
     window.exportExpenses = () => { if(expenses.length===0)return; let t=0; let txt="🦕 帳務：\n"; expenses.forEach(e=>{txt+=`${e.name}: ¥${e.price}\n`;t+=e.price;}); txt+=`總計: ¥${t}`; navigator.clipboard.writeText(txt).then(()=>showToast("已複製")); }
     window.deleteExpense = (i) => { if(confirm("刪除？")){expenses.splice(i,1); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); renderContent();} }
-    window.quickSearch = (q) => { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`,'_blank'); showToast("搜尋中..."); }
-    window.speak = (t,b) => { const o=b.innerHTML; b.innerHTML=`<div class="playing-wave"><span></span><span></span><span></span></div>`; if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=0.9;u.onend=()=>b.innerHTML=o;u.onerror=()=>{b.innerHTML=o;window.open(`https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(t)}&op=translate`,'_blank');};window.speechSynthesis.speak(u);}else{b.innerHTML=o;window.open(`https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(t)}&op=translate`,'_blank');} }
+    window.quickSearch = (q) => { window.open(`http://maps.google.com/?q=${encodeURIComponent(q)}`,'_blank'); showToast("搜尋中..."); }
+    // v17.0: 點餐語音使用 speak() 函式，支援日語
+    window.speak = (t,b) => { 
+        if(b && b.querySelector) { // 如果是按鈕元素
+            const o=b.innerHTML; b.innerHTML=`<div class="playing-wave"><span></span><span></span><span></span></div>`; 
+            const reset = () => b.innerHTML = o;
+            if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=0.9;u.onend=reset;u.onerror=()=>{reset();window.open(`https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(t)}&op=translate`,'_blank');};window.speechSynthesis.speak(u);}else{reset();window.open(`https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(t)}&op=translate`,'_blank');}
+        } else {
+            // 純文字觸發
+             if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';window.speechSynthesis.speak(u);}
+        }
+    }
     window.toggleEditMedical = () => { document.getElementById('medical-view').classList.toggle('hidden'); document.getElementById('medical-edit').classList.toggle('hidden'); }
     window.saveMedical = () => { const n=document.getElementById('in-name').value; const p=document.getElementById('in-phone').value; const h=document.getElementById('in-hotel').value; const a=Array.from(document.querySelectorAll('.allergy-chk:checked')).map(c=>c.value); medicalData={name:n,phone:p,hotel:h,allergies:a}; localStorage.setItem('medical_data',JSON.stringify(medicalData)); toggleEditMedical(); renderContent(); showToast("已更新"); }
     window.showInfoCard = (t, p) => { const m=document.getElementById('modal-overlay'); const tag=document.getElementById('modal-tag'); const tit=document.getElementById('modal-title'); const con=document.getElementById('modal-content'); const not=document.getElementById('modal-note'); if(t==='hotel'){if(!p){showToast("請先編輯");return;} tag.innerText="給司機看"; tit.innerHTML="このホテルまで<br>お願いします"; con.innerText=p; con.className="text-xl font-bold text-blue-700 mb-2"; not.innerText="請帶我去這家飯店";}else if(t==='gas'){tag.innerText="給店員"; tit.innerHTML="レギュラー満タン<br>現金で"; con.innerText="Regular Full / Cash"; con.className="text-xl font-bold text-red-600 mb-2"; not.innerText="紅槍加滿，付現";} m.classList.add('open'); }
@@ -1163,16 +1599,64 @@
     window.deleteReward = (idx) => { if(confirm('刪除這個獎項？')) { rewardsDB.splice(idx, 1); saveRewards(); renderRewardList(); } }
     window.resetRewards = () => { if(confirm('恢復為預設獎勵？')) { rewardsDB = [...defaultRewards]; saveRewards(); renderRewardList(); } }
     function saveRewards() { localStorage.setItem('gasha_rewards', JSON.stringify(rewardsDB)); }
-    window.saveParking = () => { const n=prompt("位置備註:","B1"); if(n&&navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{parkingData={lat:p.coords.latitude,lon:p.coords.longitude,note:n,time:new Date().toTimeString().slice(0,5)}; localStorage.setItem('parking_data',JSON.stringify(parkingData)); renderContent(); showToast("已記錄");});} }
-    window.findCar = () => { if(parkingData) window.open(`https://www.google.com/maps/search/?api=1&query=${parkingData.lat},${parkingData.lon}`,'_blank'); }
+    
+    // v17.0 升級版: 停車儲存 (支援照片)
+    window.saveParking = () => { 
+        const n = prompt("位置備註 (例如: B1 綠區):", parkingData ? parkingData.note : ""); 
+        if(n === null) return;
+        
+        // 嘗試上傳照片?
+        const wantPhoto = confirm("要順便拍張照/上傳照片嗎？");
+        let photoData = null;
+        
+        if (wantPhoto) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment'; // 優先使用後鏡頭
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if(file) {
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        photoData = evt.target.result;
+                        saveParkingToStorage(n, photoData);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    saveParkingToStorage(n, null);
+                }
+            };
+            input.click();
+        } else {
+            saveParkingToStorage(n, null);
+        }
+    }
+    
+    function saveParkingToStorage(note, photo) {
+        if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(p=>{
+                parkingData = {
+                    lat: p.coords.latitude,
+                    lon: p.coords.longitude,
+                    note: note,
+                    photo: photo || (parkingData ? parkingData.photo : null), // 保留舊照片
+                    time: new Date().toTimeString().slice(0,5)
+                }; 
+                localStorage.setItem('parking_data',JSON.stringify(parkingData)); 
+                renderContent(); 
+                showToast("✅ 已記錄停車位！");
+            });
+        }
+    }
+    
+    window.findCar = () => { if(parkingData) window.open(`http://maps.google.com/?q=${parkingData.lat},${parkingData.lon}`, '_blank'); }
     window.clearParking = () => { if(confirm("清除？")){parkingData=null; localStorage.removeItem('parking_data'); renderContent();} }
     window.backupData = () => { const d={user_rate:localStorage.getItem('user_rate'), trip_budget:localStorage.getItem('trip_budget'), trip_expenses:localStorage.getItem('trip_expenses'), trip_gifts:localStorage.getItem('trip_gifts'), medical_data:localStorage.getItem('medical_data'), parking_data:localStorage.getItem('parking_data'), gasha_coins_used:localStorage.getItem('gasha_coins_used'), gasha_rewards:localStorage.getItem('gasha_rewards'), items:{}}; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(k.startsWith('chk_')||k.startsWith('m')||k.startsWith('diary_')||k==='last_departure_check')d.items[k]=localStorage.getItem(k);} navigator.clipboard.writeText(btoa(encodeURIComponent(JSON.stringify(d)))).then(()=>showToast("代碼已複製")); }
     window.restoreData = () => { const c=document.getElementById('importDataInput').value.trim(); if(!c)return; if(confirm("覆蓋資料？")){try{const d=JSON.parse(decodeURIComponent(atob(c))); if(d.user_rate)localStorage.setItem('user_rate',d.user_rate); if(d.trip_budget)localStorage.setItem('trip_budget',d.trip_budget); if(d.trip_expenses)localStorage.setItem('trip_expenses',d.trip_expenses); if(d.trip_gifts)localStorage.setItem('trip_gifts',d.trip_gifts); if(d.medical_data)localStorage.setItem('medical_data',d.medical_data); if(d.parking_data)localStorage.setItem('parking_data',d.parking_data); if(d.gasha_coins_used)localStorage.setItem('gasha_coins_used',d.gasha_coins_used); if(d.gasha_rewards)localStorage.setItem('gasha_rewards',d.gasha_rewards); if(d.items){for(let k in d.items)localStorage.setItem(k,d.items[k]);} alert("成功！"); location.reload();}catch(e){alert("代碼錯誤");}} }
     function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
     
-    // ================= v16.0 新功能邏輯 (整合) =================
-
-    // --- 1. 地理圍欄 (Geofence) ---
+    // --- Geofence & HUD Helpers ---
     function checkGeofence(userLat, userLon) {
         missionsDB.forEach(m => {
             if (localStorage.getItem(m.id) !== '1' && localStorage.getItem(m.id + '_notified') !== '1') {
@@ -1197,83 +1681,28 @@
 
     function showGeoToast(msg) { const t = document.getElementById('geo-toast'); document.getElementById('geo-msg').innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 5000); }
 
-   // --- 2. 語音翻譯 (Translation) - 除錯增強版 ---
+    // --- Translation ---
     let recognition;
     function toggleTranslation() {
+        // v17.0 使用新的 toggleVoiceMemo 取代或共用，這裡保留翻譯專用介面邏輯 (Part 8 使用)
         const btn = document.getElementById('mic-btn');
         const output = document.getElementById('trans-output');
-        
-        // 檢查瀏覽器支援
-        if (!('webkitSpeechRecognition' in window)) {
-            output.innerHTML = '<span class="text-red-400">❌ 此瀏覽器不支援</span>';
-            return;
-        }
-
-        if (btn.classList.contains('listening')) {
-            if(recognition) recognition.stop();
-            btn.classList.remove('listening');
-            output.innerText = "點擊按鈕，請店員說話";
-            return;
-        }
-
+        if (!('webkitSpeechRecognition' in window)) { output.innerHTML = '<span class="text-red-400">❌ 不支援</span>'; return; }
+        if (btn.classList.contains('listening')) { if(recognition) recognition.stop(); btn.classList.remove('listening'); output.innerText = "點擊按鈕，請店員說話"; return; }
         try {
             recognition = new webkitSpeechRecognition();
-            recognition.lang = 'ja-JP'; // 設定為聽日文
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.onstart = function() {
-                btn.classList.add('listening');
-                output.innerHTML = '<span class="animate-pulse">🇯🇵 聽日文中...</span>';
-            };
-
-            recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            
-            // ★ 強制修正排版：改成垂直排列 (flex-col)，增加內距
-            output.className = "w-full bg-white/10 rounded-xl p-4 flex flex-col items-center justify-center gap-3 animate-pop";
-            
-            output.innerHTML = `
-                <div class="text-2xl font-black text-white tracking-widest">「${transcript}」</div>
-                
-                <a href="https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(transcript)}&op=translate" 
-                   target="_blank" 
-                   style="text-decoration: none;"
-                   class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-8 py-3 rounded-full font-bold shadow-lg active:scale-95 transition-transform flex items-center gap-2 border-2 border-blue-400/50">
-                   <span>🦖 翻譯成中文</span>
-                </a>
-            `;
-        };
-
-            // ★★★ 新增錯誤顯示功能 ★★★
-            recognition.onerror = function(event) {
-                console.error("Speech Err:", event.error);
-                let msg = event.error;
-                if(event.error === 'not-allowed') msg = "麥克風權限被拒 (請檢查設定)";
-                if(event.error === 'network') msg = "網路不穩，無法連線翻譯";
-                if(event.error === 'no-speech') msg = "沒聽到聲音，請再試一次";
-                
-                output.innerHTML = `<span class="text-red-400 text-sm font-bold">❌ 錯誤: ${msg}</span>`;
-                btn.classList.remove('listening');
-            };
-
-            recognition.onend = function() {
-                btn.classList.remove('listening');
-            };
-            
+            recognition.lang = 'ja-JP'; recognition.continuous = false; recognition.interimResults = false;
+            recognition.onstart = function() { btn.classList.add('listening'); output.innerHTML = '<span class="animate-pulse">🇯🇵 聽日文中...</span>'; };
+            recognition.onresult = function(event) { const transcript = event.results[0][0].transcript; output.className = "w-full bg-white/10 rounded-xl p-4 flex flex-col items-center justify-center gap-3 animate-pop"; output.innerHTML = `<div class="text-2xl font-black text-white tracking-widest">「${transcript}」</div><a href="https://translate.google.com/?sl=ja&tl=zh-TW&text=${encodeURIComponent(transcript)}&op=translate" target="_blank" class="bg-blue-600 text-white text-sm px-8 py-3 rounded-full font-bold shadow-lg">🦖 翻譯成中文</a>`; };
+            recognition.onerror = function(event) { output.innerHTML = `<span class="text-red-400 text-sm font-bold">❌ 錯誤 (請重試)</span>`; btn.classList.remove('listening'); };
+            recognition.onend = function() { btn.classList.remove('listening'); };
             recognition.start();
-        } catch (e) {
-            output.innerHTML = '<span class="text-red-400">❌ 啟動失敗</span>';
-        }
+        } catch (e) { output.innerHTML = '<span class="text-red-400">❌ 啟動失敗</span>'; }
     }
    
-    // --- 3. 潮汐 Widget ---
-    function getTideWidgetHTML() {
-        const d = itineraryDB[currentDayIdx].day; const info = tideDB[d] || tideDB["D1"];
-        return `<div class="tide-widget mb-6 shadow-lg"><div class="relative z-10 p-5"><div class="flex justify-between items-start"><div><div class="text-[10px] font-bold opacity-70 uppercase tracking-widest">TIDE & SUN (Day ${currentDayIdx+1})</div><div class="text-2xl font-black mt-1 flex items-center gap-2"><i class="fas fa-water text-blue-200"></i> ${info.low} <span class="text-xs opacity-70 font-normal">乾潮</span></div><div class="text-sm font-bold mt-1 opacity-90"><i class="fas fa-sun text-yellow-300 mr-1"></i> 日落 ${info.sun}</div></div><div class="text-right"><div class="text-[10px] opacity-70">適合玩水</div><div class="text-xl font-bold">${parseInt(info.low.split(':')[0]) - 2}:00 - ${parseInt(info.low.split(':')[0]) + 2}:00</div></div></div></div><div class="wave-box"><div class="wave"></div><div class="wave"></div></div></div>`;
-    }
+    function getTideWidgetHTML() { const d = itineraryDB[currentDayIdx].day; const info = tideDB[d] || tideDB["D1"]; return `<div class="tide-widget mb-6 shadow-lg"><div class="relative z-10 p-5"><div class="flex justify-between items-start"><div><div class="text-[10px] font-bold opacity-70 uppercase tracking-widest">TIDE & SUN (Day ${currentDayIdx+1})</div><div class="text-2xl font-black mt-1 flex items-center gap-2"><i class="fas fa-water text-blue-200"></i> ${info.low} <span class="text-xs opacity-70 font-normal">乾潮</span></div><div class="text-sm font-bold mt-1 opacity-90"><i class="fas fa-sun text-yellow-300 mr-1"></i> 日落 ${info.sun}</div></div><div class="text-right"><div class="text-[10px] opacity-70">適合玩水</div><div class="text-xl font-bold">${parseInt(info.low.split(':')[0]) - 2}:00 - ${parseInt(info.low.split(':')[0]) + 2}:00</div></div></div></div><div class="wave-box"><div class="wave"></div><div class="wave"></div></div></div>`; }
 
-    // --- 5. Trip Wrapped ---
+    // --- Wrapped ---
     let currentWrapSlide = 1;
     function openWrapped() {
         const totalExp = expenses.reduce((a, b) => a + b.price, 0);
@@ -1295,10 +1724,9 @@
     function showWrapSlide(n) { document.querySelectorAll('.wrapped-slide').forEach(s => s.classList.remove('active')); document.getElementById(`wrap-${n}`).classList.add('active'); currentWrapSlide = n; }
     function nextWrappedSlide() { if (currentWrapSlide < 5) { showWrapSlide(currentWrapSlide + 1); if(navigator.vibrate) navigator.vibrate(50); } else { closeWrapped(); } }
 
-    // ================= Driver HUD Logic =================
+    // --- Driver HUD ---
     let hudWatchId = null, wakeLock = null, hudCurrentEventIdx = 0, hudAllEvents = [];
     let roadType = 'city'; let currentSpeedLimit = 50; 
-
     function flattenEvents() { let l=[]; itineraryDB.forEach(d=>{d.events.forEach(e=>{l.push({...((isRainyMode&&e.rainy)?{...e,...e.rainy}:e), dayTitle:d.day, fullTitle:e.title});});}); return l; }
     async function openDriverMode() { document.getElementById('driver-hud').classList.remove('hidden'); document.getElementById('driver-hud').classList.add('flex'); hudAllEvents=flattenEvents(); hudCurrentEventIdx=0; updateHUDUI(); if(navigator.geolocation) hudWatchId=navigator.geolocation.watchPosition(updateHudSpeed,console.log,{enableHighAccuracy:true}); try{if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen');}catch(e){} startHudClock(); }
     function closeDriverMode() { document.getElementById('driver-hud').classList.add('hidden'); document.getElementById('driver-hud').classList.remove('flex'); if(hudWatchId)navigator.geolocation.clearWatch(hudWatchId); if(wakeLock)wakeLock.release(); }
