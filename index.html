@@ -796,18 +796,18 @@
         ]}
     ];
 
-    // v17.0 新增: 美食指指通資料庫
+    // v17.4 修正: 美食圖片連結 (更換為穩定圖源)
     const foodBoardDB = [
-        { name: "沖繩麵", img: "https://images.unsplash.com/photo-1623800366624-9426f04c0df6?q=80&w=400", jp: "沖縄そばをください", note: "Okinawa Soba" },
-        { name: "塔可飯", img: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?q=80&w=400", jp: "タコライスをください", note: "Taco Rice" },
-        { name: "炸豬排", img: "https://images.unsplash.com/photo-1599354607481-e27c50074219?q=80&w=400", jp: "とんかつをください", note: "Tonkatsu" },
-        { name: "苦瓜炒蛋", img: "https://images.unsplash.com/photo-1627889987823-3756372d8076?q=80&w=400", jp: "ゴーヤーチャンプルーをください", note: "Goya Chanpuru" },
-        { name: "海葡萄", img: "https://images.unsplash.com/photo-1582236967732-c7f394c03837?q=80&w=400", jp: "海ぶどうをください", note: "Umi Budo" },
-        { name: "炸薯條", img: "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?q=80&w=400", jp: "フライドポテトをください", note: "Potato" },
-        { name: "炒飯", img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=400", jp: "チャーハンをください", note: "Cha-han" },
-        { name: "炸雞", img: "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?q=80&w=400", jp: "唐揚げをください", note: "Karaage" },
-        { name: "兒童餐", img: "https://images.unsplash.com/photo-1595155459343-690a78619623?q=80&w=400", jp: "お子様セットをください", note: "Kids Meal" },
-        { name: "冰開水", img: "https://images.unsplash.com/photo-1560697728-661d9a04a371?q=80&w=400", jp: "お水をください", note: "Water" }
+        { name: "沖繩麵", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Okinawa_soba.jpg/640px-Okinawa_soba.jpg", jp: "沖縄そばをください", note: "Okinawa Soba" },
+        { name: "塔可飯", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Taco_rice.jpg/640px-Taco_rice.jpg", jp: "タコライスをください", note: "Taco Rice" },
+        { name: "炸豬排", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Tonkatsu.jpg/640px-Tonkatsu.jpg", jp: "とんかつをください", note: "Tonkatsu" },
+        { name: "苦瓜炒蛋", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Goya_chanpuru.jpg/640px-Goya_chanpuru.jpg", jp: "ゴーヤーチャンプルーをください", note: "Goya Chanpuru" },
+        { name: "海葡萄", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Umibudo.jpg/640px-Umibudo.jpg", jp: "海ぶどうをください", note: "Umi Budo" },
+        { name: "炸薯條", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/French_Fries.JPG/640px-French_Fries.JPG", jp: "フライドポテトをください", note: "Potato" },
+        { name: "炒飯", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Fried_rice_with_egg%2C_shrimp%2C_and_scallion.jpg/640px-Fried_rice_with_egg%2C_shrimp%2C_and_scallion.jpg", jp: "チャーハンをください", note: "Cha-han" },
+        { name: "炸雞", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Karaage_by_jscash_in_Tokyo.jpg/640px-Karaage_by_jscash_in_Tokyo.jpg", jp: "唐揚げをください", note: "Karaage" },
+        { name: "兒童餐", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Okosama_lunch_by_kawanet.jpg/640px-Okosama_lunch_by_kawanet.jpg", jp: "お子様セットをください", note: "Kids Meal" },
+        { name: "冰開水", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Glass_of_water.jpg/480px-Glass_of_water.jpg", jp: "お水をください", note: "Water" }
     ];
     // 潮汐資料 (2026 3月底預測數據，那霸港基準)
     const tideDB = {
@@ -1230,13 +1230,18 @@
                  
                  // v17.0: 快速工具區新增 "隨身尺規" 按鈕
                  main.innerHTML = `<div class="animate-slide-up space-y-4"><button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4"><div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div><div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div></button>${tideWidget}${parkingHTML}${gasHelperHTML}
+// 請搜尋並替換原本的 grid div 區塊 (在 tools > drive 區域)
 <div class="grid grid-cols-3 gap-2 mb-6">
     <button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">找廁所</span></button>
     <button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">找超商</span></button>
+    
     <button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">小小畫家</span></button>
+    
     <button onclick="openCamera()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-yellow-100"><i class="fas fa-camera text-yellow-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">回憶相機</span></button>
+    
     <button onclick="openRuler()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-blue-100"><i class="fas fa-ruler-combined text-blue-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">隨身尺規</span></button>
-    <div class="opacity-0"></div>
+    
+    <button onclick="goBackHotel()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-green-100"><i class="fas fa-house-chimney text-green-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">回飯店</span></button>
 </div>
 ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-card ${d.color} border border-black/5 relative overflow-hidden"><i class="fas fa-car absolute -right-2 -bottom-2 text-6xl opacity-10"></i><div class="text-xs font-bold opacity-60 mb-2 uppercase tracking-wider">${d.title}</div><div class="text-xl font-black leading-tight">${d.content}</div></div>`).join('')}</div>`;
             } else if (currentToolFilter === 'food') {
