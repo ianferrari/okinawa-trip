@@ -1306,21 +1306,22 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
     let videoTrack = null;
     let facingMode = 'environment'; // 預設後鏡頭
 
+    // ✅ 修正版：確保相機視窗能正確彈出
     window.openCamera = async () => {
-        document.getElementById('camera-modal').classList.remove('hidden'); // 這裡用 hidden class 控制
-        document.getElementById('camera-modal').classList.add('flex');
+        const modal = document.getElementById('camera-modal');
+        
+        // 1. 強制顯示視窗 (修正 CSS 權重問題)
+        modal.classList.remove('hidden'); 
+        modal.classList.add('open'); // 關鍵！加上 open class 才會觸發 display: flex
         
         // 更新浮水印資料
         const today = new Date();
         document.getElementById('cam-day-val').innerText = currentDayIdx + 1;
         document.getElementById('cam-date-val').innerText = `${today.getFullYear()}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getDate().toString().padStart(2,'0')}`;
-        document.getElementById('cam-loc-val').innerText = "Okinawa"; // 預設
+        document.getElementById('cam-loc-val').innerText = "Okinawa"; 
         
-        // 嘗試取得地點
         if(navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(p => {
-                 // 簡單反查 (這裡簡化，實際可 call API)
-                 // 若在名護附近
                  if(p.coords.latitude > 26.5) document.getElementById('cam-loc-val').innerText = "Nago, Okinawa";
                  else document.getElementById('cam-loc-val').innerText = "Naha, Okinawa";
              });
@@ -1329,25 +1330,16 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
         startCamera();
     }
 
-    async function startCamera() {
-        const video = document.getElementById('camera-video');
-        try {
-            if (stream) { stream.getTracks().forEach(track => track.stop()); }
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
-            video.srcObject = stream;
-            document.getElementById('cam-overlay').classList.remove('hidden');
-        } catch (err) {
-            alert("無法啟動相機，請確認權限。\n(iOS請使用Safari開啟)");
-            closeCamera();
-        }
-    }
-
+    // ✅ 修正版：關閉相機
     window.closeCamera = () => {
         const video = document.getElementById('camera-video');
+        const modal = document.getElementById('camera-modal');
+        
         if (stream) { stream.getTracks().forEach(track => track.stop()); }
         video.srcObject = null;
-        document.getElementById('camera-modal').classList.add('hidden');
-        document.getElementById('camera-modal').classList.remove('flex');
+        
+        modal.classList.remove('open'); // 移除 open 讓它變回 display: none
+        setTimeout(() => modal.classList.add('hidden'), 300); // 等動畫跑完再完全隱藏
     }
 
     window.toggleCameraFacing = () => {
