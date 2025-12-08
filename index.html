@@ -1306,20 +1306,21 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
     let videoTrack = null;
     let facingMode = 'environment'; // 預設後鏡頭
 
-    // ✅ 修正版：確保相機視窗能正確彈出
+    // 啟動相機視窗
     window.openCamera = async () => {
         const modal = document.getElementById('camera-modal');
         
         // 1. 強制顯示視窗 (修正 CSS 權重問題)
         modal.classList.remove('hidden'); 
-        modal.classList.add('open'); // 關鍵！加上 open class 才會觸發 display: flex
+        modal.classList.add('open'); 
         
-        // 更新浮水印資料
+        // 2. 更新浮水印資料 (日期/地點/Day)
         const today = new Date();
         document.getElementById('cam-day-val').innerText = currentDayIdx + 1;
         document.getElementById('cam-date-val').innerText = `${today.getFullYear()}/${(today.getMonth()+1).toString().padStart(2,'0')}/${today.getDate().toString().padStart(2,'0')}`;
         document.getElementById('cam-loc-val').innerText = "Okinawa"; 
         
+        // 嘗試抓取 GPS 地點
         if(navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(p => {
                  if(p.coords.latitude > 26.5) document.getElementById('cam-loc-val').innerText = "Nago, Okinawa";
@@ -1330,7 +1331,38 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
         startCamera();
     }
 
-    // ✅ 修正版：關閉相機
+    // 啟動鏡頭串流 (含 iOS 黑屏修正)
+    async function startCamera() {
+        const video = document.getElementById('camera-video');
+        try {
+            if (stream) { stream.getTracks().forEach(track => track.stop()); }
+            
+            // v17.2 修正：強制指定解析度，解決部分 iOS 黑屏問題
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: facingMode,
+                    width: { ideal: 1280 }, // 提升解析度，讓 iOS 願意啟動
+                    height: { ideal: 720 } 
+                },
+                audio: false 
+            });
+            
+            video.srcObject = stream;
+            
+            // v17.2 關鍵修正：iOS 必須顯式呼叫 play()
+            video.onloadedmetadata = () => {
+                video.play().catch(e => console.log("Play error:", e));
+            };
+
+            document.getElementById('cam-overlay').classList.remove('hidden');
+        } catch (err) {
+            console.error(err);
+            alert("相機啟動失敗：請確認\n1. 用 Safari 開啟\n2. 允許相機權限\n3. 網址是 https 或 localhost");
+            closeCamera();
+        }
+    }
+
+    // 關閉相機
     window.closeCamera = () => {
         const video = document.getElementById('camera-video');
         const modal = document.getElementById('camera-modal');
@@ -1342,22 +1374,23 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
         setTimeout(() => modal.classList.add('hidden'), 300); // 等動畫跑完再完全隱藏
     }
 
+    // 切換前後鏡頭
     window.toggleCameraFacing = () => {
         facingMode = facingMode === 'user' ? 'environment' : 'user';
         startCamera();
     }
 
+    // 拍照並下載 (含 iOS 存檔修正)
     window.takePhoto = () => {
         const video = document.getElementById('camera-video');
         const canvas = document.getElementById('camera-canvas');
-        const overlay = document.getElementById('cam-overlay');
         
-        // 設定 Canvas 大小與影片一致
+        // --- 1. 繪製影像 ---
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
         
-        // 1. 繪製影像 (水平翻轉處理自拍)
+        // 處理自拍鏡像
         if (facingMode === 'user') {
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
@@ -1365,8 +1398,7 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         if (facingMode === 'user') ctx.setTransform(1, 0, 0, 1, 0, 0); // 重置矩陣
 
-        // 2. 繪製浮水印 (模擬 HTML overlay 的樣式)
-        // 這裡簡化繪製邏輯，直接畫文字
+        // --- 2. 繪製浮水印 ---
         const scale = canvas.width / 800; // 響應式縮放
         ctx.shadowColor = "rgba(0,0,0,0.8)";
         ctx.shadowBlur = 4 * scale;
@@ -1384,11 +1416,11 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
         const locText = "📍 " + document.getElementById('cam-loc-val').innerText;
         ctx.fillText(locText, canvas.width - (20 * scale), canvas.height - (45 * scale));
 
-        // 天氣
-        const weatherText = "☀️ " + document.getElementById('cam-weather-val').innerText;
+        // 天氣 (防呆: 若無天氣資訊則顯示晴天)
+        const weatherText = "☀️ " + (document.getElementById('cam-weather-val')?.innerText || '晴天'); 
         ctx.fillText(weatherText, canvas.width - (20 * scale), canvas.height - (20 * scale));
 
-        // Day Badge
+        // Day Badge (左上角標籤)
         ctx.save();
         ctx.translate(30 * scale, 40 * scale);
         ctx.rotate(-5 * Math.PI / 180);
@@ -1400,19 +1432,33 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
         ctx.fillText(`DAY ${currentDayIdx+1}`, 50 * scale, 22 * scale);
         ctx.restore();
 
-        // 3. 下載圖片
-        const link = document.createElement('a');
-        link.download = `kuku-memory-${Date.now()}.jpg`;
-        link.href = canvas.toDataURL('image/jpeg', 0.9);
-        link.click();
+        // --- 3. 下載圖片 (關鍵修正: 使用 Blob) ---
+        canvas.toBlob(function(blob) {
+            if (!blob) {
+                 showToast("🚨 圖片處理失敗，請重試！");
+                 return;
+            }
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `kuku-memory-${Date.now()}.jpg`; // 強制副檔名
+            link.href = url;
+            
+            // 觸發下載
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 釋放記憶體
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+            
+            showToast("📸 照片已處理！請點擊下載！");
+        }, 'image/jpeg', 0.95); // 使用高品質 JPEG
         
         // 閃光特效
         const flash = document.createElement('div');
         flash.className = "fixed inset-0 bg-white z-[300] transition-opacity duration-300";
         document.body.appendChild(flash);
         setTimeout(() => { flash.style.opacity = 0; setTimeout(() => flash.remove(), 300); }, 50);
-        
-        showToast("📸 照片已儲存！");
     }
     
     // 開啟相簿 (觸發 input file)
@@ -1421,7 +1467,6 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
         input.type = 'file';
         input.accept = 'image/*';
         input.onchange = (e) => {
-            // 這裡可以做讀取照片後加浮水印的功能，目前 v17.0 先單純打開
             showToast("功能開發中：匯入照片加框");
         };
         input.click();
