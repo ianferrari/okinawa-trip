@@ -6,11 +6,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v17.0 Ultimate</title>
+    <title>奎奎全家沖繩遊 🦕 v17.2 Ultimate</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
         /* ================= 基礎設定 ================= */
@@ -1127,7 +1129,7 @@
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
-        // 1. 行程 (Itinerary) - 已更新天氣顯示 v17.5
+        // 1. 行程 (Itinerary) - 整合天氣 v17.5 + 地圖 v18.0
         if (activeTab === 'itinerary') {
             const d = itineraryDB[currentDayIdx];
             const diaryKey = `diary_${d.day}`;
@@ -1145,7 +1147,7 @@
 
             main.innerHTML = `
             <div class="animate-slide-up">
-                <div class="glass-card rounded-3xl p-5 mb-6 relative overflow-hidden border-l-4 border-blue-500 shadow-lg">
+                <div class="glass-card rounded-3xl p-5 mb-4 relative overflow-hidden border-l-4 border-blue-500 shadow-lg">
                     
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex flex-col">
@@ -1199,6 +1201,8 @@
                         </div>` : ''}
                     </div>
                     ` : ''}
+
+                    <div id="day-map-container" class="w-full h-40 bg-slate-100 rounded-2xl mb-3 border border-slate-200 shadow-inner z-0 relative overflow-hidden"></div>
 
                     <div class="text-sm bg-white p-3 rounded-xl border border-slate-100 text-gray-700 flex items-start gap-2 shadow-sm">
                         <i class="fas fa-star text-yellow-400 mt-0.5 text-lg"></i> 
@@ -1260,6 +1264,9 @@
                 </div>
                 <div class="h-12"></div>
             </div>`;
+
+            // v18.0: 延遲載入地圖 (因為要等上面 innerHTML 渲染完，地圖容器出現後才能畫地圖)
+            setTimeout(initDayMap, 100);		
         } else if (activeTab === 'checklist') {
             const list = checklistDB.find(c => c.id === currentChecklistFilter);
             main.innerHTML = `
@@ -1278,9 +1285,53 @@
                 <button onclick="addChecklistItem()" class="w-full mt-4 py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-[0.98]"><i class="fas fa-plus mr-1"></i> 新增項目</button>
                 <div class="mt-8 pt-4 border-t border-gray-100"><button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100 mb-2"><i class="fas fa-rotate-right mr-1"></i> 重置勾選狀態</button><button onclick="openGiftModal()" class="w-full py-4 bg-red-50 text-red-500 rounded-2xl text-lg font-bold shadow-sm active:scale-95 border border-red-100"><i class="fas fa-gift mr-2"></i> 管理伴手禮清單</button></div>
             </div>`;
-        } else if (activeTab === 'missions') {
+			
+		} else if (activeTab === 'missions') {
             const balance = getGashaBalance();
-            main.innerHTML = `<div class="animate-slide-up space-y-4"><div id="gasha-machine" class="glass-card rounded-3xl p-6 text-center border-4 border-pink-400 bg-pink-50 relative overflow-hidden"><div class="absolute -left-10 -top-10 w-32 h-32 bg-pink-200 rounded-full opacity-50 blur-xl"></div><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-xl font-black text-pink-600">🎉 快樂扭蛋機</h3><button onclick="openRewardEditor()" class="text-[10px] bg-white border border-pink-200 text-pink-400 px-2 py-1 rounded-full"><i class="fas fa-cog"></i> 設定獎品</button></div><div class="text-4xl font-black text-gray-800 mb-2">${balance} <span class="text-sm text-gray-500 font-medium">枚代幣</span></div><p class="text-xs text-gray-500 mb-4">每完成 1 個任務，就能轉 1 次！</p><button onclick="spinGasha()" ${balance <= 0 ? 'disabled' : ''} class="w-full py-4 rounded-2xl font-bold text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${balance > 0 ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-300/50' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">${balance > 0 ? '<i class="fas fa-gift animate-bounce"></i> 投入代幣轉動' : '去完成任務賺代幣！'}</button></div></div><div class="grid grid-cols-2 gap-4">${missionsDB.map(m => {const isDone = localStorage.getItem(m.id) === '1'; return `<div onclick="toggleMission('${m.id}')" class="glass-card rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-2 aspect-square relative overflow-hidden transition-all active:scale-95 cursor-pointer ${isDone ? 'border-2 border-yellow-400 bg-yellow-50/90' : 'grayscale opacity-80'}">${isDone ? '<div class="absolute top-2 right-2 text-yellow-500 text-xl animate-pop"><i class="fas fa-check-circle"></i></div>' : ''}<div class="w-14 h-14 rounded-full ${isDone ? 'bg-yellow-400 text-white' : 'bg-slate-200 text-slate-400'} flex items-center justify-center text-2xl mb-1 shadow-sm transition-colors"><i class="fas ${m.icon}"></i></div><div class="font-bold text-slate-800 leading-tight">${m.title}</div><div class="text-[10px] text-slate-500 leading-tight">${m.desc}</div></div>`}).join('')}</div></div>`;
+            
+            // 這裡整合了：扭蛋機 + 任務列表 + v18.0 照片回憶牆
+            main.innerHTML = `
+            <div class="animate-slide-up space-y-4">
+                <div id="gasha-machine" class="glass-card rounded-3xl p-6 text-center border-4 border-pink-400 bg-pink-50 relative overflow-hidden">
+                    <div class="absolute -left-10 -top-10 w-32 h-32 bg-pink-200 rounded-full opacity-50 blur-xl"></div>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-black text-pink-600">🎉 快樂扭蛋機</h3>
+                            <button onclick="openRewardEditor()" class="text-[10px] bg-white border border-pink-200 text-pink-400 px-2 py-1 rounded-full"><i class="fas fa-cog"></i> 設定獎品</button>
+                        </div>
+                        <div class="text-4xl font-black text-gray-800 mb-2">${balance} <span class="text-sm text-gray-500 font-medium">枚代幣</span></div>
+                        <p class="text-xs text-gray-500 mb-4">每完成 1 個任務，就能轉 1 次！</p>
+                        <button onclick="spinGasha()" ${balance <= 0 ? 'disabled' : ''} class="w-full py-4 rounded-2xl font-bold text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${balance > 0 ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-300/50' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
+                            ${balance > 0 ? '<i class="fas fa-gift animate-bounce"></i> 投入代幣轉動' : '去完成任務賺代幣！'}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    ${missionsDB.map(m => {
+                        const isDone = localStorage.getItem(m.id) === '1'; 
+                        return `<div onclick="toggleMission('${m.id}')" class="glass-card rounded-3xl p-4 flex flex-col items-center justify-center text-center gap-2 aspect-square relative overflow-hidden transition-all active:scale-95 cursor-pointer ${isDone ? 'border-2 border-yellow-400 bg-yellow-50/90' : 'grayscale opacity-80'}">
+                            ${isDone ? '<div class="absolute top-2 right-2 text-yellow-500 text-xl animate-pop"><i class="fas fa-check-circle"></i></div>' : ''}
+                            <div class="w-14 h-14 rounded-full ${isDone ? 'bg-yellow-400 text-white' : 'bg-slate-200 text-slate-400'} flex items-center justify-center text-2xl mb-1 shadow-sm transition-colors"><i class="fas ${m.icon}"></i></div>
+                            <div class="font-bold text-slate-800 leading-tight">${m.title}</div>
+                            <div class="text-[10px] text-slate-500 leading-tight">${m.desc}</div>
+                        </div>`
+                    }).join('')}
+                </div>
+
+                <div class="glass-card rounded-3xl p-4 border border-slate-100 bg-white/80 mt-6">
+                    <h3 class="font-black text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-images text-blue-500"></i> 旅程回憶牆
+                    </h3>
+                    <div id="gallery-grid" class="grid grid-cols-3 gap-2">
+                        <div class="col-span-3 text-center py-4"><i class="fas fa-spinner fa-spin text-gray-300"></i></div>
+                    </div>
+                </div>
+                <div class="h-12"></div>
+            </div>`;
+
+            // v18.0: 延遲載入照片 (因為要等 HTML 渲染完)
+            setTimeout(loadGallery, 100);		        
         } else if (activeTab === 'tools') {
             if (currentToolFilter === 'calc') {
                 let totalJPY = 0; 
@@ -1605,27 +1656,25 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
         ctx.fillText(`DAY ${currentDayIdx+1}`, 50 * scale, 22 * scale);
         ctx.restore();
 
-        // --- 3. 下載圖片 (關鍵修正: 使用 Blob) ---
+        // --- 3. 下載圖片 & 存入回憶牆 ---
         canvas.toBlob(function(blob) {
-            if (!blob) {
-                 showToast("🚨 圖片處理失敗，請重試！");
-                 return;
-            }
+            if (!blob) { showToast("🚨 失敗，請重試！"); return; }
+            
+            // A. 下載到手機相簿
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.download = `kuku-memory-${Date.now()}.jpg`; // 強制副檔名
+            link.download = `kuku-memory-${Date.now()}.jpg`;
             link.href = url;
-            
-            // 觸發下載
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
-            // 釋放記憶體
             setTimeout(() => URL.revokeObjectURL(url), 100);
-            
-            showToast("📸 照片已處理！請點擊下載！");
-        }, 'image/jpeg', 0.95); // 使用高品質 JPEG
+
+            // B. [新功能] 自動存入 App 回憶牆
+            savePhotoToDB(blob); // <--- 關鍵就是加這一行
+
+            showToast("📸 已儲存並加入回憶牆！");
+        }, 'image/jpeg', 0.95);
         
         // 閃光特效
         const flash = document.createElement('div');
@@ -1962,7 +2011,113 @@ ${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-car
             window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel)}`, '_blank');
         }
     }
+	
+	// ================= v18.0 新功能：地圖與相簿核心邏輯 =================
 
+    // --- 1. 每日路徑地圖 (Leaflet) ---
+    let dayMap = null;
+    function initDayMap() {
+        const d = itineraryDB[currentDayIdx];
+        // 找出當天所有有座標的點
+        const points = d.events.filter(e => e.lat && e.lon);
+        
+        // 如果地圖容器不存在或是當天沒有座標點，就隱藏
+        const mapEl = document.getElementById('day-map-container');
+        if (!mapEl) return;
+        
+        if (points.length === 0) {
+            mapEl.innerHTML = '<div class="h-full flex items-center justify-center text-gray-300 text-xs bg-slate-50 rounded-xl">今日無路線資料</div>';
+            return;
+        }
+
+        // 初始化地圖
+        if (dayMap) { dayMap.remove(); dayMap = null; }
+        // 建立地圖實例
+        dayMap = L.map('day-map-container', { zoomControl: false, attributionControl: false });
+        
+        // 加入圖層 (使用 CartoDB 簡潔風格)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19
+        }).addTo(dayMap);
+
+        // 畫線與標記
+        const latlngs = points.map(p => [p.lat, p.lon]);
+        const polyline = L.polyline(latlngs, {color: '#3b82f6', weight: 4, opacity: 0.7, dashArray: '5, 10'}).addTo(dayMap);
+
+        // 加上起點終點與中間點的標記
+        points.forEach((p, idx) => {
+            let color = '#3b82f6'; // 中間點藍色
+            if (idx === 0) color = '#22c55e'; // 起點綠色
+            if (idx === points.length - 1) color = '#ef4444'; // 終點紅色
+            
+            const markerHtml = `<div style="background:${color}; width:12px; height:12px; border-radius:50%; border:2px solid white; box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`;
+            const icon = L.divIcon({ className: 'custom-div-icon', html: markerHtml, iconSize: [12, 12], iconAnchor: [6, 6] });
+            
+            L.marker([p.lat, p.lon], {icon: icon}).addTo(dayMap).bindPopup(`<b style="font-size:12px">${p.title}</b>`);
+        });
+
+        // 自動調整視野範圍
+        dayMap.fitBounds(polyline.getBounds(), { padding: [30, 30] });
+    }
+
+    // --- 2. 照片回憶牆 (IndexedDB) ---
+    // 開啟資料庫
+    function openPhotoDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open("TripGalleryDB", 1);
+            request.onupgradeneeded = function(event) {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains("photos")) {
+                    db.createObjectStore("photos", { keyPath: "id", autoIncrement: true });
+                }
+            };
+            request.onsuccess = function(event) { resolve(event.target.result); };
+            request.onerror = function(event) { reject("DB Error"); };
+        });
+    }
+
+    // 儲存照片
+    async function savePhotoToDB(blob) {
+        try {
+            const db = await openPhotoDB();
+            const tx = db.transaction("photos", "readwrite");
+            const store = tx.objectStore("photos");
+            store.add({ data: blob, date: new Date().toLocaleString(), day: `Day ${currentDayIdx+1}` });
+            console.log("照片已存入資料庫");
+        } catch (e) { console.error("存檔失敗", e); }
+    }
+
+    // 讀取並顯示照片牆
+    async function loadGallery() {
+        const container = document.getElementById('gallery-grid');
+        if (!container) return;
+        
+        try {
+            const db = await openPhotoDB();
+            const tx = db.transaction("photos", "readonly");
+            const store = tx.objectStore("photos");
+            const request = store.getAll();
+            
+            request.onsuccess = function() {
+                const photos = request.result.reverse(); // 最新的在前面
+                if (photos.length === 0) {
+                    container.innerHTML = `<div class="col-span-3 text-center text-gray-400 py-4 text-xs">還沒拍照片喔！快去用「工具 > 回憶相機」拍照吧！</div>`;
+                    return;
+                }
+                
+                container.innerHTML = photos.map(p => {
+                    const url = URL.createObjectURL(p.data);
+                    return `<div class="aspect-square rounded-xl overflow-hidden relative shadow-sm border border-slate-100 group" onclick="showParkingPhotoFull('${url}')">
+                        <img src="${url}" class="w-full h-full object-cover">
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] p-1 text-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">${p.day}</div>
+                    </div>`;
+                }).join('');
+            };
+        } catch (e) {
+            container.innerHTML = "載入失敗";
+        }
+    }
+	
     // Start App
     init();
 </script>
