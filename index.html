@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v17.2 Ultimate</title>
+    <title>奎奎全家沖繩遊 🦕 v17.0 Ultimate</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1062,17 +1062,21 @@
                     "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
             });
         } else if (activeTab === 'tools') {
-            ['calc', 'drive', 'food', 'signs', 'coins', 'sizes', 'jp', 'orders', 'sos', 'sync'].forEach(t => { // v17.0 加入 food
+            // v18.2 修正：更新為四大分類的 ID (money, drive, food, gadget)
+            ['money', 'drive', 'food', 'gadget'].forEach(t => { 
                 const btn = document.getElementById(`btn-tool-${t}`);
                 if (btn) {
                     let c = "bg-white text-blue-600";
-                    if (t === 'calc') c = "bg-white text-yellow-600";
-                    if (t === 'sos') c = "bg-white text-red-600";
-                    if (t === 'sync') c = "bg-white text-purple-600";
-                    if (t === 'food') c = "bg-white text-orange-600"; // v17.0
+                    // 定義每個按鈕被選中時的顏色
+                    if (t === 'money') c = "bg-white text-pink-600 shadow-sm";
+                    if (t === 'drive') c = "bg-white text-blue-600 shadow-sm";
+                    if (t === 'food') c = "bg-white text-orange-600 shadow-sm";
+                    if (t === 'gadget') c = "bg-white text-purple-600 shadow-sm";
+                    
+                    // 判斷是否為當前選中的工具，給予對應樣式
                     btn.className = currentToolFilter === t ?
-                        `flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${c} shadow-sm` :
-                        "flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all text-white/80";
+                        `flex-1 py-2 rounded-xl text-xs font-bold transition-all ${c}` :
+                        "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-white/80";
                 }
             });
         }
@@ -1088,25 +1092,22 @@
             container.innerHTML = `<div class="flex glass-dark p-1 rounded-2xl mx-1">${checklistDB.map(c => `<button id="btn-chk-${c.id}" onclick="switchChecklist('${c.id}')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentChecklistFilter === c.id ? 'bg-white text-blue-600 shadow-sm' : 'text-white/80'}">${c.title.split(' ')[1]}</button>`).join('')}</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${bgImages.SHOP}')`;
         } else if (activeTab === 'tools') {
-            // v17.0: 新增 "美食 (food)" 按鈕
+            // v18.1: 改為四大分類選單
             container.innerHTML = `
-            <div class="flex glass-dark p-1 rounded-2xl mx-1 overflow-x-auto hide-scrollbar">
-                <button id="btn-tool-calc" onclick="switchTool('calc')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='calc'?'bg-white text-yellow-600':'text-white/80'}">💰 匯率</button>
-                <button id="btn-tool-drive" onclick="switchTool('drive')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='drive'?'bg-white text-blue-600':'text-white/80'}">🚗 駕駛</button>
-                <button id="btn-tool-food" onclick="switchTool('food')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='food'?'bg-white text-orange-600':'text-white/80'}">🍱 點餐</button>
-                <button id="btn-tool-signs" onclick="switchTool('signs')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='signs'?'bg-white text-blue-600':'text-white/80'}">🛑 標誌</button>
-                <button id="btn-tool-coins" onclick="switchTool('coins')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='coins'?'bg-white text-blue-600':'text-white/80'}">🪙 硬幣</button>
-                <button id="btn-tool-sizes" onclick="switchTool('sizes')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='sizes'?'bg-white text-blue-600':'text-white/80'}">👕 尺寸</button>
-                <button id="btn-tool-jp" onclick="switchTool('jp')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='jp'?'bg-white text-blue-600':'text-white/80'}">🗣️ 日語</button>
-                <button id="btn-tool-orders" onclick="switchTool('orders')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='orders'?'bg-white text-blue-600':'text-white/80'}">🍣 點餐</button>
-                <button id="btn-tool-sos" onclick="switchTool('sos')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='sos'?'bg-white text-red-600':'text-white/80'}">🚨 急難</button>
-                <button id="btn-tool-sync" onclick="switchTool('sync')" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${currentToolFilter==='sync'?'bg-white text-purple-600':'text-white/80'}">☁️ 同步</button>
+            <div class="flex glass-dark p-1 rounded-2xl mx-1">
+                <button id="btn-tool-money" onclick="switchTool('money')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentToolFilter==='money'?'bg-white text-pink-600 shadow-sm':'text-white/80'}">💰 消費</button>
+                <button id="btn-tool-drive" onclick="switchTool('drive')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentToolFilter==='drive'?'bg-white text-blue-600 shadow-sm':'text-white/80'}">🚗 交通</button>
+                <button id="btn-tool-food" onclick="switchTool('food')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentToolFilter==='food'?'bg-white text-orange-600 shadow-sm':'text-white/80'}">🍱 用餐</button>
+                <button id="btn-tool-gadget" onclick="switchTool('gadget')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all ${currentToolFilter==='gadget'?'bg-white text-purple-600 shadow-sm':'text-white/80'}">🛠️ 工具</button>
             </div>`;
-            let bg = bgImages.TOOL;
-            if (currentToolFilter === 'calc') bg = bgImages.CALC;
-            if (currentToolFilter === 'sync') bg = bgImages.SYNC;
-            if (currentToolFilter === 'sos') bg = bgImages.SOS;
-            if (currentToolFilter === 'food') bg = "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?q=80&w=1000&fit=crop"; // Food BG
+            
+            // 設定背景圖
+            let bg = bgImages.TOOL; // 預設
+            if (currentToolFilter === 'money') bg = bgImages.SHOP;
+            if (currentToolFilter === 'drive') bg = "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?q=80&w=1000&fit=crop";
+            if (currentToolFilter === 'food') bg = "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?q=80&w=1000&fit=crop";
+            if (currentToolFilter === 'gadget') bg = bgImages.SYNC;
+            
             document.getElementById('bg-layer').style.backgroundImage = `url('${bg}')`;
         } else if (activeTab === 'missions') {
             container.innerHTML = `<div class="text-center text-white/90 text-sm font-bold pt-2 drop-shadow-md">完成任務獲得代幣！</div>`;
@@ -1333,30 +1334,47 @@
             // v18.0: 延遲載入照片 (因為要等 HTML 渲染完)
             setTimeout(loadGallery, 100);		        
         } else if (activeTab === 'tools') {
-            if (currentToolFilter === 'calc') {
+            
+            // --- 1. 消費高手 (Money) ---
+            if (currentToolFilter === 'money') {
+                // 確保變數都有初始值，避免報錯
                 let totalJPY = 0; 
                 const catTotals = {}; 
-                expenses.forEach(e => { 
-                    totalJPY += e.price; 
-                    const cat = e.cat || 'other'; 
-                    if (!catTotals[cat]) catTotals[cat] = 0; 
-                    catTotals[cat] += e.price; 
-                }); 
-                let totalTWD = Math.round(totalJPY * CURRENT_RATE); 
-                let budgetLeft = TOTAL_BUDGET - totalTWD; 
-                let budgetPercent = Math.min((totalTWD / TOTAL_BUDGET) * 100, 100); 
-                let taxBasketTotal = taxBasket.reduce((a, b) => a + b, 0); 
+                
+                // 計算總花費
+                if(expenses && expenses.length > 0) {
+                    expenses.forEach(e => { 
+                        totalJPY += e.price; 
+                        const cat = e.cat || 'other'; 
+                        if (!catTotals[cat]) catTotals[cat] = 0; 
+                        catTotals[cat] += e.price; 
+                    }); 
+                }
+
+                // 計算匯率與預算
+                let curRate = typeof CURRENT_RATE !== 'undefined' ? CURRENT_RATE : 0.21;
+                let totalBudget = typeof TOTAL_BUDGET !== 'undefined' ? TOTAL_BUDGET : 100000;
+                let totalTWD = Math.round(totalJPY * curRate); 
+                let budgetLeft = totalBudget - totalTWD;
+                let budgetPercent = Math.min((totalTWD / totalBudget) * 100, 100); 
+                
+                // 免稅計算
+                let currentTaxBasket = typeof taxBasket !== 'undefined' ? taxBasket : [];
+                let taxBasketTotal = currentTaxBasket.reduce((a, b) => a + b, 0);
                 let taxDiff = 5500 - taxBasketTotal; 
-                let taxPercent = Math.min((taxBasketTotal / 5500) * 100, 100); 
-                let taxMsg = taxDiff > 0 ? `還差 ¥${taxDiff.toLocaleString()}` : "🎉 免稅達成！"; 
-                let taxBasketItems = taxBasket.map((price) => `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-[10px] font-bold">¥${price}</span>`).join(" "); 
+                let taxMsg = taxDiff > 0 ? `還差 ¥${taxDiff.toLocaleString()}` : "🎉 免稅達成！";
+                let taxPercent = Math.min((taxBasketTotal / 5500) * 100, 100);
+                let taxBasketItems = currentTaxBasket.map((price) => `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-[10px] font-bold">¥${price}</span>`).join(" "); 
+                
+                // 圓餅圖邏輯
                 let gradientStr = "conic-gradient(#e2e8f0 0deg 360deg)";
                 let legendHTML = `<div class="text-center w-full text-xs text-gray-400 mt-2">尚無資料</div>`; 
+                
                 if (totalJPY > 0) { 
-                    const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]); 
+                    const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
                     const gradients = []; 
                     let currentDeg = 0; 
-                    legendHTML = ""; 
+                    legendHTML = "";
                     sortedCats.forEach(c => { 
                         const percent = catTotals[c] / totalJPY; 
                         const deg = percent * 360; 
@@ -1365,95 +1383,156 @@
                         currentDeg += deg; 
                         legendHTML += `<div class="flex items-center gap-1 text-[10px] w-1/3 mb-1"><div class="w-2 h-2 rounded-full" style="background:${color}"></div><span class="opacity-70">${expenseCats[c].name} ${Math.round(percent*100)}%</span></div>`; 
                     }); 
-                    gradientStr = `conic-gradient(${gradients.join(', ')})`; 
+                    gradientStr = `conic-gradient(${gradients.join(', ')})`;
                 } 
-                let expenseListHTML = expenses.length === 0 ? 
-                    `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>` : 
+
+                // 記帳列表 HTML
+                let expenseListHTML = (expenses && expenses.length > 0) ? 
                     expenses.map((item, idx) => { 
                         const cat = item.cat || 'other'; 
-                        const catInfo = expenseCats[cat] || expenseCats.other;
+                        const catInfo = expenseCats[cat] || expenseCats.other; 
                         return `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-2"><div class="flex-1 flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs" style="background:${catInfo.color}"><i class="fas ${catInfo.icon}"></i></div><div><div class="font-bold text-gray-700">${item.name}</div><div class="text-xs text-gray-400">¥${item.price.toLocaleString()}</div></div></div><button onclick="deleteExpense(${idx})" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center active:scale-90"><i class="fas fa-trash-alt text-xs"></i></button></div>`; 
-                    }).join('');
-                
-                main.innerHTML = `<div class="animate-slide-up space-y-4"><div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative"><button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><i class="fas fa-sync-alt"></i></button><h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3><div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">1 JPY = <input type="number" id="rateInput" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD</div><div class="flex flex-col gap-4"><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative"><label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label><input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額" class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black"></div><i class="fas fa-arrow-down text-3xl text-blue-500 animate-bounce absolute left-1/2 -translate-x-1/2 top-[52%] z-10 drop-shadow-sm"></i><div class="bg-green-50 p-4 rounded-xl border border-green-100"><label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label><div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div></div></div></div><div class="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-5 border-2 border-pink-200 shadow-md relative overflow-hidden"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3><button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button></div><div class="flex gap-2 mb-3"><input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 min-w-0 bg-white border-2 border-pink-100 rounded-xl px-4 py-3 text-xl font-bold focus:outline-pink-400 text-gray-700"><button onclick="addTaxItem()" class="flex-none w-16 bg-pink-500 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center"><i class="fas fa-plus text-2xl"></i></button></div><div class="mb-2"><div class="flex justify-between text-xs mb-1 font-bold text-gray-500"><span>目前: ¥${taxBasketTotal.toLocaleString()}</span><span class="${taxDiff > 0 ? 'text-blue-500' : 'text-orange-500'}">${taxMsg}</span></div><div class="w-full bg-gray-200 rounded-full h-3"><div class="${taxDiff>0?'bg-blue-500':'bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse'} h-3 rounded-full transition-all duration-300" style="width: ${taxPercent}%"></div></div></div><div class="flex flex-wrap gap-1 min-h-[20px]">${taxBasketItems}</div></div><div class="glass-card rounded-3xl p-4"><div class="flex justify-between items-center mb-2"><div class="text-xs font-bold text-gray-500">總預算: $${TOTAL_BUDGET.toLocaleString()}</div><div class="text-xs font-bold ${budgetLeft < 0 ? 'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div></div><div class="w-full bg-gray-200 rounded-full h-1.5 mb-4"><div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div></div><div class="pie-chart" style="background: ${gradientStr}"></div><div class="flex flex-wrap justify-center mt-3 px-2">${legendHTML}</div></div><div class="glass-card rounded-3xl p-4"><h3 class="text-sm font-bold text-gray-600 mb-3"><i class="fas fa-pen mr-1"></i> 記一筆</h3><div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1"><label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-bag-shopping"></i> 購物</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-utensils"></i> 餐飲</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="play" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-purple-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-ticket"></i> 娛樂</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="transport" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-car"></i> 交通</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-box"></i> 其他</div></label></div><div class="flex flex-col gap-3 mb-3"><input id="exName" type="text" placeholder="品項名稱" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500"><input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500 font-bold"></div><div class="flex gap-2"><button onclick="addExpense()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-plus-circle mr-2"></i> 新增</button><button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-share-from-square"></i></button><button onclick="setBudget()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-cog"></i></button></div></div><div class="pb-24">${expenseListHTML}</div></div>`; setTimeout(() => { const i = document.getElementById('jpyInput'); if(i) i.focus(); }, 100);
-            } else if (currentToolFilter === 'drive') {
-                 // v17.0: 停車照片顯示邏輯
-                 const parkingPhotoHtml = (parkingData && parkingData.photo) ? `<div class="mt-3 relative group"><img src="${parkingData.photo}" class="w-full rounded-xl border border-green-300 shadow-sm" onclick="showParkingPhotoFull('${parkingData.photo}')"><div class="absolute bottom-2 right-2 text-[10px] bg-black/50 text-white px-2 py-1 rounded backdrop-blur">點擊放大</div></div>` : '';
-                 const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><p class="text-xs text-gray-400 mb-3">停好車記得拍張照！</p><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg mt-3"><i class="fas fa-camera mr-2"></i> 📷 記錄車位</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div>${parkingPhotoHtml}</div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
-                 const gasHelperHTML = `<div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-1 shadow-lg mb-6 relative overflow-hidden text-white"><div class="bg-white/10 backdrop-blur-sm p-5 rounded-[1.3rem] border border-white/20"><div class="flex justify-between items-start mb-4"><div><div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">GAS STATION</div><h3 class="text-2xl font-black">加油請找 <span class="text-yellow-300">紅槍</span></h3><p class="text-xs opacity-90">Regular (レギュラー) = 92/95無鉛</p></div><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-md"><i class="fas fa-gas-pump"></i></div></div><div class="grid grid-cols-2 gap-2 text-center mb-4"><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-hand-sparkles mb-1 block opacity-70"></i><div class="text-[10px]">1.除靜電</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-credit-card mb-1 block opacity-70"></i><div class="text-[10px]">2.付錢/選油</div></div><div class="bg-red-700 rounded-lg p-2 border border-red-400"><i class="fas fa-fill-drip mb-1 block"></i><div class="text-[10px] font-bold">3.紅槍加油</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-receipt mb-1 block opacity-70"></i><div class="text-[10px]">4.拿收據</div></div></div><button onclick="showInfoCard('gas')" class="w-full bg-white text-red-600 font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"><i class="fas fa-comment-dots"></i> 給店員看 (日文)</button></div></div>`;
-                 const soundBoardHTML = `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6"><h3 class="text-xs font-bold text-gray-500 uppercase mb-3"><i class="fas fa-music mr-1"></i> 安撫音效板 (Soundboard)</h3><div class="grid grid-cols-3 gap-3"><button onclick="playSound('clapping')" class="aspect-square bg-yellow-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">👏</button><button onclick="playSound('laugh')" class="aspect-square bg-pink-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">😆</button><button onclick="playSound('fart')" class="aspect-square bg-amber-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">💨</button><button onclick="playSound('magic')" class="aspect-square bg-purple-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">✨</button><button onclick="playSound('wrong')" class="aspect-square bg-red-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">❌</button><button onclick="playSound('correct')" class="aspect-square bg-green-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">⭕</button></div></div>`;
-                 const tideWidget = getTideWidgetHTML();
-                 
-                 // v17.0: 快速工具區新增 "隨身尺規" 按鈕
-                 main.innerHTML = `<div class="animate-slide-up space-y-4"><button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4"><div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div><div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div></button>${tideWidget}${parkingHTML}${gasHelperHTML}
-<div class="grid grid-cols-3 gap-2 mb-6">
-    <button onclick="quickSearch('toilets')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">找廁所</span></button>
-    <button onclick="quickSearch('convenience store')" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">找超商</span></button>
-    
-    <button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">小小畫家</span></button>
-    
-    <button onclick="openCamera()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-yellow-100"><i class="fas fa-camera text-yellow-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">回憶相機</span></button>
-    
-    <button onclick="openRuler()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-blue-100"><i class="fas fa-ruler-combined text-blue-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">隨身尺規</span></button>
-    
-    <button onclick="goBackHotel()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border-2 border-green-100"><i class="fas fa-house-chimney text-green-500 text-xl mb-1 block"></i><span class="text-[10px] font-bold">回飯店</span></button>
-</div>
-${soundBoardHTML}${toolsDB.drive.map(d => `<div class="p-6 rounded-3xl glass-card ${d.color} border border-black/5 relative overflow-hidden"><i class="fas fa-car absolute -right-2 -bottom-2 text-6xl opacity-10"></i><div class="text-xs font-bold opacity-60 mb-2 uppercase tracking-wider">${d.title}</div><div class="text-xl font-black leading-tight">${d.content}</div></div>`).join('')}</div>`;
-            } else if (currentToolFilter === 'food') {
-                // v17.0: 美食指指通渲染 (Food Board)
+                    }).join('') : `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>`;
+
+                // 組合最終 HTML
                 main.innerHTML = `
                 <div class="animate-slide-up space-y-4">
-                    <div class="bg-orange-50 border border-orange-200 rounded-3xl p-5 text-center">
-                        <h3 class="text-lg font-black text-orange-800 mb-1"><i class="fas fa-utensils mr-2"></i>手指點餐通</h3>
-                        <p class="text-xs text-orange-600">點擊圖片，手機幫你說日文！</p>
+                    <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative">
+                        <button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><i class="fas fa-sync-alt"></i></button>
+                        <h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3>
+                        <div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">1 JPY = <input type="number" id="rateInput" value="${curRate}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD</div>
+                        <div class="flex flex-col gap-4">
+                            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative"><label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label><input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額" class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black"></div>
+                            <i class="fas fa-arrow-down text-3xl text-blue-500 animate-bounce absolute left-1/2 -translate-x-1/2 top-[52%] z-10 drop-shadow-sm"></i>
+                            <div class="bg-green-50 p-4 rounded-xl border border-green-100"><label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label><div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div></div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        ${foodBoardDB.map(f => `
-                            <div class="food-grid-item" onclick="speak('${f.jp}', this)">
-                                <img src="${f.img}" class="food-grid-img" loading="lazy">
-                                <div class="food-grid-label">
-                                    <div class="text-lg">${f.name}</div>
-                                    <div class="text-[10px] font-normal opacity-80">${f.note}</div>
-                                </div>
-                                <div class="absolute top-2 right-2 bg-white/90 rounded-full w-8 h-8 flex items-center justify-center text-orange-500 shadow-md">
-                                    <i class="fas fa-volume-high"></i>
-                                </div>
-                            </div>
-                        `).join('')}
+
+                    <div class="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-5 border-2 border-pink-200 shadow-md relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-3"><h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3><button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button></div>
+                        <div class="flex gap-2 mb-3"><input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 min-w-0 bg-white border-2 border-pink-100 rounded-xl px-4 py-3 text-xl font-bold focus:outline-pink-400 text-gray-700"><button onclick="addTaxItem()" class="flex-none w-16 bg-pink-500 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center"><i class="fas fa-plus text-2xl"></i></button></div>
+                        <div class="mb-2"><div class="flex justify-between text-xs mb-1 font-bold text-gray-500"><span>目前: ¥${taxBasketTotal.toLocaleString()}</span><span class="${taxDiff > 0 ? 'text-blue-500' : 'text-orange-500'}">${taxMsg}</span></div><div class="w-full bg-gray-200 rounded-full h-3"><div class="${taxDiff>0?'bg-blue-500':'bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse'} h-3 rounded-full transition-all duration-300" style="width: ${taxPercent}%"></div></div></div><div class="flex flex-wrap gap-1 min-h-[20px]">${taxBasketItems}</div>
+                    </div>
+
+                    <div class="glass-card rounded-3xl p-4">
+                        <div class="flex justify-between items-center mb-2"><div class="text-xs font-bold text-gray-500">總預算: $${totalBudget.toLocaleString()}</div><div class="text-xs font-bold ${budgetLeft < 0 ? 'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div></div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-4"><div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div></div>
+                        <div class="pie-chart" style="background: ${gradientStr}"></div><div class="flex flex-wrap justify-center mt-3 px-2">${legendHTML}</div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-3 mt-4">
-                        <button onclick="speak('辛いですか？ (Karai desuka?)', this)" class="bg-red-100 text-red-700 py-4 rounded-2xl font-bold active:scale-95 transition-transform text-sm"><i class="fas fa-pepper-hot mr-1"></i> 這會辣嗎？</button>
-                        <button onclick="speak('卵や牛乳は入っていますか？ (Tamago ya gyunyu wa...)', this)" class="bg-yellow-100 text-yellow-700 py-4 rounded-2xl font-bold active:scale-95 transition-transform text-sm"><i class="fas fa-exclamation-triangle mr-1"></i> 含蛋/奶嗎？</button>
+                    <div class="glass-card rounded-3xl p-4">
+                        <h3 class="text-sm font-bold text-gray-600 mb-3"><i class="fas fa-pen mr-1"></i> 記一筆</h3>
+                        <div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1">
+                            <label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-bag-shopping"></i> 購物</div></label>
+                            <label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-utensils"></i> 餐飲</div></label>
+                            <label class="cursor-pointer"><input type="radio" name="cat" value="play" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-purple-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-ticket"></i> 娛樂</div></label>
+                            <label class="cursor-pointer"><input type="radio" name="cat" value="transport" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-car"></i> 交通</div></label>
+                            <label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-box"></i> 其他</div></label>
+                        </div>
+                        <div class="flex flex-col gap-3 mb-3"><input id="exName" type="text" placeholder="品項名稱" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500"><input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500 font-bold"></div>
+                        <div class="flex gap-2"><button onclick="addExpense()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-plus-circle mr-2"></i> 新增</button><button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-share-from-square"></i></button><button onclick="setBudget()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-cog"></i></button></div>
+                    </div>
+                    <div class="pb-6">${expenseListHTML}</div>
+
+                    <div class="bg-slate-800 text-white p-5 rounded-3xl text-center shadow-lg"><h3 class="font-bold text-lg mb-1">硬幣速查盤</h3><p class="text-xs opacity-60">結帳前看一下，快速把零錢花掉！</p></div>
+                    <div class="grid grid-cols-2 gap-4">${toolsDB.coins.map(c => `<div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center"><div class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-black shadow-inner mb-3 ${c.color}">${c.val}</div><div class="font-bold text-gray-800 text-lg">¥${c.val}</div><div class="text-xs text-blue-500 font-bold mb-1">約 NT$${c.twd}</div><div class="text-[10px] text-gray-400 bg-gray-50 px-2 py-1 rounded-full">${c.desc}</div></div>`).join('')}</div>
+                    
+                    <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100"><div class="bg-blue-600 text-white p-4 text-center"><h3 class="font-bold text-lg"><i class="fas fa-shirt mr-2"></i>童裝童鞋尺寸對照</h3></div><table class="w-full text-sm text-center"><thead class="bg-gray-50 text-gray-500 font-bold border-b"><tr><th class="py-3">年齡</th><th class="py-3">日本身高</th><th class="py-3">美國</th><th class="py-3">鞋(cm)</th></tr></thead><tbody class="divide-y divide-gray-100">${toolsDB.sizes.map(s => `<tr><td class="py-4 font-bold text-gray-700">${s.label}</td><td class="py-4 text-blue-600 font-bold">${s.h}</td><td class="py-4 text-gray-500">${s.us}</td><td class="py-4 text-pink-500 font-bold">${s.shoe}</td></tr>`).join('')}</tbody></table></div>
+                </div>`;
+                setTimeout(() => { const i = document.getElementById('jpyInput'); if(i) i.focus(); }, 100);
+            
+            // --- 2. 自駕神隊友 (Drive) ---
+            } else if (currentToolFilter === 'drive') {
+                const parkingPhotoHtml = (parkingData && parkingData.photo) ? `<div class="mt-3 relative group"><img src="${parkingData.photo}" class="w-full rounded-xl border border-green-300 shadow-sm" onclick="showParkingPhotoFull('${parkingData.photo}')"><div class="absolute bottom-2 right-2 text-[10px] bg-black/50 text-white px-2 py-1 rounded backdrop-blur">點擊放大</div></div>` : '';
+                const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><p class="text-xs text-gray-400 mb-3">停好車記得拍張照！</p><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg mt-3"><i class="fas fa-camera mr-2"></i> 📷 記錄車位</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div>${parkingPhotoHtml}</div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
+                const gasHelperHTML = `<div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-1 shadow-lg mb-6 relative overflow-hidden text-white"><div class="bg-white/10 backdrop-blur-sm p-5 rounded-[1.3rem] border border-white/20"><div class="flex justify-between items-start mb-4"><div><div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">GAS STATION</div><h3 class="text-2xl font-black">加油請找 <span class="text-yellow-300">紅槍</span></h3><p class="text-xs opacity-90">Regular (レギュラー) = 92/95無鉛</p></div><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-md"><i class="fas fa-gas-pump"></i></div></div><div class="grid grid-cols-2 gap-2 text-center mb-4"><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-hand-sparkles mb-1 block opacity-70"></i><div class="text-[10px]">1.除靜電</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-credit-card mb-1 block opacity-70"></i><div class="text-[10px]">2.付錢/選油</div></div><div class="bg-red-700 rounded-lg p-2 border border-red-400"><i class="fas fa-fill-drip mb-1 block"></i><div class="text-[10px] font-bold">3.紅槍加油</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-receipt mb-1 block opacity-70"></i><div class="text-[10px]">4.拿收據</div></div></div><button onclick="showInfoCard('gas')" class="w-full bg-white text-red-600 font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"><i class="fas fa-comment-dots"></i> 給店員看 (日文)</button></div></div>`;
+                const tideWidget = getTideWidgetHTML();
+                
+                // 這裡也整合了 SOS 緊急求助卡 (原本在獨立頁面)
+                let allergyTags = medicalData.allergies.length > 0 ? medicalData.allergies.map(a => `<span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-200">${allergyDict[a].jp}</span>`).join(" ") : "<span class='text-gray-400 text-xs'>無 (なし)</span>";
+                const sosHTML = `<div class="mt-6 border-t pt-4"><h3 class="text-xs font-bold text-gray-400 uppercase mb-4 tracking-wider">緊急安全</h3><button onclick="openSosCard()" class="w-full bg-red-600 text-white rounded-3xl p-4 shadow-lg flex items-center justify-between active:scale-95 transition-transform mb-4"><div class="text-left"><h3 class="text-lg font-black">SOS 緊急求助卡</h3></div><i class="fas fa-exclamation-circle text-3xl"></i></button><div class="safe-card p-4 rounded-3xl shadow-sm relative overflow-hidden mb-4"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-gray-800">安心護照</h3><button onclick="toggleEditMedical()" class="text-xs bg-white border border-gray-200 px-2 py-1 rounded text-gray-500">編輯</button></div><div id="medical-view">${!medicalData.name ? `<div class="text-center py-2 text-gray-400 text-xs">請點擊編輯</div>` : `<div class="space-y-2"><div class="text-sm font-bold">${medicalData.name} <span class="text-xs font-normal text-gray-500">(${medicalData.hotel})</span></div><div class="flex gap-1 flex-wrap">${allergyTags}</div></div>`}</div><div id="medical-edit" class="hidden space-y-2 mt-2"><input id="in-name" type="text" placeholder="暱稱" value="${medicalData.name}" class="w-full p-2 border rounded text-xs"><input id="in-phone" type="tel" placeholder="電話" value="${medicalData.phone}" class="w-full p-2 border rounded text-xs"><input id="in-hotel" type="text" placeholder="飯店" value="${medicalData.hotel}" class="w-full p-2 border rounded text-xs"><button onclick="saveMedical()" class="w-full bg-gray-800 text-white text-xs py-2 rounded">儲存</button></div></div><div class="space-y-2">${toolsDB.sos.map(s => `<a href="tel:${s.tel}" class="${s.style} p-3 rounded-2xl shadow-sm flex items-center justify-between"><div><div class="text-xs opacity-80">${s.name}</div><div class="text-lg font-black">${s.tel}</div></div><i class="fas fa-phone"></i></a>`).join('')}</div></div>`;
+
+                main.innerHTML = `<div class="animate-slide-up space-y-4">
+                    <button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4">
+                        <div class="absolute right-0 top-0 p-6 opacity-20 group-active:scale-110 transition-transform"><i class="fas fa-gauge-high text-7xl"></i></div>
+                        <div class="relative z-10 flex flex-col items-start"><span class="bg-yellow-400 text-black text-[10px] font-bold px-2 py-1 rounded mb-2 animate-pulse">NEW</span><h3 class="text-2xl font-black italic">DRIVER HUD</h3><p class="text-sm text-gray-300 mt-1">駕駛專用儀表板 / 大字體模式</p></div>
+                    </button>
+                    ${tideWidget}
+                    ${parkingHTML}
+                    ${gasHelperHTML}
+                    <div class="grid gap-4">${toolsDB.signs.map(s => `<div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-4"><div class="text-3xl w-12 h-12 flex items-center justify-center bg-gray-50 rounded-2xl">${s.icon}</div><div class="flex-1"><h3 class="text-base font-black ${s.color} mb-1">${s.title}</h3><p class="text-xs text-gray-600 leading-relaxed">${s.desc}</p></div></div>`).join('')}</div>
+                    ${sosHTML}
+                </div>`;
+            
+            // --- 3. 溝通點餐 (Food) ---
+            } else if (currentToolFilter === 'food') {
+                main.innerHTML = `
+                <div class="animate-slide-up space-y-4">
+                    <div class="bg-slate-800 rounded-3xl p-5 text-center text-white relative overflow-hidden shadow-xl mb-4">
+                        <h3 class="text-base font-bold mb-3">日語翻譯蒟蒻</h3>
+                        <div class="flex justify-center mb-4"><button id="mic-btn" onclick="toggleTranslation()" class="mic-btn"><i class="fas fa-microphone"></i></button></div>
+                        <div id="trans-output" class="min-h-[2.5rem] text-lg font-bold text-gray-200 bg-white/10 rounded-xl p-2 flex items-center justify-center">點擊按鈕，請店員說話</div>
+                    </div>
+
+                    <div class="bg-orange-50 border border-orange-200 rounded-3xl p-5 text-center">
+                        <h3 class="text-lg font-black text-orange-800 mb-1"><i class="fas fa-utensils mr-2"></i>手指點餐通</h3>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            ${foodBoardDB.map(f => `
+                                <div class="food-grid-item" onclick="speak('${f.jp}', this)">
+                                    <img src="${f.img}" class="food-grid-img" loading="lazy">
+                                    <div class="food-grid-label"><div class="text-lg">${f.name}</div><div class="text-[10px] font-normal opacity-80">${f.note}</div></div>
+                                    <div class="absolute top-2 right-2 bg-white/90 rounded-full w-8 h-8 flex items-center justify-center text-orange-500 shadow-md"><i class="fas fa-volume-high"></i></div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider ml-2 mt-4">點餐常用句</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="speak('辛いですか？ (Karai desuka?)', this)" class="bg-red-100 text-red-700 py-3 rounded-2xl font-bold active:scale-95 transition-transform text-xs"><i class="fas fa-pepper-hot mr-1"></i> 這會辣嗎？</button>
+                        <button onclick="speak('卵や牛乳は入っていますか？', this)" class="bg-yellow-100 text-yellow-700 py-3 rounded-2xl font-bold active:scale-95 transition-transform text-xs"><i class="fas fa-exclamation-triangle mr-1"></i> 含蛋/奶嗎？</button>
+                        ${toolsDB.orders.map(o => `<div class="bg-white border-2 border-slate-100 rounded-2xl p-3 text-center active:bg-blue-50 active:border-blue-200 transition-colors" onclick="speak('${o.jp}', this)"><div class="text-2xl mb-1">${o.icon}</div><div class="font-bold text-gray-700 text-sm">${o.title}</div><div class="text-[10px] text-gray-400">${o.sub}</div></div>`).join('')}
+                    </div>
+
+                    <div class="mt-4 space-y-2">
+                        ${toolsDB.jp.map(cat => `<div class="collapse-group"><h4 class="text-xs font-bold text-blue-500 bg-blue-50 px-3 py-2 rounded-lg mb-2">${cat.label}</h4><div class="grid gap-2">${cat.items.map(item => `<div class="bg-white p-3 rounded-xl border border-slate-50 flex justify-between items-center" onclick="speak('${item.j}', this)"><div class="flex-1"><div class="text-xs text-gray-500">${item.t}</div><div class="font-bold text-gray-800">${item.j}</div></div><i class="fas fa-volume-high text-yellow-400"></i></div>`).join('')}</div></div>`).join('')}
                     </div>
                 </div>`;
-            } else if (currentToolFilter === 'signs') {
-                main.innerHTML = `<div class="animate-slide-up grid gap-4">${toolsDB.signs.map(s => `<div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-4"><div class="text-4xl w-16 h-16 flex items-center justify-center bg-gray-50 rounded-2xl">${s.icon}</div><div class="flex-1"><h3 class="text-lg font-black ${s.color} mb-1">${s.title}</h3><p class="text-sm text-gray-600 leading-relaxed">${s.desc}</p></div></div>`).join('')}</div>`;
-            } else if (currentToolFilter === 'coins') {
-                main.innerHTML = `<div class="animate-slide-up space-y-4"><div class="bg-slate-800 text-white p-5 rounded-3xl text-center mb-4 shadow-lg"><h3 class="font-bold text-lg mb-1">硬幣速查盤</h3><p class="text-xs opacity-60">結帳前看一下，快速把零錢花掉！</p></div><div class="grid grid-cols-2 gap-4">${toolsDB.coins.map(c => `<div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center"><div class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-black shadow-inner mb-3 ${c.color}">${c.val}</div><div class="font-bold text-gray-800 text-lg">¥${c.val}</div><div class="text-xs text-blue-500 font-bold mb-1">約 NT$${c.twd}</div><div class="text-[10px] text-gray-400 bg-gray-50 px-2 py-1 rounded-full">${c.desc}</div></div>`).join('')}</div></div>`;
-            } else if (currentToolFilter === 'sizes') {
-                main.innerHTML = `<div class="animate-slide-up"><div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100"><div class="bg-blue-600 text-white p-4 text-center"><h3 class="font-bold text-lg"><i class="fas fa-shirt mr-2"></i>童裝童鞋尺寸對照</h3></div><table class="w-full text-sm text-center"><thead class="bg-gray-50 text-gray-500 font-bold border-b"><tr><th class="py-3">年齡</th><th class="py-3">日本身高</th><th class="py-3">美國</th><th class="py-3">鞋(cm)</th></tr></thead><tbody class="divide-y divide-gray-100">${toolsDB.sizes.map(s => `<tr><td class="py-4 font-bold text-gray-700">${s.label}</td><td class="py-4 text-blue-600 font-bold">${s.h}</td><td class="py-4 text-gray-500">${s.us}</td><td class="py-4 text-pink-500 font-bold">${s.shoe}</td></tr>`).join('')}</tbody></table></div></div>`;
-            } else if (currentToolFilter === 'orders') {
-                main.innerHTML = `<div class="animate-slide-up grid grid-cols-2 gap-4">${toolsDB.orders.map(o => `<div class="order-card" onclick="alert('${o.jp}')"><div class="text-5xl mb-2">${o.icon}</div><div class="font-black text-gray-800 text-lg mb-1">${o.title}</div><div class="text-xs text-gray-400 font-mono">${o.sub}</div><div class="mt-3 bg-blue-50 text-blue-600 font-black py-2 rounded-xl text-xl">${o.jp}</div></div>`).join('')}</div>`;
-            } else if (currentToolFilter === 'jp') {
-                main.innerHTML = `<div class="animate-slide-up space-y-6"><div class="bg-slate-800 rounded-3xl p-6 text-center text-white relative overflow-hidden shadow-xl"><div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-pink-500"></div><h3 class="text-lg font-bold mb-4">聽譯蒟蒻 (日 ➡ 中)</h3><div class="flex justify-center mb-6"><button id="mic-btn" onclick="toggleTranslation()" class="mic-btn"><i class="fas fa-microphone"></i></button></div><div id="trans-output" class="min-h-[3rem] text-xl font-bold text-gray-200 bg-white/10 rounded-xl p-3 flex items-center justify-center">點擊按鈕，請店員說話</div><div class="text-[10px] text-gray-400 mt-2">支援 Chrome / Android / iOS 15+</div></div><div class="glass-card p-4 rounded-2xl text-center bg-blue-50 border border-blue-200"><div class="text-sm text-blue-800 font-bold mb-1">💡 字卡教學</div><div class="text-xs text-blue-600">點擊 <i class="fas fa-volume-high mx-1 text-yellow-600"></i> 黃色按鈕，手機會直接唸出日語！</div></div>${toolsDB.jp.map(cat => `<div><h3 class="text-xs font-bold text-gray-400 uppercase mb-3 ml-2 tracking-wider border-l-2 border-blue-500 pl-2">${cat.label}</h3><div class="grid gap-3">${cat.items.map(item => `<div class="glass-card p-5 rounded-3xl border border-slate-50 transition-transform flex items-center justify-between gap-3 relative z-10"><div class="flex-1"><div class="text-xs text-gray-500 mb-1 flex items-center gap-1"><i class="fas fa-language"></i> ${item.t}</div><div class="text-xl font-black text-gray-800 mb-1 leading-tight">${item.j}</div><div class="text-xs text-blue-500 font-bold bg-blue-50 inline-block px-2 py-0.5 rounded">${item.p}</div></div><button onclick="speak('${item.j}', this)" class="w-12 h-12 flex-shrink-0 rounded-full bg-yellow-400 text-yellow-900 flex items-center justify-center shadow-lg active:scale-90 transition-transform z-20"><i class="fas fa-volume-high text-xl"></i></button></div>`).join('')}</div></div>`).join('')}</div>`;
-            } else if (currentToolFilter === 'sos') {
-                let allergyTags = medicalData.allergies.length > 0 ? medicalData.allergies.map(a => `<span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-200">${allergyDict[a].jp}</span>`).join(" ") : "<span class='text-gray-400 text-xs'>無 (なし)</span>";
-                main.innerHTML = `
-                <div class="animate-slide-up space-y-6">
-                    <button onclick="openSosCard()" class="w-full bg-red-600 text-white rounded-3xl p-6 shadow-xl border-4 border-red-500 flex items-center justify-between active:scale-95 transition-transform animate-pulse">
-                        <div class="text-left">
-                            <h3 class="text-2xl font-black">緊急求助卡</h3>
-                            <p class="text-xs opacity-80">給日本人看 / 尋求幫助</p>
+            
+            // --- 4. 萬用工具箱 (Gadget) ---
+            } else if (currentToolFilter === 'gadget') {
+                const soundBoardHTML = `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6"><h3 class="text-xs font-bold text-gray-500 uppercase mb-3"><i class="fas fa-music mr-1"></i> 安撫音效板</h3><div class="grid grid-cols-3 gap-3"><button onclick="playSound('clapping')" class="aspect-square bg-yellow-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">👏</button><button onclick="playSound('laugh')" class="aspect-square bg-pink-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">😆</button><button onclick="playSound('fart')" class="aspect-square bg-amber-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">💨</button><button onclick="playSound('magic')" class="aspect-square bg-purple-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">✨</button><button onclick="playSound('wrong')" class="aspect-square bg-red-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">❌</button><button onclick="playSound('correct')" class="aspect-square bg-green-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">⭕</button></div></div>`;
+                
+                main.innerHTML = `<div class="animate-slide-up space-y-4">
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button onclick="openCamera()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-yellow-100"><i class="fas fa-camera text-yellow-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">回憶相機</span></button>
+                        <button onclick="openDrawing()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">小小畫家</span></button>
+                        <button onclick="openRuler()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-blue-100"><i class="fas fa-ruler-combined text-blue-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">隨身尺規</span></button>
+                        <button onclick="goBackHotel()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-green-100"><i class="fas fa-house-chimney text-green-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">回飯店</span></button>
+                    </div>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <button onclick="quickSearch('toilets')" class="flex-1 bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 mb-1"></i> 找廁所</button>
+                        <button onclick="quickSearch('convenience store')" class="flex-1 bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 mb-1"></i> 找超商</button>
+                    </div>
+
+                    ${soundBoardHTML}
+
+                    <div class="glass-card rounded-3xl p-6 border-l-4 border-purple-500 mb-4">
+                        <div class="text-xs font-bold text-purple-600 uppercase mb-2">資料備份與還原</div>
+                        <div class="flex gap-2">
+                            <button onclick="backupData()" class="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-copy mr-2"></i> 複製代碼 (舊機)</button>
                         </div>
-                        <i class="fas fa-exclamation-circle text-5xl"></i>
-                    </button>
-                    <div class="safe-card p-6 rounded-3xl shadow-xl relative overflow-hidden"><div class="absolute top-0 right-0 p-4 opacity-10 text-red-600"><i class="fas fa-user-shield text-8xl"></i></div><div class="relative z-10"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-black text-gray-800"><i class="fas fa-passport text-red-500 mr-2"></i>兒童安心護照</h3><button onclick="toggleEditMedical()" class="text-xs bg-white border border-gray-200 px-3 py-1 rounded-full text-gray-500 font-bold">編輯</button></div><div id="medical-view">${!medicalData.name ? `<div class="text-center py-6 text-gray-400 text-sm">⚠️ 請點擊「編輯」輸入資料</div>` : `<div class="space-y-4"><div class="bg-white/60 p-3 rounded-xl border border-red-100"><div class="text-[10px] text-gray-500 uppercase">My Name</div><div class="text-2xl font-black text-gray-800">${medicalData.name}</div></div><div class="bg-white/60 p-3 rounded-xl border border-red-100"><div class="text-[10px] text-gray-500 uppercase">Emergency Contact</div><div class="text-xl font-bold text-blue-600"><i class="fas fa-phone mr-1"></i> ${medicalData.phone}</div></div><div class="bg-white/60 p-3 rounded-xl border border-red-100"><div class="text-[10px] text-gray-500 uppercase">Allergy</div><div class="flex flex-wrap gap-1 mt-1">${allergyTags}</div></div><div class="bg-white/60 p-3 rounded-xl border border-red-100 relative"><div class="text-[10px] text-gray-500 uppercase">Hotel</div><div class="font-bold text-gray-700">${medicalData.hotel}</div><button onclick="showInfoCard('hotel', '${medicalData.hotel}')" class="absolute top-3 right-3 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow"><i class="fas fa-taxi mr-1"></i>給司機看</button></div></div>`}</div><div id="medical-edit" class="hidden space-y-3"><input id="in-name" type="text" placeholder="孩子暱稱" value="${medicalData.name}" class="w-full p-3 rounded-xl border border-gray-200 text-sm"><input id="in-phone" type="tel" placeholder="爸媽電話" value="${medicalData.phone}" class="w-full p-3 rounded-xl border border-gray-200 text-sm"><input id="in-hotel" type="text" placeholder="住宿飯店" value="${medicalData.hotel}" class="w-full p-3 rounded-xl border border-gray-200 text-sm"><div class="text-xs font-bold text-gray-500 mt-2 mb-1">過敏源</div><div class="grid grid-cols-2 gap-2">${Object.keys(allergyDict).map(k => `<label class="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-100"><input type="checkbox" class="allergy-chk" value="${k}" ${medicalData.allergies.includes(k) ? 'checked' : ''}><span class="text-xs text-gray-600">${allergyDict[k].label}</span></label>`).join('')}</div><button onclick="saveMedical()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl mt-2">儲存</button></div></div></div><div class="space-y-3"><h3 class="text-xs font-bold text-gray-400 uppercase ml-2 tracking-wider">緊急電話</h3>${toolsDB.sos.map(s => `<a href="tel:${s.tel}" class="${s.style} p-5 rounded-3xl shadow-lg flex items-center justify-between active:scale-95 transition-transform"><div><div class="text-sm opacity-80 font-medium mb-1">${s.name}</div><div class="text-3xl font-black tracking-tighter">${s.tel}</div></div><div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur flex items-center justify-center"><i class="fas fa-phone text-xl"></i></div></a>`).join('')}</div></div>`;
-            } else if (currentToolFilter === 'sync') {
-                 main.innerHTML = `<div class="animate-slide-up space-y-6"><div class="glass-card rounded-3xl p-6 border-l-4 border-purple-500"><div class="text-xs font-bold text-purple-600 uppercase mb-2">我是舊手機 / 傳送端</div><h3 class="text-xl font-bold text-gray-800 mb-2">備份資料</h3><p class="text-sm text-gray-500 mb-4">將資料產生代碼。</p><button onclick="backupData()" class="w-full bg-purple-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-copy mr-2"></i> 複製代碼</button></div><div class="glass-card rounded-3xl p-6 border-l-4 border-teal-500"><div class="text-xs font-bold text-teal-600 uppercase mb-2">我是新手機 / 接收端</div><h3 class="text-xl font-bold text-gray-800 mb-2">還原資料</h3><textarea id="importDataInput" placeholder="貼上代碼..." class="w-full h-24 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs mb-3 focus:outline-teal-500"></textarea><button onclick="restoreData()" class="w-full bg-teal-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-file-import mr-2"></i> 載入</button></div></div>`;
+                        <div class="mt-4 pt-4 border-t border-purple-100">
+                            <textarea id="importDataInput" placeholder="在此貼上代碼..." class="w-full h-16 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs mb-2 focus:outline-teal-500"></textarea>
+                            <button onclick="restoreData()" class="w-full bg-teal-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-file-import mr-2"></i> 載入資料 (新機)</button>
+                        </div>
+                    </div>
+                </div>`;
             }
         }
     }
+	
 	// ================= 3. 輔助與其他功能 (Helpers) =================
     
     // --- 1. 小小畫家 (Drawing) ---
