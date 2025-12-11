@@ -1862,7 +1862,7 @@
     // === 新版記帳功能 (含 Google Sheet 同步) ===
     // === V17.4 記帳功能 (支援離線標記) ===
     window.addExpense = () => { 
-        const googleScriptUrl = "你的_Google_Web_App_URL_請貼在這裡"; // <--- 記得補上你的網址
+        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbz9zwK2zQYvz9qfmexviYn78gP_0mMMzHGLFsyharh02YWniCc8ZxuQQZILhzrTAhF7kw/exec"; // <--- 記得補上你的網址
         
         const n = document.getElementById('exName').value; 
         const p = document.getElementById('exPrice').value; 
@@ -1907,7 +1907,7 @@
     }
 	// === V17.4 補傳功能 ===
     window.syncOfflineData = () => {
-        const googleScriptUrl = "你的_Google_Web_App_URL_請貼在這裡"; // <--- 記得補上你的網址
+        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbz9zwK2zQYvz9qfmexviYn78gP_0mMMzHGLFsyharh02YWniCc8ZxuQQZILhzrTAhF7kw/exec"; // <--- 記得補上你的網址
         
         if (!navigator.onLine) { showToast("❌ 請先連上網路"); return; }
         
