@@ -1848,12 +1848,74 @@
     window.updateRate = (v) => { if(v>0){CURRENT_RATE=parseFloat(v); localStorage.setItem('user_rate',v); convertCurrency(); renderContent();} }
     window.convertCurrency = () => { const j=parseFloat(document.getElementById('jpyInput').value); const t=document.getElementById('twdOutput'); if(isNaN(j)||j<=0){t.innerText="0";return;} t.innerText=(j*CURRENT_RATE).toFixed(j%1!==0?2:0).toLocaleString('en-US'); }
     window.setBudget = () => { const n=prompt("輸入總預算:", TOTAL_BUDGET); if(n&&!isNaN(n)){TOTAL_BUDGET=parseInt(n); localStorage.setItem('trip_budget', TOTAL_BUDGET); renderContent();} }
-    window.addExpense = () => { const n=document.getElementById('exName').value; const p=document.getElementById('exPrice').value; const c=document.querySelector('input[name="cat"]:checked')?.value||'other'; if(!n||!p){showToast("請輸入完整");return;} expenses.unshift({name:n,price:parseInt(p),cat:c}); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); showToast("已記帳"); renderContent(); }
+    // === 新版記帳功能 (含 Google Sheet 同步) ===
+    window.addExpense = () => { 
+        // 1. 這裡填入你剛剛複製的那串 Google 網址
+        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbw7CG9D-EqjR9gkn5WaPe1tsV7Wg3fE9l58s86IuTE26ZLPSbpy9ttU0KlIzkUEERJBEw/exec"; 
+        
+        const n = document.getElementById('exName').value; 
+        const p = document.getElementById('exPrice').value; 
+        const c = document.querySelector('input[name="cat"]:checked')?.value || 'other'; 
+        
+        if (!n || !p) { showToast("請輸入完整"); return; } 
+        
+        // 舊功能：存手機
+        const expenseObj = { name: n, price: parseInt(p), cat: c };
+        expenses.unshift(expenseObj); 
+        localStorage.setItem('trip_expenses', JSON.stringify(expenses)); 
+        
+        // 新功能：偷偷傳送給 Google (這就是同步的魔法)
+        if (googleScriptUrl.includes("script.google.com")) {
+            fetch(googleScriptUrl, {
+                method: 'POST',
+                mode: 'no-cors', // 重要：這讓瀏覽器不會擋下跨域請求
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(expenseObj)
+            }).then(() => console.log("已發送至 Google")).catch(e => console.error("同步失敗", e));
+        }
+
+        showToast("已記帳 (同步中)"); 
+        renderContent(); 
+        // 如果是從快速記帳視窗來的，要清空欄位
+        document.getElementById('exName').value = "";
+        document.getElementById('exPrice').value = "";
+    }
     window.openQuickExpense = () => { document.getElementById('expense-modal').classList.add('open'); setTimeout(()=>document.getElementById('quickExPrice').focus(),100); }
     window.closeQuickExpense = () => { document.getElementById('expense-modal').classList.remove('open'); document.getElementById('quickExName').value=""; document.getElementById('quickExPrice').value=""; }
     window.saveQuickExpense = () => { const n=document.getElementById('quickExName').value; const p=document.getElementById('quickExPrice').value; const c=document.querySelector('input[name="quick-cat"]:checked')?.value||'shopping'; if(!n||!p){showToast("請輸入完整");return;} expenses.unshift({name:n,price:parseInt(p),cat:c}); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); showToast("快速記帳成功"); if(activeTab==='tools'&&currentToolFilter==='calc')renderContent(); closeQuickExpense(); }
     window.exportExpenses = () => { if(expenses.length===0)return; let t=0; let txt="🦕 帳務：\n"; expenses.forEach(e=>{txt+=`${e.name}: ¥${e.price}\n`;t+=e.price;}); txt+=`總計: ¥${t}`; navigator.clipboard.writeText(txt).then(()=>showToast("已複製")); }
-    window.deleteExpense = (i) => { if(confirm("刪除？")){expenses.splice(i,1); localStorage.setItem('trip_expenses',JSON.stringify(expenses)); renderContent();} }
+    // === 刪除功能 (含 Google Sheet 負數沖銷) ===
+    window.deleteExpense = (i) => { 
+        if(confirm("確定刪除這筆？(將同步傳送扣款紀錄)")) {
+            // 1. 填入你的 Google 網址 (跟剛剛記帳那串一樣)
+            const googleScriptUrl = "https://script.google.com/macros/s/AKfycbw7CG9D-EqjR9gkn5WaPe1tsV7Wg3fE9l58s86IuTE26ZLPSbpy9ttU0KlIzkUEERJBEw/exec"; 
+
+            // 取得即將被刪除的那筆資料
+            const item = expenses[i];
+
+            // 2. 傳送「負數」資料給 Google
+            if (googleScriptUrl.includes("script.google.com")) {
+                const deleteObj = {
+                    name: "❌刪除修正: " + item.name,  // 幫名字加個標記，讓你在 Excel 一眼看出
+                    cat: item.cat,
+                    price: -Math.abs(item.price)      // 重點：把價格轉成負數 (例如 -500)
+                };
+                
+                fetch(googleScriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(deleteObj)
+                }).then(() => console.log("已傳送刪除修正")).catch(e => console.error("同步失敗", e));
+            }
+
+            // 3. 執行原本的刪除 (讓手機畫面上的資料消失)
+            expenses.splice(i, 1); 
+            localStorage.setItem('trip_expenses', JSON.stringify(expenses)); 
+            renderContent(); 
+            showToast("已刪除 (並傳送修正紀錄)");
+        } 
+    }
     window.quickSearch = (q) => { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`,'_blank'); showToast("搜尋中..."); }
     // v18.4 升級: 聰明雙語發音 (自動偵測 中文/日文)
     window.speak = (t, b) => {
