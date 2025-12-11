@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v17.3 Ultimate</title>
+    <title>奎奎全家沖繩遊 🦕 v17.4 Ultimate</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1286,7 +1286,7 @@
                 let expenseListHTML = (expenses && expenses.length > 0) ? expenses.map((item, idx) => { const cat = item.cat || 'other'; const catInfo = expenseCats[cat] || expenseCats.other; return `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-2"><div class="flex-1 flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs" style="background:${catInfo.color}"><i class="fas ${catInfo.icon}"></i></div><div><div class="font-bold text-gray-700">${item.name}</div><div class="text-xs text-gray-400">¥${item.price.toLocaleString()}</div></div></div><button onclick="deleteExpense(${idx})" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center active:scale-90"><i class="fas fa-trash-alt text-xs"></i></button></div>`; }).join('') : `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>`;
 
                 main.innerHTML = `<div class="animate-slide-up space-y-4">
-                    <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative"><button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><i class="fas fa-sync-alt"></i></button><h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3><div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">1 JPY = <input type="number" id="rateInput" value="${curRate}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD</div><div class="flex flex-col gap-4"><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative"><label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label><input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額" class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black"></div><div class="bg-green-50 p-4 rounded-xl border border-green-100"><label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label><div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div></div></div></div>
+                    <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative"><button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><button onclick="syncOfflineData()" class="absolute top-4 left-4 bg-blue-100 text-blue-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><i class="fas fa-cloud-upload-alt"></i></button><i class="fas fa-sync-alt"></i></button><h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3><div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">1 JPY = <input type="number" id="rateInput" value="${curRate}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD</div><div class="flex flex-col gap-4"><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative"><label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label><input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額" class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black"></div><div class="bg-green-50 p-4 rounded-xl border border-green-100"><label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label><div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div></div></div></div>
                     <div class="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-5 border-2 border-pink-200 shadow-md relative overflow-hidden"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3><button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button></div><div class="flex gap-2 mb-3"><input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 min-w-0 bg-white border-2 border-pink-100 rounded-xl px-4 py-3 text-xl font-bold focus:outline-pink-400 text-gray-700"><button onclick="addTaxItem()" class="flex-none w-16 bg-pink-500 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center"><i class="fas fa-plus text-2xl"></i></button></div><div class="mb-2"><div class="flex justify-between text-xs mb-1 font-bold text-gray-500"><span>目前: ¥${taxBasketTotal.toLocaleString()}</span><span class="${taxDiff > 0 ? 'text-blue-500' : 'text-orange-500'}">${taxMsg}</span></div><div class="w-full bg-gray-200 rounded-full h-3"><div class="${taxDiff>0?'bg-blue-500':'bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse'} h-3 rounded-full transition-all duration-300" style="width: ${taxPercent}%"></div></div></div><div class="flex flex-wrap gap-1 min-h-[20px]">${taxBasketItems}</div></div>
                     <div class="glass-card rounded-3xl p-4"><div class="flex justify-between items-center mb-2"><div class="text-xs font-bold text-gray-500">總預算: $${totalBudget.toLocaleString()}</div><div class="text-xs font-bold ${budgetLeft < 0 ? 'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div></div><div class="w-full bg-gray-200 rounded-full h-1.5 mb-4"><div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div></div><div class="pie-chart" style="background: ${gradientStr}"></div><div class="flex flex-wrap justify-center mt-3 px-2">${legendHTML}</div></div>
                     <div class="glass-card rounded-3xl p-4"><h3 class="text-sm font-bold text-gray-600 mb-3"><i class="fas fa-pen mr-1"></i> 記一筆</h3><div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1"><label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-bag-shopping"></i> 購物</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-utensils"></i> 餐飲</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="play" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-purple-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-ticket"></i> 娛樂</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="transport" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-car"></i> 交通</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-box"></i> 其他</div></label></div><div class="flex flex-col gap-3 mb-3"><input id="exName" type="text" placeholder="品項名稱" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500"><input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500 font-bold"></div><div class="flex gap-2"><button onclick="addExpense()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-plus-circle mr-2"></i> 新增</button><button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-share-from-square"></i></button><button onclick="setBudget()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-cog"></i></button></div></div><div class="pb-6">${expenseListHTML}</div>
@@ -1849,9 +1849,9 @@
     window.convertCurrency = () => { const j=parseFloat(document.getElementById('jpyInput').value); const t=document.getElementById('twdOutput'); if(isNaN(j)||j<=0){t.innerText="0";return;} t.innerText=(j*CURRENT_RATE).toFixed(j%1!==0?2:0).toLocaleString('en-US'); }
     window.setBudget = () => { const n=prompt("輸入總預算:", TOTAL_BUDGET); if(n&&!isNaN(n)){TOTAL_BUDGET=parseInt(n); localStorage.setItem('trip_budget', TOTAL_BUDGET); renderContent();} }
     // === 新版記帳功能 (含 Google Sheet 同步) ===
+    // === V17.4 記帳功能 (支援離線標記) ===
     window.addExpense = () => { 
-        // 1. 這裡填入你剛剛複製的那串 Google 網址
-        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbw7CG9D-EqjR9gkn5WaPe1tsV7Wg3fE9l58s86IuTE26ZLPSbpy9ttU0KlIzkUEERJBEw/exec"; 
+        const googleScriptUrl = "你的_Google_Web_App_URL_請貼在這裡"; // <--- 記得補上你的網址
         
         const n = document.getElementById('exName').value; 
         const p = document.getElementById('exPrice').value; 
@@ -1859,26 +1859,73 @@
         
         if (!n || !p) { showToast("請輸入完整"); return; } 
         
-        // 舊功能：存手機
-        const expenseObj = { name: n, price: parseInt(p), cat: c };
+        // 建立資料物件，預設 synced (已同步) 為 false
+        const expenseObj = { name: n, price: parseInt(p), cat: c, synced: false };
+        
+        // 先存入手機 (這樣畫面才會馬上跑出來)
         expenses.unshift(expenseObj); 
         localStorage.setItem('trip_expenses', JSON.stringify(expenses)); 
+        renderContent();
         
-        // 新功能：偷偷傳送給 Google (這就是同步的魔法)
+        // 嘗試傳送給 Google
         if (googleScriptUrl.includes("script.google.com")) {
-            fetch(googleScriptUrl, {
-                method: 'POST',
-                mode: 'no-cors', // 重要：這讓瀏覽器不會擋下跨域請求
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(expenseObj)
-            }).then(() => console.log("已發送至 Google")).catch(e => console.error("同步失敗", e));
+            // 檢查有沒有網路
+            if (navigator.onLine) {
+                fetch(googleScriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(expenseObj)
+                }).then(() => {
+                    // 成功了！把標籤改成 true，並更新存檔
+                    expenseObj.synced = true;
+                    localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+                    console.log("同步成功");
+                }).catch(e => {
+                    console.error("同步失敗 (將保留為未同步狀態)", e);
+                    showToast("⚠️ 網路不穩，請稍後補傳");
+                });
+            } else {
+                showToast("⚠️ 目前離線，資料已暫存");
+            }
         }
-
-        showToast("已記帳 (同步中)"); 
-        renderContent(); 
-        // 如果是從快速記帳視窗來的，要清空欄位
+        
+        // 清空欄位
         document.getElementById('exName').value = "";
         document.getElementById('exPrice').value = "";
+    }
+	// === V17.4 補傳功能 ===
+    window.syncOfflineData = () => {
+        const googleScriptUrl = "你的_Google_Web_App_URL_請貼在這裡"; // <--- 記得補上你的網址
+        
+        if (!navigator.onLine) { showToast("❌ 請先連上網路"); return; }
+        
+        // 找出所有標記為 false (未同步) 的資料
+        const unsyncedItems = expenses.filter(e => e.synced === false);
+        
+        if (unsyncedItems.length === 0) { showToast("✅ 所有資料都已同步！"); return; }
+        
+        showToast(`🔄 正在補傳 ${unsyncedItems.length} 筆資料...`);
+        
+        let successCount = 0;
+        
+        // 一筆一筆補傳
+        unsyncedItems.forEach(item => {
+            fetch(googleScriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(item)
+            }).then(() => {
+                item.synced = true; // 標記為已同步
+                successCount++;
+                // 如果全部傳完，就存檔
+                if(successCount === unsyncedItems.length) {
+                    localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+                    showToast("🎉 全部補傳成功！");
+                }
+            }).catch(e => console.error("補傳失敗", e));
+        });
     }
     window.openQuickExpense = () => { document.getElementById('expense-modal').classList.add('open'); setTimeout(()=>document.getElementById('quickExPrice').focus(),100); }
     window.closeQuickExpense = () => { document.getElementById('expense-modal').classList.remove('open'); document.getElementById('quickExName').value=""; document.getElementById('quickExPrice').value=""; }
