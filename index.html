@@ -16,31 +16,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-<script>
-  // 2. 你的專屬設定檔 (我已經從你的截圖幫你抄下來了)
-  const firebaseConfig = {
-    apiKey: "AIzaSyD6zkdh2jfus1szUvqj3403ZnsDE_nZoEA",
-    authDomain: "wuokinawatrip.firebaseapp.com",
-    databaseURL: "https://wuokinawatrip-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "wuokinawatrip",
-    storageBucket: "wuokinawatrip.firebasestorage.app",
-    messagingSenderId: "734216156614",
-    appId: "1:734216156614:web:71a6719aaff3eea0d6eec7",
-    measurementId: "G-4E2EYPZEKZ"
-  };
-
-  // 3. 初始化 Firebase
-  let db = null;
-  try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.database(); // 啟動資料庫功能
-      console.log("Firebase 連線成功！🦖");
-  } catch (e) {
-      console.error("Firebase 初始化失敗：", e);
-  }
-</script>
-    
+  
     <style>
         /* ================= 基礎設定 ================= */
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #0f172a; -webkit-tap-highlight-color: transparent; transition: background-color 0.5s; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
