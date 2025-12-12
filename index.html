@@ -1941,7 +1941,6 @@ function initChecklistSync() {
                 console.error("同步上傳失敗", e);
             }
         }
-    }
     // === 新的 toggleCheck 結束 ===
     window.addChecklistItem = () => { const text = prompt("新增項目名稱："); if (!text) return; const sub = prompt("備註 (可不填)：") || ""; const list = checklistDB.find(c => c.id === currentChecklistFilter); list.items.push({ text: text, sub: sub }); saveChecklistDB(); renderContent(); showToast("已新增項目"); }
     window.deleteChecklistItem = (index) => { if (!confirm("刪除此項目？")) return; const list = checklistDB.find(c => c.id === currentChecklistFilter); const itemText = list.items[index].text; localStorage.removeItem(`chk_${currentChecklistFilter}_${itemText}`); list.items.splice(index, 1); saveChecklistDB(); renderContent(); showToast("已刪除項目"); }
