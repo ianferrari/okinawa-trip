@@ -14,6 +14,32 @@
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 	<link rel="manifest" href="manifest.json">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  // 2. 你的專屬設定檔 (我已經從你的截圖幫你抄下來了)
+  const firebaseConfig = {
+    apiKey: "AIzaSyD6zkdh2jfus1szUvqj3403ZnsDE_nZoEA",
+    authDomain: "wuokinawatrip.firebaseapp.com",
+    databaseURL: "https://wuokinawatrip-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "wuokinawatrip",
+    storageBucket: "wuokinawatrip.firebasestorage.app",
+    messagingSenderId: "734216156614",
+    appId: "1:734216156614:web:71a6719aaff3eea0d6eec7",
+    measurementId: "G-4E2EYPZEKZ"
+  };
+
+  // 3. 初始化 Firebase
+  let db = null;
+  try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database(); // 啟動資料庫功能
+      console.log("Firebase 連線成功！🦖");
+  } catch (e) {
+      console.error("Firebase 初始化失敗：", e);
+  }
+</script>
     
     <style>
         /* ================= 基礎設定 ================= */
@@ -644,6 +670,57 @@
   }
 </script>
 <script>
+// === Firebase 設定開始 ===
+const firebaseConfig = {
+    // ⚠️ 這裡請貼上你剛剛從 Firebase Console 複製的內容
+    apiKey: "你的API_KEY",
+    authDomain: "你的專案.firebaseapp.com",
+    databaseURL: "https://你的資料庫網址.firebasedatabase.app",
+    projectId: "你的專案ID",
+    storageBucket: "...",
+    messagingSenderId: "...",
+    appId: "..."
+};
+
+// 初始化並取得資料庫實體
+let db = null;
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.database();
+    console.log("Firebase 連線成功");
+} catch (e) {
+    console.error("Firebase 初始化失敗 (可能是沒貼 Config)", e);
+}
+
+// 啟動同步監聽 (只要雲端有變動，這裡就會收到通知)
+function initChecklistSync() {
+    if (!db) return;
+    
+    // 監聽 'checklist' 節點的任何變化
+    db.ref('checklist').on('value', (snapshot) => {
+        const cloudData = snapshot.val() || {}; // 取得雲端所有打勾的項目
+        
+        // 1. 先把本地所有的 checklist 相關紀錄清乾淨 (避免舊資料殘留)
+        // 我們只清除以 "chk_" 開頭的 key，不影響記帳或其他資料
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('chk_')) {
+                localStorage.removeItem(key);
+            }
+        });
+
+        // 2. 把雲端的新資料寫入 localStorage
+        Object.keys(cloudData).forEach(key => {
+            // 還原 key 中的特殊符號 (如果有的話)
+            localStorage.setItem(key, '1');
+        });
+
+        // 3. 如果使用者目前正在看清單頁面，立刻刷新畫面
+        if (activeTab === 'checklist') {
+            renderContent();
+        }
+    });
+}
+// === Firebase 設定結束 ===
     // ================= 1. 資料庫 (DATA) =================
     // 這邊開始 JS 邏輯，接續到下一段...
     const TRIP_YEAR = 2026;
@@ -987,6 +1064,7 @@
         setInterval(updateCountdown, 60000);
         initWeather();
         checkDailyPopup();
+		initChecklistSync();
         // v17.0: 如果有儲存的日記，可以在這裡預載 (目前是 localStorage 自動讀取)
     }
 
@@ -1840,7 +1918,31 @@
     window.addTaxItem = () => { const input = document.getElementById('taxItemInput'); const val = parseInt(input.value); if(val && val > 0) { taxBasket.push(val); input.value = ""; renderContent(); const i = document.getElementById('taxItemInput'); if(i) i.focus(); } }
     window.resetTaxBasket = () => { if(confirm("確定要清空免稅購物籃嗎？")) { taxBasket = []; renderContent(); } }
     window.fetchExchangeRate = async () => { const btn = document.getElementById('fetchRateBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; try { const res = await fetch('https://api.exchangerate-api.com/v4/latest/JPY'); const data = await res.json(); const twd = data.rates.TWD; if(twd) { updateRate(twd.toFixed(4)); document.getElementById('rateInput').value = twd.toFixed(4); showToast(`匯率已更新：${twd}`); } } catch(e) { showToast("更新失敗，請檢查網路"); } finally { btn.innerHTML = originalText; } }
-    window.toggleCheck = (key) => { const v=localStorage.getItem(key); v==='1'?localStorage.removeItem(key):localStorage.setItem(key,'1'); renderContent(); }
+    // === 這裡開始是新的 toggleCheck (取代原本那一行) ===
+    window.toggleCheck = (key) => { 
+        // 1. 取得目前狀態
+        const isChecked = localStorage.getItem(key) === '1';
+        const newValue = isChecked ? null : '1'; // Firebase 用 null 代表刪除
+
+        // 2. 本地先偷跑 (讓畫面馬上變，不用等網路)
+        if (newValue) {
+            localStorage.setItem(key, '1');
+        } else {
+            localStorage.removeItem(key);
+        }
+        renderContent(); // 刷新畫面
+
+        // 3. 發送訊號給 Firebase
+        if (typeof db !== 'undefined' && db) {
+            try {
+                // key 裡面如果有特殊符號可能要處理，但在這裡我們直接傳傳看
+                db.ref('checklist/' + key).set(newValue);
+            } catch (e) {
+                console.error("同步上傳失敗", e);
+            }
+        }
+    }
+    // === 新的 toggleCheck 結束 ===
     window.addChecklistItem = () => { const text = prompt("新增項目名稱："); if (!text) return; const sub = prompt("備註 (可不填)：") || ""; const list = checklistDB.find(c => c.id === currentChecklistFilter); list.items.push({ text: text, sub: sub }); saveChecklistDB(); renderContent(); showToast("已新增項目"); }
     window.deleteChecklistItem = (index) => { if (!confirm("刪除此項目？")) return; const list = checklistDB.find(c => c.id === currentChecklistFilter); const itemText = list.items[index].text; localStorage.removeItem(`chk_${currentChecklistFilter}_${itemText}`); list.items.splice(index, 1); saveChecklistDB(); renderContent(); showToast("已刪除項目"); }
     window.resetChecklist = (id) => { if(confirm('重置清單？')) { checklistDB.find(c=>c.id===id).items.forEach(item => localStorage.removeItem(`chk_${id}_${item.text}`)); renderContent(); showToast("已重置"); } }
