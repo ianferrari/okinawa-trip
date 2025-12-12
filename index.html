@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩遊 🦕 v17.5 Ultimate</title>
+    <title>奎奎全家沖繩遊 🦕 v18.0 Ultimate</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -669,30 +669,44 @@ try {
 }
 
 // 啟動同步監聽 (只要雲端有變動，這裡就會收到通知)
+// 啟動同步監聽 (V18.0 完整同步版)
 function initChecklistSync() {
     if (!db) return;
-    
-    // 監聽 'checklist' 節點的任何變化
-    db.ref('checklist').on('value', (snapshot) => {
-        const cloudData = snapshot.val() || {}; // 取得雲端所有打勾的項目
-        
-        // 1. 先把本地所有的 checklist 相關紀錄清乾淨 (避免舊資料殘留)
-        // 我們只清除以 "chk_" 開頭的 key，不影響記帳或其他資料
-        Object.keys(localStorage).forEach(key => {
-            if (key.startsWith('chk_')) {
-                localStorage.removeItem(key);
-            }
-        });
 
-        // 2. 把雲端的新資料寫入 localStorage
+    // --- A. 監聽「打勾狀態」 (跟原本一樣) ---
+    db.ref('checklist').on('value', (snapshot) => {
+        const cloudData = snapshot.val() || {};
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('chk_')) localStorage.removeItem(key);
+        });
         Object.keys(cloudData).forEach(key => {
-            // 還原 key 中的特殊符號 (如果有的話)
             localStorage.setItem(key, '1');
         });
+        if (activeTab === 'checklist') renderContent();
+    });
 
-        // 3. 如果使用者目前正在看清單頁面，立刻刷新畫面
-        if (activeTab === 'checklist') {
-            renderContent();
+    // --- B. [新增] 監聽「清單內容」變化 ---
+    db.ref('checklist_structure').on('value', (snapshot) => {
+        const cloudStr = snapshot.val();
+        
+        // 如果雲端有資料，就以雲端的為主
+        if (cloudStr) {
+            try {
+                // 1. 更新記憶體中的資料庫
+                checklistDB = JSON.parse(cloudStr);
+                // 2. 順便存回本地，下次沒網路也能用
+                localStorage.setItem('trip_checklist_db', cloudStr);
+                // 3. 刷新畫面
+                if (activeTab === 'checklist') renderContent();
+                // 4. 小提示
+                // showToast("清單已同步更新");
+            } catch (e) {
+                console.error("同步清單結構解析失敗", e);
+            }
+        } else {
+            // 如果雲端是空的 (第一次執行)，我們把手上的預設值傳上去
+            // 這樣第一次用的時候，資料庫就會被初始化
+            saveChecklistDB();
         }
     });
 }
@@ -1922,7 +1936,20 @@ function initChecklistSync() {
     window.addChecklistItem = () => { const text = prompt("新增項目名稱："); if (!text) return; const sub = prompt("備註 (可不填)：") || ""; const list = checklistDB.find(c => c.id === currentChecklistFilter); list.items.push({ text: text, sub: sub }); saveChecklistDB(); renderContent(); showToast("已新增項目"); }
     window.deleteChecklistItem = (index) => { if (!confirm("刪除此項目？")) return; const list = checklistDB.find(c => c.id === currentChecklistFilter); const itemText = list.items[index].text; localStorage.removeItem(`chk_${currentChecklistFilter}_${itemText}`); list.items.splice(index, 1); saveChecklistDB(); renderContent(); showToast("已刪除項目"); }
     window.resetChecklist = (id) => { if(confirm('重置清單？')) { checklistDB.find(c=>c.id===id).items.forEach(item => localStorage.removeItem(`chk_${id}_${item.text}`)); renderContent(); showToast("已重置"); } }
-    function saveChecklistDB() { localStorage.setItem('trip_checklist_db', JSON.stringify(checklistDB)); }
+    function saveChecklistDB() { 
+        // 1. 先存手機 (保持原本邏輯)
+        localStorage.setItem('trip_checklist_db', JSON.stringify(checklistDB)); 
+        
+        // 2. 如果有連上網路，順便把整份清單傳上去！
+        if (db) {
+            try {
+                // 把整個陣列轉成 JSON 字串傳上去，簡單暴力
+                db.ref('checklist_structure').set(JSON.stringify(checklistDB));
+            } catch (e) {
+                console.error("清單上傳失敗", e);
+            }
+        }
+    }
     
     // --- 遊戲化 (Game Logic) ---
     function playCoinSound() { const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.setValueAtTime(987,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(1318,ctx.currentTime+0.1); g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.5); o.start(); o.stop(ctx.currentTime+0.5); }
