@@ -231,7 +231,8 @@
                     <div id="countdown" class="text-[10px] font-mono font-medium opacity-90 bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10">計算中...</div>
                 </div>
                 
-                <h1 class="text-3xl font-black tracking-tight drop-shadow-lg leading-tight">奎奎全家<br>沖繩遊 🦕</h1>
+                <h1 onclick="triggerAdmin()" class="text-3xl font-black tracking-tight drop-shadow-lg leading-tight cursor-pointer select-none">奎奎全家<br>沖繩遊 🦕</h1>
+
 
                 <p id="date-info" class="text-sm opacity-95 font-medium mt-2 text-blue-100 drop-shadow-md"><i class="fas fa-calendar-alt mr-1"></i>3/28 (六) - 4/3 (五)</p>
             </div>
@@ -807,7 +808,7 @@ function initChecklistSync() {
     };
 
     // 2. 行程資料庫 (已整合天氣與穿搭建議 v17.5)
-    const itineraryDB = [
+    let itineraryDB = [
         { 
             day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, 
             weather: {
@@ -945,6 +946,16 @@ function initChecklistSync() {
     ];
 
     // v17.4 修正: 美食圖片連結 (更換為穩定圖源)
+// === (新功能) 嘗試讀取自訂行程 ===
+const savedItin = localStorage.getItem('custom_itinerary');
+if (savedItin) {
+    try {
+        itineraryDB = JSON.parse(savedItin);
+        console.log("已載入修改版行程");
+    } catch(e) { console.error("行程讀取失敗"); }
+}
+// ===============================
+
     const foodBoardDB = [
         { name: "沖繩麵", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Okinawa_soba.jpg/640px-Okinawa_soba.jpg", jp: "沖縄そばをください", note: "Okinawa Soba" },
         { name: "塔可飯", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Taco_rice.jpg/640px-Taco_rice.jpg", jp: "タコライスをください", note: "Taco Rice" },
@@ -1050,6 +1061,14 @@ function initChecklistSync() {
 
     function init() {
         if(isRainyMode) updateRainyModeUI();
+        // === 自動切換到今天 (Auto Day Switch) ===
+        const todayStr = new Date().toLocaleDateString('zh-TW', {month:'numeric', day:'numeric'}); // 取得 "3/29" 格式
+        const todayIdx = itineraryDB.findIndex(d => d.date.includes(todayStr));
+        if (todayIdx !== -1) {
+            currentDayIdx = todayIdx; // 如果日期有對上，就跳到那一天
+        }
+        // === 結束 ===
+
         switchTab('itinerary');
         updateCountdown();
         setInterval(updateCountdown, 60000);
@@ -1416,6 +1435,12 @@ function initChecklistSync() {
                         <div class="flex justify-center mb-4"><button id="mic-btn" onclick="toggleTranslation()" class="mic-btn"><i class="fas fa-microphone"></i></button></div>
                         <div id="trans-output" class="min-h-[2.5rem] text-lg font-bold text-gray-200 bg-white/10 rounded-xl p-2 flex items-center justify-center">點擊按鈕，請店員說話</div>
                     </div>
+
+<button onclick="document.getElementById('food-modal').classList.add('open')" class="w-full bg-gradient-to-r from-orange-400 to-red-400 text-white font-bold py-4 rounded-3xl shadow-lg mb-6 active:scale-95 transition-transform flex items-center justify-center gap-2">
+    <i class="fas fa-dice text-2xl animate-bounce"></i>
+    <span class="text-lg">幫我決定今天吃什麼！</span>
+</button>
+
 
                     <div class="bg-white border-2 border-pink-100 rounded-3xl p-5" id="custom-speech-area">
                         <h3 class="text-sm font-black text-pink-600 mb-3"><i class="fas fa-star mr-1"></i> 自訂 / 常用語句</h3>
@@ -2410,5 +2435,70 @@ function initChecklistSync() {
     // Start App
     init();
 </script>
+
+<div id="admin-modal" class="fixed inset-0 z-[300] bg-black/90 hidden flex-col p-4 animate-slide-up">
+    <div class="flex justify-between items-center text-white mb-4">
+        <h3 class="font-bold text-xl">🔧 行程編輯器 (JSON)</h3>
+        <button onclick="closeAdmin()" class="px-3 py-1 bg-gray-700 rounded">關閉</button>
+    </div>
+    <div class="text-xs text-yellow-400 mb-2">⚠️ 小心符號錯誤！少一個逗號就會壞掉。建議只改文字內容。</div>
+    <textarea id="admin-json" class="flex-1 w-full bg-gray-800 text-green-400 font-mono text-xs p-2 rounded-xl border border-gray-700 focus:outline-none"></textarea>
+    <div class="flex gap-2 mt-4">
+        <button onclick="resetItinerary()" class="flex-1 py-3 bg-red-900 text-red-200 rounded-xl font-bold">重置回預設</button>
+        <button onclick="saveItinerary()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">儲存並重整</button>
+    </div>
+</div>
+
+<script>
+    // 管理員模式邏輯
+    let adminClickCount = 0;
+    let adminTimer = null;
+
+    function triggerAdmin() {
+        adminClickCount++;
+        if (adminClickCount === 1) {
+            adminTimer = setTimeout(() => { adminClickCount = 0; }, 3000);
+        }
+        if (adminClickCount === 5) {
+            clearTimeout(adminTimer);
+            adminClickCount = 0;
+            openAdmin();
+        }
+    }
+
+    function openAdmin() {
+        const modal = document.getElementById('admin-modal');
+        const textarea = document.getElementById('admin-json');
+        textarea.value = JSON.stringify(itineraryDB, null, 2);
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeAdmin() {
+        const modal = document.getElementById('admin-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function saveItinerary() {
+        const val = document.getElementById('admin-json').value;
+        try {
+            JSON.parse(val);
+            localStorage.setItem('custom_itinerary', val);
+            alert("✅ 儲存成功！App 將重新整理。");
+            location.reload();
+        } catch (e) {
+            alert("❌ 格式錯誤！\n" + e);
+        }
+    }
+
+    function resetItinerary() {
+        if(confirm("確定要回到最原始版本嗎？")) {
+            localStorage.removeItem('custom_itinerary');
+            location.reload();
+        }
+    }
+</script>
+
 </body>
 </html>
