@@ -2401,7 +2401,22 @@ if (savedItin) {
         } catch (e) { console.error("存檔失敗", e); }
     }
 
-    // 讀取並顯示照片牆
+        // === 新增功能：刪除照片邏輯 ===
+    async function deletePhoto(id) {
+        if(!confirm("確定要刪除這張回憶嗎？💥")) return;
+        try {
+            const db = await openPhotoDB();
+            const tx = db.transaction("photos", "readwrite");
+            const store = tx.objectStore("photos");
+            store.delete(id);
+            tx.oncomplete = () => {
+                showToast("🗑️ 照片已刪除");
+                loadGallery(); // 刪除成功後，重新整理畫面
+            };
+        } catch(e) { console.error("刪除失敗", e); }
+    }
+
+    // === 更新功能：讀取照片牆 (包含紅色的刪除按鈕) ===
     async function loadGallery() {
         const container = document.getElementById('gallery-grid');
         if (!container) return;
@@ -2411,26 +2426,36 @@ if (savedItin) {
             const tx = db.transaction("photos", "readonly");
             const store = tx.objectStore("photos");
             const request = store.getAll();
-            
             request.onsuccess = function() {
-                const photos = request.result.reverse(); // 最新的在前面
+                const photos = request.result.reverse();
                 if (photos.length === 0) {
                     container.innerHTML = `<div class="col-span-3 text-center text-gray-400 py-4 text-xs">還沒拍照片喔！快去用「工具 > 回憶相機」拍照吧！</div>`;
                     return;
                 }
                 
                 container.innerHTML = photos.map(p => {
+                    // 為了安全，檢查一下是否有資料
+                    if (!p.data) return '';
                     const url = URL.createObjectURL(p.data);
-                    return `<div class="aspect-square rounded-xl overflow-hidden relative shadow-sm border border-slate-100 group" onclick="showParkingPhotoFull('${url}')">
-                        <img src="${url}" class="w-full h-full object-cover">
-                        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] p-1 text-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">${p.day}</div>
+                    
+                    // 這裡加上了右上角的 X 按鈕
+                    return `<div class="aspect-square rounded-xl overflow-hidden relative shadow-sm border border-slate-100 group">
+                        <img src="${url}" class="w-full h-full object-cover" onclick="showParkingPhotoFull('${url}')">
+                        
+                        <button onclick="event.stopPropagation(); deletePhoto(${p.id})" class="absolute top-1 right-1 bg-red-500/80 text-white w-7 h-7 rounded-full flex items-center justify-center shadow-md active:scale-90 z-20 backdrop-blur-sm">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+
+                        <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] p-1 text-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">${p.day || ''}</div>
                     </div>`;
                 }).join('');
             };
         } catch (e) {
+            console.error(e);
             container.innerHTML = "載入失敗";
         }
     }
+
 	
     // Start App
     init();
