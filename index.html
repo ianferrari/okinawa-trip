@@ -2516,7 +2516,7 @@ async function askGemini() {
     使用者問題: ${q}`;
 
     // 改用 1.5-flash (搭配新鑰匙，這是最快的組合)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MY_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${MY_KEY}`;
     
     try {
         const response = await fetch(url, {
