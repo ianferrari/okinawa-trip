@@ -1503,7 +1503,7 @@ if (savedItin) {
                 main.innerHTML = `<div class="animate-slide-up space-y-4">
                     <div class="grid grid-cols-2 gap-3 mb-6">
                         <button onclick="openCamera()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-yellow-100"><i class="fas fa-camera text-yellow-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">回憶相機</span></button>
-			// --- V20.0 新增按鈕區 (貼在 Gadget 頁面裡面) ---
+			
 <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 rounded-3xl shadow-lg mb-6">
     <div class="bg-white rounded-[1.3rem] p-4">
         <div class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-600 uppercase mb-3 text-center tracking-widest">V20.0 GOD MODE</div>
@@ -2496,33 +2496,46 @@ if (savedItin) {
 	
 	// ================= V20.0 神級功能邏輯區 =================
 
-// 1. 🤖 AI 奎奎管家
+// 1. 🤖 AI 奎奎管家 (修復版 v20.1)
 async function askGemini() {
-    const q = prompt("🦖 奎奎管家：請問有什麼我可以幫忙的？\n(例如：明天幾點出門？這附近有廁所嗎？)");
+    const q = prompt("🦖 奎奎管家：請問有什麼我可以幫忙的？");
     if(!q) return;
     
     showToast("🧠 AI 正在思考中...");
     
-    // 構建提示詞 (讓 AI 讀懂行程)
-    const context = `你現在是奎奎全家沖繩遊的隨身導遊。使用者是爸爸或媽媽。
+    // 構建提示詞
+    const context = `你現在是奎奎全家沖繩遊的隨身導遊。
     目前是 Day ${currentDayIdx + 1}。
     今日行程資料: ${JSON.stringify(itineraryDB[currentDayIdx])}。
-    請用繁體中文，簡短、活潑的語氣回答。回答限制在 100 字以內。
+    請用繁體中文，簡短、活潑的語氣回答。
     使用者問題: ${q}`;
 
+    // 使用 gemini-1.5-flash 模型 (速度快且免費)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: context }] }]
+            })
         });
+
+        if (!response.ok) {
+            const errData = await response.json();
+            console.error("API Error:", errData);
+            throw new Error(`API 錯誤: ${errData.error?.message || response.status}`);
+        }
+
         const data = await response.json();
         const reply = data.candidates[0].content.parts[0].text;
         alert("🦖 管家建議：\n\n" + reply);
+
     } catch (e) {
         console.error(e);
-        alert("❌ AI 連線失敗，請檢查網路或 API Key");
+        // 如果是 Fetch 失敗，通常是網路或跨域問題
+        alert(`❌ 連線失敗！\n原因：${e.message}\n\n請確認：\n1. 手機有網路\n2. API Key 正確無誤`);
     }
 }
 
@@ -2632,7 +2645,7 @@ function openScanner() {
         html5QrcodeScanner = new Html5Qrcode("reader");
     }
     
-    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    const config = { fps: 10, qrbox: { width: 250, height: 150 } };
     html5QrcodeScanner.start({ facingMode: "environment" }, config, (decodedText) => {
         // 掃描成功
         closeScanner();
