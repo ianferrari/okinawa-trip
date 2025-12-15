@@ -1499,52 +1499,85 @@ if (savedItin) {
             } else if (currentToolFilter === 'gadget') {
                 const soundBoardHTML = `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6"><h3 class="text-xs font-bold text-gray-500 uppercase mb-3"><i class="fas fa-music mr-1"></i> 安撫音效板</h3><div class="grid grid-cols-3 gap-3"><button onclick="playSound('clapping')" class="aspect-square bg-yellow-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">👏</button><button onclick="playSound('laugh')" class="aspect-square bg-pink-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">😆</button><button onclick="playSound('fart')" class="aspect-square bg-amber-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">💨</button><button onclick="playSound('magic')" class="aspect-square bg-purple-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">✨</button><button onclick="playSound('wrong')" class="aspect-square bg-red-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">❌</button><button onclick="playSound('correct')" class="aspect-square bg-green-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">⭕</button></div></div>`;
                 
+                // 👇👇👇 請將這裡的內容全部換成新的 👇👇👇
                 main.innerHTML = `<div class="animate-slide-up space-y-4">
-                    <div class="grid grid-cols-2 gap-3 mb-6">
-                        <button onclick="openCamera()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-yellow-100"><i class="fas fa-camera text-yellow-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">回憶相機</span></button>
-			
-<div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 rounded-3xl shadow-lg mb-6">
-    <div class="bg-white rounded-[1.3rem] p-4">
-        <div class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-600 uppercase mb-3 text-center tracking-widest">V20.0 GOD MODE</div>
-        <div class="grid grid-cols-2 gap-3">
-            <button onclick="startFamilyRadar()" class="bg-green-50 text-green-600 p-3 rounded-2xl font-bold flex flex-col items-center gap-1 active:scale-95 transition-transform"><i class="fas fa-map-marked-alt text-2xl"></i><span>家人雷達</span></button>
-            <button onclick="openScanner()" class="bg-gray-50 text-gray-600 p-3 rounded-2xl font-bold flex flex-col items-center gap-1 active:scale-95 transition-transform"><i class="fas fa-barcode text-2xl"></i><span>掃描比價</span></button>
-            <button onclick="generatePDF()" class="bg-red-50 text-red-600 p-3 rounded-2xl font-bold flex flex-col items-center gap-1 active:scale-95 transition-transform"><i class="fas fa-file-pdf text-2xl"></i><span>存成 PDF</span></button>
-        </div>
-    </div>
-</div>
-            			
-                        <button onclick="openDrawing()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-purple-100"><i class="fas fa-palette text-purple-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">小小畫家</span></button>
-                        <button onclick="openRuler()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-blue-100"><i class="fas fa-ruler-combined text-blue-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">隨身尺規</span></button>
-                        <button onclick="goBackHotel()" class="bg-white p-4 rounded-3xl shadow-sm text-center active:scale-95 transition-transform border-2 border-green-100"><i class="fas fa-house-chimney text-green-500 text-3xl mb-2 block"></i><span class="text-sm font-bold">回飯店</span></button>
-                    </div>
                     
+                    <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 rounded-3xl shadow-lg mb-2">
+                        <div class="bg-white rounded-[1.3rem] p-5">
+                            <div class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-600 uppercase mb-4 text-center tracking-widest">
+                                <i class="fas fa-rocket mr-1"></i> SUPER TRAVEL TOOLS
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <button onclick="openCamera()" class="bg-yellow-50 text-yellow-600 p-4 rounded-2xl font-bold flex flex-col items-center gap-2 active:scale-95 transition-transform border border-yellow-100 shadow-sm">
+                                    <i class="fas fa-camera text-3xl mb-1"></i>
+                                    <span>回憶相機</span>
+                                </button>
+
+                                <button onclick="startFamilyRadar()" class="bg-green-50 text-green-600 p-4 rounded-2xl font-bold flex flex-col items-center gap-2 active:scale-95 transition-transform border border-green-100 shadow-sm">
+                                    <i class="fas fa-map-marked-alt text-3xl mb-1"></i>
+                                    <span>家人雷達</span>
+                                </button>
+                                
+                                <button onclick="openScanner()" class="bg-gray-50 text-gray-600 p-4 rounded-2xl font-bold flex flex-col items-center gap-2 active:scale-95 transition-transform border border-gray-100 shadow-sm">
+                                    <i class="fas fa-barcode text-3xl mb-1"></i>
+                                    <span>掃描比價</span>
+                                </button>
+                                
+                                <button onclick="generatePDF()" class="bg-red-50 text-red-600 p-4 rounded-2xl font-bold flex flex-col items-center gap-2 active:scale-95 transition-transform border border-red-100 shadow-sm">
+                                    <i class="fas fa-file-pdf text-3xl mb-1"></i>
+                                    <span>存成 PDF</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <button onclick="openDrawing()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border border-purple-100 text-purple-500">
+                            <i class="fas fa-palette text-xl mb-1 block"></i>
+                            <span class="text-xs font-bold text-gray-600">小畫家</span>
+                        </button>
+
+                        <button onclick="openRuler()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border border-blue-100 text-blue-500">
+                            <i class="fas fa-ruler-combined text-xl mb-1 block"></i>
+                            <span class="text-xs font-bold text-gray-600">隨身尺</span>
+                        </button>
+
+                        <button onclick="goBackHotel()" class="bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border border-green-100 text-green-500">
+                            <i class="fas fa-house-chimney text-xl mb-1 block"></i>
+                            <span class="text-xs font-bold text-gray-600">回飯店</span>
+                        </button>
+                    </div>
+
                     <button onclick="printItinerary()" class="w-full bg-slate-700 text-white p-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform mb-4">
                         <i class="fas fa-print text-xl"></i>
                         <span class="font-bold">列印紙本行程 (Printer Friendly)</span>
                     </button>
 
                     <div class="flex gap-2 mb-4">
-                        <button onclick="quickSearch('toilets')" class="flex-1 bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-restroom text-blue-500 mb-1"></i> 找廁所</button>
-                        <button onclick="quickSearch('convenience store')" class="flex-1 bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform"><i class="fas fa-store text-orange-500 mb-1"></i> 找超商</button>
+                        <button onclick="quickSearch('toilets')" class="flex-1 bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border border-slate-50">
+                            <i class="fas fa-restroom text-blue-500 mb-1"></i> 
+                            <span class="text-xs font-bold text-gray-600 block">找廁所</span>
+                        </button>
+                        <button onclick="quickSearch('convenience store')" class="flex-1 bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border border-slate-50">
+                            <i class="fas fa-store text-orange-500 mb-1"></i> 
+                            <span class="text-xs font-bold text-gray-600 block">找超商</span>
+                        </button>
                     </div>
 
                     ${soundBoardHTML}
 
-                    <div class="glass-card rounded-3xl p-6 border-l-4 border-purple-500 mb-4">
+                    <div class="glass-card rounded-3xl p-6 border-l-4 border-purple-500 mb-4 bg-purple-50/50">
                         <div class="text-xs font-bold text-purple-600 uppercase mb-2">資料備份與還原</div>
                         <div class="flex gap-2">
                             <button onclick="backupData()" class="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-copy mr-2"></i> 複製代碼 (舊機)</button>
                         </div>
                         <div class="mt-4 pt-4 border-t border-purple-100">
-                            <textarea id="importDataInput" placeholder="在此貼上代碼..." class="w-full h-16 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs mb-2 focus:outline-teal-500"></textarea>
+                            <textarea id="importDataInput" placeholder="在此貼上代碼..." class="w-full h-16 bg-white border border-purple-100 rounded-xl p-3 text-xs mb-2 focus:outline-purple-500"></textarea>
                             <button onclick="restoreData()" class="w-full bg-teal-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-file-import mr-2"></i> 載入資料 (新機)</button>
                         </div>
                     </div>
                 </div>`;
-            }
-        }
-    }
 	
 	// ================= 3. 輔助與其他功能 (Helpers) =================
     
