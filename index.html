@@ -670,7 +670,6 @@ let db = null;
 let storage = null; // V20.0 新增: 雲端硬碟
 
 // === V20.0 金鑰設定 ===
-const GEMINI_API_KEY = "AIzaSyDslMSNY38EXhLP9kszcYT55XEnr67sEN8"; // 您的金鑰已填入
 let myMemberId = localStorage.getItem('my_member_id');
 if (!myMemberId) {
     // 如果是第一次用，問一下是誰 (之後會存在手機裡)
@@ -1508,7 +1507,6 @@ if (savedItin) {
     <div class="bg-white rounded-[1.3rem] p-4">
         <div class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-pink-600 uppercase mb-3 text-center tracking-widest">V20.0 GOD MODE</div>
         <div class="grid grid-cols-2 gap-3">
-            <button onclick="askGemini()" class="bg-indigo-50 text-indigo-600 p-3 rounded-2xl font-bold flex flex-col items-center gap-1 active:scale-95 transition-transform"><i class="fas fa-robot text-2xl"></i><span>AI 導遊</span></button>
             <button onclick="startFamilyRadar()" class="bg-green-50 text-green-600 p-3 rounded-2xl font-bold flex flex-col items-center gap-1 active:scale-95 transition-transform"><i class="fas fa-map-marked-alt text-2xl"></i><span>家人雷達</span></button>
             <button onclick="openScanner()" class="bg-gray-50 text-gray-600 p-3 rounded-2xl font-bold flex flex-col items-center gap-1 active:scale-95 transition-transform"><i class="fas fa-barcode text-2xl"></i><span>掃描比價</span></button>
             <button onclick="generatePDF()" class="bg-red-50 text-red-600 p-3 rounded-2xl font-bold flex flex-col items-center gap-1 active:scale-95 transition-transform"><i class="fas fa-file-pdf text-2xl"></i><span>存成 PDF</span></button>
@@ -2496,51 +2494,6 @@ if (savedItin) {
 	
 	// ================= V20.0 神級功能邏輯區 =================
 
-// 1. 🤖 AI 奎奎管家 (V20.6 鑰匙修正版)
-async function askGemini() {
-    const q = prompt("🦖 奎奎管家：請問有什麼我可以幫忙的？");
-    if(!q) return;
-    
-    showToast("🧠 AI 正在思考中...");
-
-    // ==========================================
-    // 👇 這裡原本是舊鑰匙，我幫您換成新的了！
-    const MY_KEY = "AIzaSyDslMSNY38EXhLP9kszcYT55XEnr67sEN8"; 
-    // ==========================================
-
-    // 構建提示詞
-    const context = `你現在是奎奎全家沖繩遊的隨身導遊。
-    目前是 Day ${currentDayIdx + 1}。
-    今日行程資料: ${JSON.stringify(itineraryDB[currentDayIdx])}。
-    請用繁體中文，簡短、活潑的語氣回答。
-    使用者問題: ${q}`;
-
-    // 改用 1.5-flash (搭配新鑰匙，這是最快的組合)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${MY_KEY}`;
-    
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: context }] }]
-            })
-        });
-
-        if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(`API 錯誤 (${response.status}): ${errData.error?.message}`);
-        }
-
-        const data = await response.json();
-        const reply = data.candidates[0].content.parts[0].text;
-        alert("🦖 管家建議：\n\n" + reply);
-
-    } catch (e) {
-        console.error(e);
-        alert(`❌ 連線失敗！\n原因：${e.message}\n請確認網路是否正常`);
-    }
-}
 // 2. 📡 家人雷達
 function startFamilyRadar() {
     if (!db) { showToast("資料庫未連線"); return; }
