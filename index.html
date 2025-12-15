@@ -2496,15 +2496,17 @@ if (savedItin) {
 	
 	// ================= V20.0 神級功能邏輯區 =================
 
-// 1. 🤖 AI 奎奎管家 (V20.5 最終穩定版 - 改用 gemini-pro)
+// 1. 🤖 AI 奎奎管家 (V20.6 鑰匙修正版)
 async function askGemini() {
     const q = prompt("🦖 奎奎管家：請問有什麼我可以幫忙的？");
     if(!q) return;
     
     showToast("🧠 AI 正在思考中...");
 
-    // 您的 API Key (維持不變)
-    const MY_KEY = "AIzaSyB8aMWO177zo2IGMsnKlSQC3aT7u1kf1DY";
+    // ==========================================
+    // 👇 這裡原本是舊鑰匙，我幫您換成新的了！
+    const MY_KEY = "AIzaSyDslMSNY38EXhLP9kszcYT55XEnr67sEN8"; 
+    // ==========================================
 
     // 構建提示詞
     const context = `你現在是奎奎全家沖繩遊的隨身導遊。
@@ -2513,8 +2515,8 @@ async function askGemini() {
     請用繁體中文，簡短、活潑的語氣回答。
     使用者問題: ${q}`;
 
-    // 🔥 關鍵修正：改用最穩定的 'gemini-pro' 模型，網址使用 'v1beta'
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${MY_KEY}`;
+    // 改用 1.5-flash (搭配新鑰匙，這是最快的組合)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MY_KEY}`;
     
     try {
         const response = await fetch(url, {
@@ -2527,22 +2529,16 @@ async function askGemini() {
 
         if (!response.ok) {
             const errData = await response.json();
-            throw new Error(`API 回傳錯誤 (${response.status}): ${errData.error?.message}`);
+            throw new Error(`API 錯誤 (${response.status}): ${errData.error?.message}`);
         }
 
         const data = await response.json();
-        
-        // gemini-pro 的回傳檢查
-        if (data.candidates && data.candidates.length > 0) {
-            const reply = data.candidates[0].content.parts[0].text;
-            alert("🦖 管家建議：\n\n" + reply);
-        } else {
-            alert("🦖 管家這題卡住了，請換個方式問問看～");
-        }
+        const reply = data.candidates[0].content.parts[0].text;
+        alert("🦖 管家建議：\n\n" + reply);
 
     } catch (e) {
         console.error(e);
-        alert(`❌ 連線失敗！\n${e.message}\n\n請確認手機網路是否通暢`);
+        alert(`❌ 連線失敗！\n原因：${e.message}\n請確認網路是否正常`);
     }
 }
 // 2. 📡 家人雷達
