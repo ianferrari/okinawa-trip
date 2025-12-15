@@ -2496,16 +2496,22 @@ if (savedItin) {
 	
 	// ================= V20.0 神級功能邏輯區 =================
 
-// 1. 🤖 AI 奎奎管家 (V20.3 最終修復版)
+// 1. 🤖 AI 奎奎管家 (V20.4 絕對暴力版)
 async function askGemini() {
     const q = prompt("🦖 奎奎管家：請問有什麼我可以幫忙的？");
     if(!q) return;
     
     showToast("🧠 AI 正在思考中...");
 
-    // === 請在此填入剛剛申請的「新專案」API Key ===
-    const NEW_API_KEY = "AIzaSyB8aMWO177zo2IGMsnKlSQC3aT7u1kf1DY"; 
+    // ==========================================
+    // 👇 請把下面這串換成您最新的 API Key (AIza開頭)
+    // 不要留空白鍵，直接貼在引號中間
+    const MY_KEY = "AIzaSyB8aMWO177zo2IGMsnKlSQC3aT7u1kf1DY"; 
+    // ==========================================
 
+    // 這裡我們強制使用 v1beta 和 gemini-1.5-flash，這是目前唯一保證會通的組合
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${MY_KEY}`;
+    
     // 構建提示詞
     const context = `你現在是奎奎全家沖繩遊的隨身導遊。
     目前是 Day ${currentDayIdx + 1}。
@@ -2513,9 +2519,6 @@ async function askGemini() {
     請用繁體中文，簡短、活潑的語氣回答。
     使用者問題: ${q}`;
 
-    // 使用 v1beta + gemini-1.5-flash (搭配新專案Key保證可用)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${NEW_API_KEY}`;
-    
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -2527,7 +2530,8 @@ async function askGemini() {
 
         if (!response.ok) {
             const errData = await response.json();
-            throw new Error(errData.error?.message || response.status);
+            // 如果還是錯，把詳細錯誤印出來
+            throw new Error(`錯誤代碼: ${response.status} - ${errData.error?.message}`);
         }
 
         const data = await response.json();
@@ -2536,7 +2540,7 @@ async function askGemini() {
 
     } catch (e) {
         console.error(e);
-        alert(`❌ 連線失敗！\n原因：${e.message}\n\n請確認您是否已經換上了「新專案」的 API Key！`);
+        alert(`❌ 連線失敗！\n${e.message}\n\n請確認：\n1. 您剛剛貼上的 Key 是否正確\n2. 這是「新專案」申請的 Key 嗎？`);
     }
 }
 
