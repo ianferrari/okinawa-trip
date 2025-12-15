@@ -1275,6 +1275,14 @@ if (savedItin) {
                     </div>
                     ${d.weather ? `<div class="bg-blue-50/80 rounded-xl p-3 mb-3 border border-blue-100 flex flex-col gap-2"><div class="flex items-start gap-2"><div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-500 shadow-sm shrink-0 mt-0.5"><i class="fas fa-tshirt text-sm"></i></div><div><div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">OOTD 穿搭建議</div><div class="text-sm font-bold text-blue-900 leading-tight">${d.weather.wear}</div></div></div><div class="w-full h-px bg-blue-200/50 dashed my-1"></div><div class="flex justify-between items-center px-1"><div class="flex items-center gap-1.5" title="紫外線"><i class="fas fa-sun text-orange-400 text-xs"></i><span class="text-xs font-bold text-gray-600">UV: ${d.weather.uv}</span></div><div class="w-px h-3 bg-blue-200"></div><div class="flex items-center gap-1.5" title="日落時間"><i class="fas fa-cloud-moon text-purple-400 text-xs"></i><span class="text-xs font-bold text-gray-600">日落 ${tideInfo.sun}</span></div></div>${d.weather.tips ? `<div class="mt-1 text-[10px] text-blue-600 bg-white/60 px-2 py-1.5 rounded-lg flex items-start gap-1"><i class="fas fa-circle-info mt-0.5"></i> ${d.weather.tips}</div>` : ''}</div>` : ''}
                     <div id="day-map-container" class="w-full h-40 bg-slate-100 rounded-2xl mb-3 border border-slate-200 shadow-inner z-0 relative overflow-hidden"></div>
+					<div class="dino-progress-container mb-3 shadow-inner bg-black/20">
+    <div class="dino-track"></div>
+    <div id="dino-fill-bar" class="dino-fill" style="width: 0%;"></div>
+    <div id="dino-marker" class="dino-icon animate-dino" style="left: 0%;">
+        <i class="fas fa-dragon text-2xl text-white drop-shadow-md"></i>
+    </div>
+    <div id="dino-status-text" class="text-[10px] font-bold text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-sm tracking-wider">旅程準備中...</div>
+</div>
                     <div class="text-sm bg-white p-3 rounded-xl border border-slate-100 text-gray-700 flex items-start gap-2 shadow-sm"><i class="fas fa-star text-yellow-400 mt-0.5 text-lg"></i><span class="font-bold pt-0.5">${d.highlights}</span></div>
                 </div>
                 <div class="space-y-4">
