@@ -2678,20 +2678,20 @@ function closeScanner() {
         });
     }
 
-    // 2. 呼叫超級大腦 (Gemini 1.5 Flash)
+    // 2. 呼叫超級大腦 (Gemini 1.5 Flash) - V21.1 除錯修復版
     async function callDinoBrain(file) {
         const loadingToast = document.getElementById('toast');
-        showToast("🦕 恐龍正在思考中..."); // 借用你現有的 toast
+        showToast("🦕 恐龍正在看照片..."); 
         
-        // ★★★ 請把下面的 "你的_API_KEY" 換成第一步拿到的那串密碼 ★★★
+        // ★★★ 請確認這裡填入的是新申請的 Key，且保留雙引號 ★★★
         const API_KEY = "AIzaSyAAKhd5h3mHen5qiIzWC2trQCSLzNR-4QM"; 
+        
+        // 修正點：確保網址格式絕對正確，注意冒號 :generateContent
         const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
         try {
-            // 把圖片轉成編碼
             const base64Image = await blobToBase64(file);
             
-            // 這是我們給 AI 的指令 (Prompt)
             const promptText = `
                 你現在是奎奎的恐龍好朋友。
                 如果照片是【動物或風景】，請用適合「3歲小孩」的語氣，生動有趣地介紹這是什麼 (50字以內)。
@@ -2699,7 +2699,6 @@ function closeScanner() {
                 如果照片是【收據】，請幫我列出總金額。
             `;
 
-            // 準備傳送的包裹
             const payload = {
                 contents: [{
                     parts: [
@@ -2709,7 +2708,6 @@ function closeScanner() {
                 }]
             };
 
-            // 發送給 Google
             const response = await fetch(URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -2717,37 +2715,35 @@ function closeScanner() {
             });
 
             const data = await response.json();
-            
-            // 取得 AI 的回答
-            const aiReply = data.candidates[0].content.parts[0].text;
-            
-            // 用你原本的 alert 或視窗顯示出來 (之後可以改得更漂亮)
-            alert("🦖 恐龍說：\n\n" + aiReply);
-            
-            // 順便幫你朗讀出來！(利用你現有的 speak 功能)
-            speak(aiReply);
+
+            // --- 除錯偵測區 ---
+            if (!response.ok) {
+                // 如果 Google 回傳錯誤 (例如 404 或 400)
+                console.error("API Error Detail:", data);
+                let errorMsg = "恐龍連線失敗";
+                if (data.error) {
+                    errorMsg += `\n原因: ${data.error.message}`;
+                    if (data.error.code === 404) errorMsg += "\n(可能是模型名稱寫錯，或 API Key 權限不足)";
+                    if (data.error.code === 400) errorMsg += "\n(API Key 可能無效)";
+                }
+                alert("❌ " + errorMsg);
+                return; // 停止執行
+            }
+            // ----------------
+
+            // 只有成功時才讀取內容
+            if (data.candidates && data.candidates.length > 0) {
+                const aiReply = data.candidates[0].content.parts[0].text;
+                alert("🦖 恐龍說：\n\n" + aiReply);
+                speak(aiReply);
+            } else {
+                alert("🦖 恐龍看懂了，但它不想說話 (沒有回傳內容)");
+            }
 
         } catch (e) {
             console.error(e);
-            alert("❌ 恐龍腦袋過熱了 (連線失敗)");
+            alert("❌ 程式發生錯誤：\n" + e.message);
         }
-    }
-
-    // 3. 啟動鏡頭的開關
-    function openDinoLens() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.capture = 'environment'; // 指定用後鏡頭
-        
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                // 如果有拍照，就送給大腦
-                callDinoBrain(file);
-            }
-        };
-        input.click(); // 自動觸發點擊
     }
 	
 	
