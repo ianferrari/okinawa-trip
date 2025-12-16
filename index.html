@@ -2687,7 +2687,7 @@ function closeScanner() {
         const API_KEY = "AIzaSyAAKhd5h3mHen5qiIzWC2trQCSLzNR-4QM"; 
         
         // 修正點：確保網址格式絕對正確，注意冒號 :generateContent
-        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${API_KEY}`;
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${API_KEY}`;
 
         try {
             const base64Image = await blobToBase64(file);
