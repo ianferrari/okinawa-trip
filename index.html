@@ -2666,7 +2666,7 @@ function closeScanner() {
 
 // ================= V21.0 恐龍萬能鏡頭 (Dino Lens) =================
     
-    // 1. 圖片轉碼小幫手 (把照片變成 AI 看得懂的文字)
+    // 1. 圖片轉碼小幫手
     function blobToBase64(blob) {
         return new Promise((resolve, _) => {
             const reader = new FileReader();
@@ -2675,9 +2675,10 @@ function closeScanner() {
         });
     }
 
-    // 2. 呼叫超級大腦 (Gemini 1.5 Flash) - 智慧存取版
+    // 2. 呼叫超級大腦 (Gemini 1.5 Flash) - 這是會問密碼的版本
     async function callDinoBrain(file) {
-        // --- 核心修改開始：改從瀏覽器記憶體拿鑰匙 ---
+        
+        // ★★★ 修改重點開始：改從手機記憶體拿鑰匙 ★★★
         let API_KEY = localStorage.getItem("MY_GEMINI_KEY");
         
         // 如果記憶體裡沒有，就跳出視窗問爸爸
@@ -2691,14 +2692,15 @@ function closeScanner() {
                 return;
             }
         }
-        // --- 核心修改結束 ---
+        // ★★★ 修改重點結束 ★★★
 
-        const loadingToast = document.getElementById('toast');
-        if(loadingToast) {
+        // 顯示提示
+        const toast = document.getElementById('toast');
+        if(toast) {
             document.getElementById('toast-msg').innerText = "🦖 恐龍正在看照片...";
-            loadingToast.className = "show";
+            toast.className = "show";
         }
-        
+
         // 使用 gemini-1.5-flash
         const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
@@ -2722,6 +2724,7 @@ function closeScanner() {
                 }]
             };
 
+            console.log("正在傳送給 Google...");
             const response = await fetch(URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -2730,10 +2733,10 @@ function closeScanner() {
 
             const data = await response.json();
 
-            // 錯誤偵測與自動重置
+            // 錯誤偵測
             if (!response.ok) {
                 console.error("API Error:", data);
-                // 如果是 400 或 403，通常代表鑰匙錯了或失效了
+                // 如果是 400 或 403 或 404，通常代表鑰匙錯了或失效了
                 if (response.status === 400 || response.status === 403 || response.status === 404) {
                     localStorage.removeItem("MY_GEMINI_KEY"); // 清除錯誤的鑰匙
                     alert("❌ 鑰匙似乎失效了 (Error " + response.status + ")。\n\n恐龍已經把舊鑰匙丟掉，請再按一次按鈕輸入新的！");
@@ -2745,7 +2748,10 @@ function closeScanner() {
 
             if (data.candidates && data.candidates.length > 0) {
                 const aiReply = data.candidates[0].content.parts[0].text;
+                // 成功了！彈出視窗
                 alert("🦖 恐龍說：\n\n" + aiReply);
+                
+                // 試著朗讀
                 if(window.speak) window.speak(aiReply);
             } else {
                 alert("🦖 恐龍看懂了，但它沒有說話。");
@@ -2756,10 +2762,23 @@ function closeScanner() {
             alert("❌ 發生錯誤：" + e.message);
         }
     }
-	
-	
-    // Start App
-    init();
+
+    // 3. 啟動相機按鈕
+    window.openDinoLens = function() {
+        console.log("按鈕被點擊了！");
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment';
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                callDinoBrain(file);
+            }
+        };
+        input.click();
+    }
 </script>
 
 <div id="admin-modal" class="fixed inset-0 z-[300] bg-black/90 hidden flex-col p-4 animate-slide-up">
