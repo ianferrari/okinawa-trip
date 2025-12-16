@@ -2675,18 +2675,35 @@ function closeScanner() {
         });
     }
 
-    // 2. 呼叫超級大腦 (Gemini 1.5 Flash) - V21.1 除錯修復版
+    // 2. 呼叫超級大腦 (Gemini 1.5 Flash) - 智慧存取版
     async function callDinoBrain(file) {
+        // --- 核心修改開始：改從瀏覽器記憶體拿鑰匙 ---
+        let API_KEY = localStorage.getItem("MY_GEMINI_KEY");
+        
+        // 如果記憶體裡沒有，就跳出視窗問爸爸
+        if (!API_KEY) {
+            API_KEY = prompt("🦖 請輸入恐龍大腦的 API Key (只會問一次):");
+            if (API_KEY) {
+                // 存起來，下次不用再問
+                localStorage.setItem("MY_GEMINI_KEY", API_KEY.trim());
+            } else {
+                alert("❌ 沒有鑰匙，恐龍無法思考喔！");
+                return;
+            }
+        }
+        // --- 核心修改結束 ---
+
         const loadingToast = document.getElementById('toast');
-        showToast("🦕 恐龍正在看照片..."); 
+        if(loadingToast) {
+            document.getElementById('toast-msg').innerText = "🦖 恐龍正在看照片...";
+            loadingToast.className = "show";
+        }
         
-        // ★★★ 請確認這裡填入的是新申請的 Key，且保留雙引號 ★★★
-        const API_KEY = "AIzaSyAAKhd5h3mHen5qiIzWC2trQCSLzNR-4QM"; 
-        
-        // 修正點：確保網址格式絕對正確，注意冒號 :generateContent
-        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${API_KEY}`;
+        // 使用 gemini-1.5-flash
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
         try {
+            console.log("開始處理照片...");
             const base64Image = await blobToBase64(file);
             
             const promptText = `
@@ -2713,33 +2730,30 @@ function closeScanner() {
 
             const data = await response.json();
 
-            // --- 除錯偵測區 ---
+            // 錯誤偵測與自動重置
             if (!response.ok) {
-                // 如果 Google 回傳錯誤 (例如 404 或 400)
-                console.error("API Error Detail:", data);
-                let errorMsg = "恐龍連線失敗";
-                if (data.error) {
-                    errorMsg += `\n原因: ${data.error.message}`;
-                    if (data.error.code === 404) errorMsg += "\n(可能是模型名稱寫錯，或 API Key 權限不足)";
-                    if (data.error.code === 400) errorMsg += "\n(API Key 可能無效)";
+                console.error("API Error:", data);
+                // 如果是 400 或 403，通常代表鑰匙錯了或失效了
+                if (response.status === 400 || response.status === 403 || response.status === 404) {
+                    localStorage.removeItem("MY_GEMINI_KEY"); // 清除錯誤的鑰匙
+                    alert("❌ 鑰匙似乎失效了 (Error " + response.status + ")。\n\n恐龍已經把舊鑰匙丟掉，請再按一次按鈕輸入新的！");
+                } else {
+                    alert("❌ 連線失敗 (Error " + response.status + ")");
                 }
-                alert("❌ " + errorMsg);
-                return; // 停止執行
+                return;
             }
-            // ----------------
 
-            // 只有成功時才讀取內容
             if (data.candidates && data.candidates.length > 0) {
                 const aiReply = data.candidates[0].content.parts[0].text;
                 alert("🦖 恐龍說：\n\n" + aiReply);
-                speak(aiReply);
+                if(window.speak) window.speak(aiReply);
             } else {
-                alert("🦖 恐龍看懂了，但它不想說話 (沒有回傳內容)");
+                alert("🦖 恐龍看懂了，但它沒有說話。");
             }
 
         } catch (e) {
             console.error(e);
-            alert("❌ 程式發生錯誤：\n" + e.message);
+            alert("❌ 發生錯誤：" + e.message);
         }
     }
 	
