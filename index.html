@@ -288,10 +288,7 @@
     <button onclick="openQuickExpense()" class="fixed bottom-[100px] right-4 w-14 h-14 bg-pink-500 rounded-full text-white shadow-2xl flex items-center justify-center z-40 active:scale-90 transition-transform border-4 border-white/20 backdrop-blur group">
         <i class="fas fa-plus text-2xl group-active:rotate-90 transition-transform"></i>
     </button>
-	<button onclick="openDinoLens()" class="fixed bottom-[170px] right-4 w-14 h-14 bg-gradient-to-br from-green-400 to-blue-500 rounded-full text-white shadow-2xl flex items-center justify-center z-40 active:scale-90 transition-transform border-4 border-white/20 backdrop-blur group">
-        <i class="fas fa-eye text-2xl group-active:scale-110 transition-transform animate-pulse"></i>
-    </button>
-
+	
     <div id="camera-modal" class="fixed inset-0 z-[200] bg-black flex flex-col hidden">
         <div class="flex justify-between items-center p-4 z-20 absolute top-0 w-full pt-safe-top">
             <button onclick="toggleCameraFacing()" class="text-white bg-black/30 w-10 h-10 rounded-full backdrop-blur flex items-center justify-center"><i class="fas fa-sync-alt"></i></button>
@@ -2822,5 +2819,105 @@ function closeScanner() {
         <div class="p-4 text-center text-sm font-bold text-gray-600">請對準商品條碼</div>
     </div>
 </div>
+
+<button onclick="openDinoLens()" style="position: fixed; bottom: 180px; right: 16px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #3b82f6); box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 9999; border: 4px solid rgba(255,255,255,0.3); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+    <i class="fas fa-eye" style="font-size: 24px;"></i>
+</button>
+
+<script>
+    // 讓圖片變成 AI 看得懂的格式
+    function blobToBase64(blob) {
+        return new Promise((resolve, _) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    // 呼叫 AI
+    async function callDinoBrain(file) {
+        // 顯示提示
+        const toast = document.getElementById('toast');
+        if(toast) {
+            document.getElementById('toast-msg').innerText = "🦕 恐龍正在看照片...";
+            toast.className = "show";
+        }
+
+        // ★★★ 這裡一定要換成新的 Key (因為舊的亮黃燈被警告了) ★★★
+        const API_KEY = "AIzaSyAAKhd5h3mHen5qiIzWC2trQCSLzNR-4QM"; 
+        
+        // 使用最穩定的 gemini-pro 模型，避免 404
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+        try {
+            console.log("開始處理照片...");
+            const base64Image = await blobToBase64(file);
+            
+            const promptText = `
+                你現在是奎奎的恐龍好朋友。
+                如果照片是【動物或風景】，請用適合「3歲小孩」的語氣，生動有趣地介紹這是什麼 (50字以內)。
+                如果照片是【菜單或路牌】，請直接幫爸爸「翻譯成繁體中文」，並告訴我有什麼注意事項。
+                如果照片是【收據】，請幫我列出總金額。
+            `;
+
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: promptText },
+                        { inline_data: { mime_type: file.type, data: base64Image } }
+                    ]
+                }]
+            };
+
+            console.log("正在傳送給 Google...");
+            const response = await fetch(URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            console.log("Google 回應：", data);
+
+            // 錯誤偵測
+            if (!response.ok) {
+                alert("❌ 連線失敗 (Error " + response.status + ")\n可能是 API Key 有問題或模型名稱錯誤。");
+                return;
+            }
+
+            if (data.candidates && data.candidates.length > 0) {
+                const aiReply = data.candidates[0].content.parts[0].text;
+                // 成功了！彈出視窗
+                alert("🦖 恐龍說：\n\n" + aiReply);
+                
+                // 試著朗讀 (如果有這個功能)
+                if(window.speak) window.speak(aiReply);
+            } else {
+                alert("🦖 恐龍看懂了，但它沒有說話。");
+            }
+
+        } catch (e) {
+            console.error(e);
+            alert("❌ 發生錯誤：" + e.message);
+        }
+    }
+
+    // 啟動相機
+    window.openDinoLens = function() {
+        console.log("按鈕被點擊了！"); // 測試用
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment';
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                callDinoBrain(file);
+            }
+        };
+        input.click();
+    }
+</script>
 </body>
 </html>
