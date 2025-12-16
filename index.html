@@ -840,7 +840,7 @@ function initChecklistSync() {
                 { time: "16:15", title: "機場補給 (Lawson)", icon: "fa-cart-shopping", note: "1F 入境大廳旁。買鮮奶或明治塊狀奶粉。", duration: "15m", travel: "🚌 接駁 15分" },
                 { time: "16:30", title: "搭接駁車往 OTS", icon: "fa-bus", note: "1F 大廳外 10-A 月台。", travel: "🚌 移動 20分" },
                 { 
-                    time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "檢查車況、裝汽座。導航設定飯店。", map: "OTS 臨空豐崎營業所", lat: 24.1566, lon: 120.6532, duration: "1h", travel: "🚗 開車 60分",
+                    time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "檢查車況、裝汽座。導航設定飯店。", map: "OTS 臨空豐崎營業所", lat: 24.15632657336481, lon: 120.6528311077195, duration: "1h", travel: "🚗 開車 60分",
                     guide: "歡迎來到沖繩！我們快到 OTS 租車公司了。爸爸請記得，沖繩是右駕，方向燈在右手邊，雨刷在左手邊，慢慢開，不要緊張喔！"
                 },
                 { time: "18:00", title: "出發北上 (高速公路)", icon: "fa-road", note: "中途停 中城PA 或 伊芸SA 休息買水。", travel: "🚗 開車 30分" },
@@ -2918,6 +2918,17 @@ function closeScanner() {
         } else {
             alert("瀏覽器不支援定位");
         }
+    }
+</script>
+
+<button onclick="testSpeak()" style="background: green; color: white; padding: 10px; border-radius: 10px; font-weight: bold;">
+    🗣️ 測試喇叭發音
+</button>
+
+<script>
+    function testSpeak() {
+        // 直接呼叫說話功能，跳過 GPS 判斷
+        speak("測試成功！我是您的導遊，聲音聽得清楚嗎？");
     }
 </script>
 </body>
