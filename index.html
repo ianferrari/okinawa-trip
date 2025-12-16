@@ -1258,7 +1258,7 @@ if (savedItin) {
         }
     }
 
-    // 渲染主內容 (v18.5 修正版: 修復工具頁面空白問題)
+    // 渲染主內容 (v18.5 修正版: 修復工具頁面空白問題 + 智慧儀表板)
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
@@ -1270,7 +1270,7 @@ if (savedItin) {
             const tideInfo = tideDB[d.day] || { sun: "18:40" };
 
             // === 🤖 [新功能] 智慧儀表板邏輯 (開始) ===
-            const nowHour = 12;
+            const nowHour = new Date().getHours(); // 測試時可暫時改成 const nowHour = 12;
             let smartWidget = ""; 
 
             // 情境 A: 早上 (06:00 - 09:00) -> 提醒出門檢查
@@ -1325,7 +1325,64 @@ if (savedItin) {
                 
                 ${smartWidget}
 
-                <div class="glass-card rounded-3xl p-5 mb-4 relative overflow-hidden border-l-4 border-blue-500 shadow-lg">;
+                <div class="glass-card rounded-3xl p-5 mb-4 relative overflow-hidden border-l-4 border-blue-500 shadow-lg">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">Day ${currentDayIdx + 1}</span>
+                                <h2 class="text-2xl font-black text-gray-800 tracking-tight">${d.date}</h2>
+                            </div>
+                            <div class="text-sm font-bold text-gray-500">${d.title}</div>
+                        </div>
+                        <div class="flex flex-col items-end">
+                             ${d.weather ?
+                                `<div class="flex items-center gap-1"><i class="fas ${d.weather.icon} ${weatherColor} text-2xl drop-shadow-sm"></i><span class="text-lg font-black text-gray-700">${d.weather.temp.split(' ')[0]}</span></div><div class="text-[10px] font-bold text-gray-400 mt-1">降雨 ${d.weather.rain}</div>` : ''}
+                        </div>
+                    </div>
+                    ${d.weather ?
+                        `<div class="bg-blue-50/80 rounded-xl p-3 mb-3 border border-blue-100 flex flex-col gap-2"><div class="flex items-start gap-2"><div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-500 shadow-sm shrink-0 mt-0.5"><i class="fas fa-tshirt text-sm"></i></div><div><div class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">OOTD 穿搭建議</div><div class="text-sm font-bold text-blue-900 leading-tight">${d.weather.wear}</div></div></div><div class="w-full h-px bg-blue-200/50 dashed my-1"></div><div class="flex justify-between items-center px-1"><div class="flex items-center gap-1.5" title="紫外線"><i class="fas fa-sun text-orange-400 text-xs"></i><span class="text-xs font-bold text-gray-600">UV: ${d.weather.uv}</span></div><div class="w-px h-3 bg-blue-200"></div><div class="flex items-center gap-1.5" title="日落時間"><i class="fas fa-cloud-moon text-purple-400 text-xs"></i><span class="text-xs font-bold text-gray-600">日落 ${tideInfo.sun}</span></div></div>${d.weather.tips ?
+                        `<div class="mt-1 text-[10px] text-blue-600 bg-white/60 px-2 py-1.5 rounded-lg flex items-start gap-1"><i class="fas fa-circle-info mt-0.5"></i> ${d.weather.tips}</div>` : ''}</div>` : ''}
+                    <div id="day-map-container" class="w-full h-40 bg-slate-100 rounded-2xl mb-3 border border-slate-200 shadow-inner z-0 relative overflow-hidden"></div>
+					<div class="dino-progress-container mb-3 shadow-inner bg-black/20">
+                        <div class="dino-track"></div>
+                        <div id="dino-fill-bar" class="dino-fill" style="width: 0%;"></div>
+                        <div id="dino-marker" class="dino-icon animate-dino" style="left: 0%;">
+                            <i class="fas fa-dragon text-2xl text-white drop-shadow-md"></i>
+                        </div>
+                        <div id="dino-status-text" class="text-[10px] font-bold text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-sm tracking-wider">旅程準備中...</div>
+                    </div>
+                    <div class="text-sm bg-white p-3 rounded-xl border border-slate-100 text-gray-700 flex items-start gap-2 shadow-sm"><i class="fas fa-star text-yellow-400 mt-0.5 text-lg"></i><span class="font-bold pt-0.5">${d.highlights}</span></div>
+                </div>
+                <div class="space-y-4">
+                 ${d.events.map((e, idx) => {
+                        const isRainyItem = isRainyMode && e.rainy;
+                        const current = isRainyItem ? { ...e, ...e.rainy } : e;
+                        const badge = isRainyItem ?
+                            `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
+                        const mapLink = current.map ?
+                            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
+                        const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${current.note || ''}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
+                        const isLast = idx === d.events.length - 1;
+                        const travelHtml = (current.travel && !isLast) ? `<div class="travel-pill">${current.travel}</div>` : '';
+                        const durationTag = current.duration ? `<span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-md ml-2 font-bold shadow-sm"><i class="fas fa-clock mr-1"></i>停留 ${current.duration}</span>` : '';
+                        const titleHtml = current.spotId ? `<div onclick="openSpotModal('${current.spotId}')" class="font-bold text-blue-600 text-lg cursor-pointer hover:underline decoration-blue-300 underline-offset-4 decoration-2 flex items-center gap-1">${current.title} <i class="fas fa-circle-info text-xs opacity-50"></i></div>` : `<h3 class="font-bold text-gray-800 text-lg" ${current.action ?
+                            `onclick="${current.action}"` : ''}>${current.title}</h3>`;
+
+                        return `<div class="relative group event-card-container"><div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : ""}">${badge}<div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white z-10 relative"><i class="fas ${current.icon}"></i></div></div><div class="flex-1 py-1 min-w-0"><div class="flex justify-between items-start mb-1"><div class="flex items-center"><h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3></div><div class="flex gap-2 shrink-0">${shareBtn}${mapLink ?
+                            `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}</div></div><div class="flex items-center flex-wrap mb-2 gap-y-1">${titleHtml}${durationTag}</div>${current.note ?
+                            `<p class="text-xs text-gray-500 bg-slate-50 p-2 rounded-lg border border-slate-100 leading-relaxed"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}${current.mapcode ?
+                            `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}</div></div>${current.travel ?
+                            `<div class="timeline-connector"><div class="travel-pill">${current.travel}</div></div>` : '<div class="timeline-connector" style="border:none"></div>'}</div>`;
+                }).join('')}
+                </div>
+                <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative mb-6">
+                    <label class="text-[10px] font-bold text-yellow-600 uppercase mb-1 block"><i class="fas fa-pen-nib mr-1"></i> 今日隨筆 (One-Line Diary)</label>
+                    <textarea id="diary-textarea" class="w-full bg-transparent border-none text-sm text-gray-700 focus:ring-0 p-0 resize-none h-16 leading-relaxed focus:outline-none" placeholder="今天發生了什麼好笑的事？(自動儲存)" oninput="localStorage.setItem('${diaryKey}', this.value)">${savedDiary}</textarea>
+                    <div class="text-right mt-1"><button onclick="toggleVoiceMemo()" class="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full"><i class="fas fa-microphone mr-1"></i>語音輸入</button></div>
+                </div>
+                <div class="h-12"></div>
+            </div>`;
+            setTimeout(initDayMap, 100);
 
         // 2. 清單 (Checklist)
         } else if (activeTab === 'checklist') {
@@ -1338,13 +1395,15 @@ if (savedItin) {
                         const key = `chk_${currentChecklistFilter}_${item.text}`; 
                         const isChecked = localStorage.getItem(key) === '1'; 
                         const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700'; 
-                        return `<div class="flex items-start gap-2 group"><label class="flex-1 flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer select-none border-slate-100 shadow-sm bg-white"><div class="relative flex items-center mt-0.5"><input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key}')"><i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i></div><div class="flex-1"><div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}</div></label><button onclick="deleteChecklistItem(${i})" class="mt-3 w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 active:scale-90 transition-all rounded-full hover:bg-red-50"><i class="fas fa-trash-alt"></i></button></div>`;
+                        return `<div class="flex items-start gap-2 group"><label class="flex-1 flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer select-none border-slate-100 shadow-sm bg-white"><div class="relative flex items-center mt-0.5"><input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ?
+                            'checked' : ''} onchange="toggleCheck('${key}')"><i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i></div><div class="flex-1"><div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>${item.sub ?
+                            `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}</div></label><button onclick="deleteChecklistItem(${i})" class="mt-3 w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 active:scale-90 transition-all rounded-full hover:bg-red-50"><i class="fas fa-trash-alt"></i></button></div>`;
                     }).join('')}
                 </div>
                 <button onclick="addChecklistItem()" class="w-full mt-4 py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-[0.98]"><i class="fas fa-plus mr-1"></i> 新增項目</button>
                 <div class="mt-8 pt-4 border-t border-gray-100"><button onclick="resetChecklist('${currentChecklistFilter}')" class="w-full py-4 bg-slate-50 rounded-2xl text-xs text-gray-400 font-bold tracking-wide active:bg-slate-100 mb-2"><i class="fas fa-rotate-right mr-1"></i> 重置勾選狀態</button><button onclick="openGiftModal()" class="w-full py-4 bg-red-50 text-red-500 rounded-2xl text-lg font-bold shadow-sm active:scale-95 border border-red-100"><i class="fas fa-gift mr-2"></i> 管理伴手禮清單</button></div>
             </div>`;
-
+        
         // 3. 成就 (Missions)
         } else if (activeTab === 'missions') {
             const balance = getGashaBalance();
@@ -1359,8 +1418,10 @@ if (savedItin) {
                         </div>
                         <div class="text-4xl font-black text-gray-800 mb-2">${balance} <span class="text-sm text-gray-500 font-medium">枚代幣</span></div>
                         <p class="text-xs text-gray-500 mb-4">每完成 1 個任務，就能轉 1 次！</p>
-                        <button onclick="spinGasha()" ${balance <= 0 ? 'disabled' : ''} class="w-full py-4 rounded-2xl font-bold text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${balance > 0 ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-300/50' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
-                            ${balance > 0 ? '<i class="fas fa-gift animate-bounce"></i> 投入代幣轉動' : '去完成任務賺代幣！'}
+                        <button onclick="spinGasha()" ${balance <= 0 ?
+                            'disabled' : ''} class="w-full py-4 rounded-2xl font-bold text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${balance > 0 ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-pink-300/50' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
+                            ${balance > 0 ?
+                            '<i class="fas fa-gift animate-bounce"></i> 投入代幣轉動' : '去完成任務賺代幣！'}
                         </button>
                     </div>
                 </div>
@@ -1383,21 +1444,23 @@ if (savedItin) {
             
             // --- 消費高手 (Money) ---
             if (currentToolFilter === 'money') {
-                let totalJPY = 0; const catTotals = {}; 
-                expenses.forEach(e => { totalJPY += e.price; const cat = e.cat || 'other'; if (!catTotals[cat]) catTotals[cat] = 0; catTotals[cat] += e.price; }); 
+                let totalJPY = 0;
+                const catTotals = {}; 
+                expenses.forEach(e => { totalJPY += e.price; const cat = e.cat || 'other'; if (!catTotals[cat]) catTotals[cat] = 0; catTotals[cat] += e.price; });
                 let curRate = typeof CURRENT_RATE !== 'undefined' ? CURRENT_RATE : 0.21;
-                let totalBudget = typeof TOTAL_BUDGET !== 'undefined' ? TOTAL_BUDGET : 100000;
+                let totalBudget = typeof TOTAL_BUDGET !== 'undefined' ?
+                    TOTAL_BUDGET : 100000;
                 let totalTWD = Math.round(totalJPY * curRate); 
                 let budgetLeft = totalBudget - totalTWD;
                 let budgetPercent = Math.min((totalTWD / totalBudget) * 100, 100); 
                 let currentTaxBasket = typeof taxBasket !== 'undefined' ? taxBasket : [];
                 let taxBasketTotal = currentTaxBasket.reduce((a, b) => a + b, 0);
-                let taxDiff = 5500 - taxBasketTotal; 
+                let taxDiff = 5500 - taxBasketTotal;
                 let taxMsg = taxDiff > 0 ? `還差 ¥${taxDiff.toLocaleString()}` : "🎉 免稅達成！";
                 let taxPercent = Math.min((taxBasketTotal / 5500) * 100, 100);
-                let taxBasketItems = currentTaxBasket.map((price) => `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-[10px] font-bold">¥${price}</span>`).join(" "); 
+                let taxBasketItems = currentTaxBasket.map((price) => `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-[10px] font-bold">¥${price}</span>`).join(" ");
                 let gradientStr = "conic-gradient(#e2e8f0 0deg 360deg)";
-                let legendHTML = `<div class="text-center w-full text-xs text-gray-400 mt-2">尚無資料</div>`; 
+                let legendHTML = `<div class="text-center w-full text-xs text-gray-400 mt-2">尚無資料</div>`;
                 if (totalJPY > 0) { 
                     const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
                     const gradients = []; let currentDeg = 0; legendHTML = "";
@@ -1405,30 +1468,33 @@ if (savedItin) {
                         const percent = catTotals[c] / totalJPY; const deg = percent * 360; const color = expenseCats[c] ? expenseCats[c].color : '#999'; 
                         gradients.push(`${color} ${currentDeg}deg ${currentDeg + deg}deg`); currentDeg += deg; 
                         legendHTML += `<div class="flex items-center gap-1 text-[10px] w-1/3 mb-1"><div class="w-2 h-2 rounded-full" style="background:${color}"></div><span class="opacity-70">${expenseCats[c].name} ${Math.round(percent*100)}%</span></div>`; 
-                    }); 
+                    });
                     gradientStr = `conic-gradient(${gradients.join(', ')})`;
                 } 
-                let expenseListHTML = (expenses && expenses.length > 0) ? expenses.map((item, idx) => { const cat = item.cat || 'other'; const catInfo = expenseCats[cat] || expenseCats.other; return `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-2"><div class="flex-1 flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs" style="background:${catInfo.color}"><i class="fas ${catInfo.icon}"></i></div><div><div class="font-bold text-gray-700">${item.name}</div><div class="text-xs text-gray-400">¥${item.price.toLocaleString()}</div></div></div><button onclick="deleteExpense(${idx})" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center active:scale-90"><i class="fas fa-trash-alt text-xs"></i></button></div>`; }).join('') : `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>`;
-
+                let expenseListHTML = (expenses && expenses.length > 0) ?
+                    expenses.map((item, idx) => { const cat = item.cat || 'other'; const catInfo = expenseCats[cat] || expenseCats.other; return `<div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-2"><div class="flex-1 flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs" style="background:${catInfo.color}"><i class="fas ${catInfo.icon}"></i></div><div><div class="font-bold text-gray-700">${item.name}</div><div class="text-xs text-gray-400">¥${item.price.toLocaleString()}</div></div></div><button onclick="deleteExpense(${idx})" class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center active:scale-90"><i class="fas fa-trash-alt text-xs"></i></button></div>`; }).join('') : `<div class="text-center py-8 text-gray-400 text-sm">🛍️ 還沒買東西...</div>`;
                 main.innerHTML = `<div class="animate-slide-up space-y-4">
                     <div class="glass-card rounded-3xl p-6 text-center shadow-lg border-2 border-yellow-300 relative"><button onclick="fetchExchangeRate()" id="fetchRateBtn" class="absolute top-4 right-4 bg-yellow-100 text-yellow-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><button onclick="syncOfflineData()" class="absolute top-4 left-4 bg-blue-100 text-blue-700 p-2 rounded-full text-xs shadow-sm active:scale-90 transition-transform"><i class="fas fa-cloud-upload-alt"></i></button><i class="fas fa-sync-alt"></i></button><h3 class="text-xs font-bold text-yellow-600 mb-2 uppercase tracking-wider">匯率換算器</h3><div class="text-xl font-bold text-gray-500 mb-4 flex items-center justify-center gap-2">1 JPY = <input type="number" id="rateInput" value="${curRate}" onchange="updateRate(this.value)" class="text-yellow-600 text-3xl font-black bg-transparent focus:outline-none focus:border-b-2 focus:border-yellow-500 transition-colors" step="0.0001"> TWD</div><div class="flex flex-col gap-4"><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 relative"><label class="block text-sm font-medium text-gray-600 mb-1">日幣 (JPY)</label><input type="number" id="jpyInput" oninput="convertCurrency()" placeholder="輸入日幣金額" class="w-full text-3xl text-gray-800 bg-transparent focus:outline-none text-center p-2 font-black"></div><div class="bg-green-50 p-4 rounded-xl border border-green-100"><label class="block text-sm font-medium text-gray-600 mb-1">約等於台幣 (TWD)</label><div id="twdOutput" class="w-full text-4xl text-green-700 text-center p-2 font-black">0</div></div></div></div>
-                    <div class="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-5 border-2 border-pink-200 shadow-md relative overflow-hidden"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3><button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button></div><div class="flex gap-2 mb-3"><input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 min-w-0 bg-white border-2 border-pink-100 rounded-xl px-4 py-3 text-xl font-bold focus:outline-pink-400 text-gray-700"><button onclick="addTaxItem()" class="flex-none w-16 bg-pink-500 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center"><i class="fas fa-plus text-2xl"></i></button></div><div class="mb-2"><div class="flex justify-between text-xs mb-1 font-bold text-gray-500"><span>目前: ¥${taxBasketTotal.toLocaleString()}</span><span class="${taxDiff > 0 ? 'text-blue-500' : 'text-orange-500'}">${taxMsg}</span></div><div class="w-full bg-gray-200 rounded-full h-3"><div class="${taxDiff>0?'bg-blue-500':'bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse'} h-3 rounded-full transition-all duration-300" style="width: ${taxPercent}%"></div></div></div><div class="flex flex-wrap gap-1 min-h-[20px]">${taxBasketItems}</div></div>
-                    <div class="glass-card rounded-3xl p-4"><div class="flex justify-between items-center mb-2"><div class="text-xs font-bold text-gray-500">總預算: $${totalBudget.toLocaleString()}</div><div class="text-xs font-bold ${budgetLeft < 0 ? 'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div></div><div class="w-full bg-gray-200 rounded-full h-1.5 mb-4"><div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div></div><div class="pie-chart" style="background: ${gradientStr}"></div><div class="flex flex-wrap justify-center mt-3 px-2">${legendHTML}</div></div>
+                    <div class="bg-gradient-to-br from-pink-50 to-white rounded-3xl p-5 border-2 border-pink-200 shadow-md relative overflow-hidden"><div class="flex justify-between items-center mb-3"><h3 class="font-black text-pink-600 flex items-center"><i class="fas fa-bag-shopping mr-2"></i>免稅湊單神器</h3><button onclick="resetTaxBasket()" class="text-[10px] bg-white border border-gray-200 px-2 py-1 rounded text-gray-400">清空</button></div><div class="flex gap-2 mb-3"><input type="number" id="taxItemInput" placeholder="¥ 商品金額" class="flex-1 min-w-0 bg-white border-2 border-pink-100 rounded-xl px-4 py-3 text-xl font-bold focus:outline-pink-400 text-gray-700"><button onclick="addTaxItem()" class="flex-none w-16 bg-pink-500 text-white rounded-xl shadow-lg active:scale-95 flex items-center justify-center"><i class="fas fa-plus text-2xl"></i></button></div><div class="mb-2"><div class="flex justify-between text-xs mb-1 font-bold text-gray-500"><span>目前: ¥${taxBasketTotal.toLocaleString()}</span><span class="${taxDiff > 0 ?
+                        'text-blue-500' : 'text-orange-500'}">${taxMsg}</span></div><div class="w-full bg-gray-200 rounded-full h-3"><div class="${taxDiff>0?'bg-blue-500':'bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse'} h-3 rounded-full transition-all duration-300" style="width: ${taxPercent}%"></div></div></div><div class="flex flex-wrap gap-1 min-h-[20px]">${taxBasketItems}</div></div>
+                    <div class="glass-card rounded-3xl p-4"><div class="flex justify-between items-center mb-2"><div class="text-xs font-bold text-gray-500">總預算: $${totalBudget.toLocaleString()}</div><div class="text-xs font-bold ${budgetLeft < 0 ?
+                        'text-red-500' : 'text-green-500'}">剩餘: $${budgetLeft.toLocaleString()}</div></div><div class="w-full bg-gray-200 rounded-full h-1.5 mb-4"><div class="bg-green-500 h-1.5 rounded-full transition-all duration-500" style="width: ${budgetPercent}%"></div></div><div class="pie-chart" style="background: ${gradientStr}"></div><div class="flex flex-wrap justify-center mt-3 px-2">${legendHTML}</div></div>
                     <div class="glass-card rounded-3xl p-4"><h3 class="text-sm font-bold text-gray-600 mb-3"><i class="fas fa-pen mr-1"></i> 記一筆</h3><div class="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1"><label class="cursor-pointer"><input type="radio" name="cat" value="shopping" class="peer sr-only" checked><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-pink-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-bag-shopping"></i> 購物</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="food" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-orange-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-utensils"></i> 餐飲</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="play" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-purple-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-ticket"></i> 娛樂</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="transport" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-blue-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-car"></i> 交通</div></label><label class="cursor-pointer"><input type="radio" name="cat" value="other" class="peer sr-only"><div class="bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs text-gray-500 peer-checked:bg-slate-500 peer-checked:text-white transition-all font-bold whitespace-nowrap"><i class="fas fa-box"></i> 其他</div></label></div><div class="flex flex-col gap-3 mb-3"><input id="exName" type="text" placeholder="品項名稱" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500"><input id="exPrice" type="number" placeholder="¥ 金額" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-blue-500 font-bold"></div><div class="flex gap-2"><button onclick="addExpense()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.98] transition-transform"><i class="fas fa-plus-circle mr-2"></i> 新增</button><button onclick="exportExpenses()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-share-from-square"></i></button><button onclick="setBudget()" class="px-4 bg-slate-200 text-slate-600 font-bold rounded-xl active:scale-[0.98] transition-transform"><i class="fas fa-cog"></i></button></div></div><div class="pb-6">${expenseListHTML}</div>
                     <div class="bg-slate-800 text-white p-5 rounded-3xl text-center shadow-lg"><h3 class="font-bold text-lg mb-1">硬幣速查盤</h3><p class="text-xs opacity-60">結帳前看一下，快速把零錢花掉！</p></div><div class="grid grid-cols-2 gap-4">${toolsDB.coins.map(c => `<div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center text-center"><div class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-black shadow-inner mb-3 ${c.color}">${c.val}</div><div class="font-bold text-gray-800 text-lg">¥${c.val}</div><div class="text-xs text-blue-500 font-bold mb-1">約 NT$${c.twd}</div><div class="text-[10px] text-gray-400 bg-gray-50 px-2 py-1 rounded-full">${c.desc}</div></div>`).join('')}</div>
                     <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100"><div class="bg-blue-600 text-white p-4 text-center"><h3 class="font-bold text-lg"><i class="fas fa-shirt mr-2"></i>童裝童鞋尺寸對照</h3></div><table class="w-full text-sm text-center"><thead class="bg-gray-50 text-gray-500 font-bold border-b"><tr><th class="py-3">年齡</th><th class="py-3">日本身高</th><th class="py-3">美國</th><th class="py-3">鞋(cm)</th></tr></thead><tbody class="divide-y divide-gray-100">${toolsDB.sizes.map(s => `<tr><td class="py-4 font-bold text-gray-700">${s.label}</td><td class="py-4 text-blue-600 font-bold">${s.h}</td><td class="py-4 text-gray-500">${s.us}</td><td class="py-4 text-pink-500 font-bold">${s.shoe}</td></tr>`).join('')}</tbody></table></div>
                 </div>`;
                 setTimeout(() => { const i = document.getElementById('jpyInput'); if(i) i.focus(); }, 100);
-            
+
             // --- 自駕神隊友 (Drive) ---
             } else if (currentToolFilter === 'drive') {
-                const parkingPhotoHtml = (parkingData && parkingData.photo) ? `<div class="mt-3 relative group"><img src="${parkingData.photo}" class="w-full rounded-xl border border-green-300 shadow-sm" onclick="showParkingPhotoFull('${parkingData.photo}')"><div class="absolute bottom-2 right-2 text-[10px] bg-black/50 text-white px-2 py-1 rounded backdrop-blur">點擊放大</div></div>` : '';
+                const parkingPhotoHtml = (parkingData && parkingData.photo) ?
+                    `<div class="mt-3 relative group"><img src="${parkingData.photo}" class="w-full rounded-xl border border-green-300 shadow-sm" onclick="showParkingPhotoFull('${parkingData.photo}')"><div class="absolute bottom-2 right-2 text-[10px] bg-black/50 text-white px-2 py-1 rounded backdrop-blur">點擊放大</div></div>` : '';
                 const parkingHTML = !parkingData ? `<div class="p-6 rounded-3xl parking-card border border-green-200 relative overflow-hidden bg-white"><div class="text-center"><i class="fas fa-square-parking text-4xl text-green-500 mb-3"></i><h3 class="text-lg font-bold text-gray-800 mb-1">還沒記錄停車位置</h3><p class="text-xs text-gray-400 mb-3">停好車記得拍張照！</p><button onclick="saveParking()" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl shadow-lg mt-3"><i class="fas fa-camera mr-2"></i> 📷 記錄車位</button></div></div>` : `<div class="p-6 rounded-3xl parking-card border border-green-500 relative overflow-hidden bg-green-50"><div class="relative z-10"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-green-800"><i class="fas fa-circle-check mr-2"></i>車子停在這！</h3><div class="text-xs text-green-600 font-bold bg-white px-2 py-1 rounded">${parkingData.time}</div></div><div class="bg-white p-3 rounded-xl border border-green-200 mb-4 shadow-sm"><div class="text-[10px] text-gray-400 uppercase">備註 (樓層/區域)</div><div class="text-xl font-bold text-gray-800">${parkingData.note}</div>${parkingPhotoHtml}</div><div class="flex gap-2"><button onclick="findCar()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-[0.95] transition-transform"><i class="fas fa-person-walking-arrow-right mr-2"></i> 帶我找車</button><button onclick="clearParking()" class="px-4 bg-white text-red-500 border border-red-200 font-bold rounded-xl active:scale-[0.95] transition-transform"><i class="fas fa-trash-alt"></i></button></div></div></div>`;
                 const gasHelperHTML = `<div class="bg-gradient-to-br from-red-500 to-red-600 rounded-3xl p-1 shadow-lg mb-6 relative overflow-hidden text-white"><div class="bg-white/10 backdrop-blur-sm p-5 rounded-[1.3rem] border border-white/20"><div class="flex justify-between items-start mb-4"><div><div class="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-1">GAS STATION</div><h3 class="text-2xl font-black">加油請找 <span class="text-yellow-300">紅槍</span></h3><p class="text-xs opacity-90">Regular (レギュラー) = 92/95無鉛</p></div><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-red-600 text-2xl shadow-md"><i class="fas fa-gas-pump"></i></div></div><div class="grid grid-cols-2 gap-2 text-center mb-4"><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-hand-sparkles mb-1 block opacity-70"></i><div class="text-[10px]">1.除靜電</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-credit-card mb-1 block opacity-70"></i><div class="text-[10px]">2.付錢/選油</div></div><div class="bg-red-700 rounded-lg p-2 border border-red-400"><i class="fas fa-fill-drip mb-1 block"></i><div class="text-[10px] font-bold">3.紅槍加油</div></div><div class="bg-black/20 rounded-lg p-2"><i class="fas fa-receipt mb-1 block opacity-70"></i><div class="text-[10px]">4.拿收據</div></div></div><button onclick="showInfoCard('gas')" class="w-full bg-white text-red-600 font-bold py-3 rounded-xl shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"><i class="fas fa-comment-dots"></i> 給店員看 (日文)</button></div></div>`;
                 const tideWidget = getTideWidgetHTML();
                 let allergyTags = medicalData.allergies.length > 0 ? medicalData.allergies.map(a => `<span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-200">${allergyDict[a].jp}</span>`).join(" ") : "<span class='text-gray-400 text-xs'>無 (なし)</span>";
-                const sosHTML = `<div class="mt-6 border-t pt-4"><h3 class="text-xs font-bold text-gray-400 uppercase mb-4 tracking-wider">緊急安全</h3><button onclick="openSosCard()" class="w-full bg-red-600 text-white rounded-3xl p-4 shadow-lg flex items-center justify-between active:scale-95 transition-transform mb-4"><div class="text-left"><h3 class="text-lg font-black">SOS 緊急求助卡</h3></div><i class="fas fa-exclamation-circle text-3xl"></i></button><div class="safe-card p-4 rounded-3xl shadow-sm relative overflow-hidden mb-4"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-gray-800">安心護照</h3><button onclick="toggleEditMedical()" class="text-xs bg-white border border-gray-200 px-2 py-1 rounded text-gray-500">編輯</button></div><div id="medical-view">${!medicalData.name ? `<div class="text-center py-2 text-gray-400 text-xs">請點擊編輯</div>` : `<div class="space-y-2"><div class="text-sm font-bold">${medicalData.name} <span class="text-xs font-normal text-gray-500">(${medicalData.hotel})</span></div><div class="flex gap-1 flex-wrap">${allergyTags}</div></div>`}</div><div id="medical-edit" class="hidden space-y-2 mt-2"><input id="in-name" type="text" placeholder="暱稱" value="${medicalData.name}" class="w-full p-2 border rounded text-xs"><input id="in-phone" type="tel" placeholder="電話" value="${medicalData.phone}" class="w-full p-2 border rounded text-xs"><input id="in-hotel" type="text" placeholder="飯店" value="${medicalData.hotel}" class="w-full p-2 border rounded text-xs"><button onclick="saveMedical()" class="w-full bg-gray-800 text-white text-xs py-2 rounded">儲存</button></div></div><div class="space-y-2">${toolsDB.sos.map(s => `<a href="tel:${s.tel}" class="${s.style} p-3 rounded-2xl shadow-sm flex items-center justify-between"><div><div class="text-xs opacity-80">${s.name}</div><div class="text-lg font-black">${s.tel}</div></div><i class="fas fa-phone"></i></a>`).join('')}</div></div>`;
-
+                const sosHTML = `<div class="mt-6 border-t pt-4"><h3 class="text-xs font-bold text-gray-400 uppercase mb-4 tracking-wider">緊急安全</h3><button onclick="openSosCard()" class="w-full bg-red-600 text-white rounded-3xl p-4 shadow-lg flex items-center justify-between active:scale-95 transition-transform mb-4"><div class="text-left"><h3 class="text-lg font-black">SOS 緊急求助卡</h3></div><i class="fas fa-exclamation-circle text-3xl"></i></button><div class="safe-card p-4 rounded-3xl shadow-sm relative overflow-hidden mb-4"><div class="flex justify-between items-start mb-2"><h3 class="text-lg font-black text-gray-800">安心護照</h3><button onclick="toggleEditMedical()" class="text-xs bg-white border border-gray-200 px-2 py-1 rounded text-gray-500">編輯</button></div><div id="medical-view">${!medicalData.name ?
+                    `<div class="text-center py-2 text-gray-400 text-xs">請點擊編輯</div>` : `<div class="space-y-2"><div class="text-sm font-bold">${medicalData.name} <span class="text-xs font-normal text-gray-500">(${medicalData.hotel})</span></div><div class="flex gap-1 flex-wrap">${allergyTags}</div></div>`}</div><div id="medical-edit" class="hidden space-y-2 mt-2"><input id="in-name" type="text" placeholder="暱稱" value="${medicalData.name}" class="w-full p-2 border rounded text-xs"><input id="in-phone" type="tel" placeholder="電話" value="${medicalData.phone}" class="w-full p-2 border rounded text-xs"><input id="in-hotel" type="text" placeholder="飯店" value="${medicalData.hotel}" class="w-full p-2 border rounded text-xs"><button onclick="saveMedical()" class="w-full bg-gray-800 text-white text-xs py-2 rounded">儲存</button></div></div><div class="space-y-2">${toolsDB.sos.map(s => `<a href="tel:${s.tel}" class="${s.style} p-3 rounded-2xl shadow-sm flex items-center justify-between"><div><div class="text-xs opacity-80">${s.name}</div><div class="text-lg font-black">${s.tel}</div></div><i class="fas fa-phone"></i></a>`).join('')}</div></div>`;
                 main.innerHTML = `<div class="animate-slide-up space-y-4">
                     <button onclick="shareMyLocation()" class="w-full bg-green-500 text-white p-4 rounded-3xl shadow-lg border-2 border-green-400 flex items-center justify-center gap-2 active:scale-95 transition-transform mb-2"><i class="fas fa-location-crosshairs text-2xl animate-pulse"></i><span class="font-bold text-lg">傳送我的位置 (SOS)</span></button>
                     <button onclick="openDriverMode()" class="w-full bg-gradient-to-r from-slate-800 to-black text-white p-6 rounded-3xl shadow-xl border border-slate-700 relative overflow-hidden group mb-4">
@@ -1453,7 +1519,6 @@ if (savedItin) {
                         </div>
                     </div>
                 `).join('');
-
                 main.innerHTML = `
                 <div class="animate-slide-up space-y-4">
                     <div class="bg-slate-800 rounded-3xl p-5 text-center text-white relative overflow-hidden shadow-xl mb-4">
@@ -1462,11 +1527,10 @@ if (savedItin) {
                         <div id="trans-output" class="min-h-[2.5rem] text-lg font-bold text-gray-200 bg-white/10 rounded-xl p-2 flex items-center justify-center">點擊按鈕，請店員說話</div>
                     </div>
 
-<button onclick="document.getElementById('food-modal').classList.add('open')" class="w-full bg-gradient-to-r from-orange-400 to-red-400 text-white font-bold py-4 rounded-3xl shadow-lg mb-6 active:scale-95 transition-transform flex items-center justify-center gap-2">
-    <i class="fas fa-dice text-2xl animate-bounce"></i>
-    <span class="text-lg">幫我決定今天吃什麼！</span>
-</button>
-
+                    <button onclick="document.getElementById('food-modal').classList.add('open')" class="w-full bg-gradient-to-r from-orange-400 to-red-400 text-white font-bold py-4 rounded-3xl shadow-lg mb-6 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                        <i class="fas fa-dice text-2xl animate-bounce"></i>
+                        <span class="text-lg">幫我決定今天吃什麼！</span>
+                    </button>
 
                     <div class="bg-white border-2 border-pink-100 rounded-3xl p-5" id="custom-speech-area">
                         <h3 class="text-sm font-black text-pink-600 mb-3"><i class="fas fa-star mr-1"></i> 自訂 / 常用語句</h3>
@@ -1475,7 +1539,8 @@ if (savedItin) {
                             <button onclick="quickTranslate()" class="bg-slate-100 text-slate-600 px-3 py-3 rounded-xl font-bold text-xs flex-shrink-0 border border-slate-200 active:bg-slate-200"><i class="fas fa-language text-lg"></i></button>
                             <button onclick="addCustomSpeech()" class="bg-pink-500 text-white px-4 py-3 rounded-xl font-bold text-xs flex-shrink-0 whitespace-nowrap shadow-md active:scale-95 transition-transform">加入</button>
                         </div>
-                        <div class="space-y-2" id="custom-speech-list">${customSpeechDB.length > 0 ? customSpeechHTML : '<div class="text-center text-xs text-gray-400 py-2">還沒有自訂語句</div>'}</div>
+                        <div class="space-y-2" id="custom-speech-list">${customSpeechDB.length > 0 ?
+                            customSpeechHTML : '<div class="text-center text-xs text-gray-400 py-2">還沒有自訂語句</div>'}</div>
                     </div>
 
                     <div class="bg-orange-50 border border-orange-200 rounded-3xl p-5 text-center">
@@ -1500,8 +1565,6 @@ if (savedItin) {
             // --- 萬用工具箱 (Gadget) ---
             } else if (currentToolFilter === 'gadget') {
                 const soundBoardHTML = `<div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 mb-6"><h3 class="text-xs font-bold text-gray-500 uppercase mb-3"><i class="fas fa-music mr-1"></i> 安撫音效板</h3><div class="grid grid-cols-3 gap-3"><button onclick="playSound('clapping')" class="aspect-square bg-yellow-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">👏</button><button onclick="playSound('laugh')" class="aspect-square bg-pink-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">😆</button><button onclick="playSound('fart')" class="aspect-square bg-amber-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">💨</button><button onclick="playSound('magic')" class="aspect-square bg-purple-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">✨</button><button onclick="playSound('wrong')" class="aspect-square bg-red-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">❌</button><button onclick="playSound('correct')" class="aspect-square bg-green-100 rounded-2xl text-2xl flex items-center justify-center shadow-sm active:scale-90 transition-transform">⭕</button></div></div>`;
-                
-                // 👇👇👇 請將這裡的內容全部換成新的 👇👇👇
                 main.innerHTML = `<div class="animate-slide-up space-y-4">
                     
                     <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-1 rounded-3xl shadow-lg mb-2">
