@@ -288,6 +288,9 @@
     <button onclick="openQuickExpense()" class="fixed bottom-[100px] right-4 w-14 h-14 bg-pink-500 rounded-full text-white shadow-2xl flex items-center justify-center z-40 active:scale-90 transition-transform border-4 border-white/20 backdrop-blur group">
         <i class="fas fa-plus text-2xl group-active:rotate-90 transition-transform"></i>
     </button>
+	<button onclick="openDinoLens()" class="fixed bottom-[170px] right-4 w-14 h-14 bg-gradient-to-br from-green-400 to-blue-500 rounded-full text-white shadow-2xl flex items-center justify-center z-40 active:scale-90 transition-transform border-4 border-white/20 backdrop-blur group">
+        <i class="fas fa-eye text-2xl group-active:scale-110 transition-transform animate-pulse"></i>
+    </button>
 
     <div id="camera-modal" class="fixed inset-0 z-[200] bg-black flex flex-col hidden">
         <div class="flex justify-between items-center p-4 z-20 absolute top-0 w-full pt-safe-top">
@@ -2664,6 +2667,89 @@ function closeScanner() {
     }
 }
 
+// ================= V21.0 恐龍萬能鏡頭 (Dino Lens) =================
+    
+    // 1. 圖片轉碼小幫手 (把照片變成 AI 看得懂的文字)
+    function blobToBase64(blob) {
+        return new Promise((resolve, _) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    // 2. 呼叫超級大腦 (Gemini 1.5 Flash)
+    async function callDinoBrain(file) {
+        const loadingToast = document.getElementById('toast');
+        showToast("🦕 恐龍正在思考中..."); // 借用你現有的 toast
+        
+        // ★★★ 請把下面的 "你的_API_KEY" 換成第一步拿到的那串密碼 ★★★
+        const API_KEY = "AIzaSyAAKhd5h3mHen5qiIzWC2trQCSLzNR-4QM"; 
+        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+        try {
+            // 把圖片轉成編碼
+            const base64Image = await blobToBase64(file);
+            
+            // 這是我們給 AI 的指令 (Prompt)
+            const promptText = `
+                你現在是奎奎的恐龍好朋友。
+                如果照片是【動物或風景】，請用適合「3歲小孩」的語氣，生動有趣地介紹這是什麼 (50字以內)。
+                如果照片是【菜單或路牌】，請直接幫爸爸「翻譯成繁體中文」，並告訴我有什麼注意事項。
+                如果照片是【收據】，請幫我列出總金額。
+            `;
+
+            // 準備傳送的包裹
+            const payload = {
+                contents: [{
+                    parts: [
+                        { text: promptText },
+                        { inline_data: { mime_type: file.type, data: base64Image } }
+                    ]
+                }]
+            };
+
+            // 發送給 Google
+            const response = await fetch(URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            
+            // 取得 AI 的回答
+            const aiReply = data.candidates[0].content.parts[0].text;
+            
+            // 用你原本的 alert 或視窗顯示出來 (之後可以改得更漂亮)
+            alert("🦖 恐龍說：\n\n" + aiReply);
+            
+            // 順便幫你朗讀出來！(利用你現有的 speak 功能)
+            speak(aiReply);
+
+        } catch (e) {
+            console.error(e);
+            alert("❌ 恐龍腦袋過熱了 (連線失敗)");
+        }
+    }
+
+    // 3. 啟動鏡頭的開關
+    function openDinoLens() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.capture = 'environment'; // 指定用後鏡頭
+        
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // 如果有拍照，就送給大腦
+                callDinoBrain(file);
+            }
+        };
+        input.click(); // 自動觸發點擊
+    }
+	
 	
     // Start App
     init();
