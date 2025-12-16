@@ -1639,6 +1639,12 @@ if (savedItin) {
                                     <i class="fas fa-file-pdf text-3xl mb-1"></i>
                                     <span>存成 PDF</span>
                                 </button>
+								
+								<button onclick="openCapsuleModal()" class="bg-indigo-50 text-indigo-600 p-4 rounded-2xl font-bold flex flex-col items-center gap-2 active:scale-95 transition-transform border border-indigo-100 shadow-sm">
+									<i class="fas fa-hourglass-half text-3xl mb-1"></i>
+									<span>時空膠囊</span>
+								</button>
+								
                             </div>
                         </div>
                     </div>
@@ -2104,6 +2110,171 @@ if (savedItin) {
     window.playSound = (type) => { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.connect(gain); gain.connect(ctx.destination); const now = ctx.currentTime; if (type === 'magic') { osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(1000, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'wrong') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(100, now + 0.3); gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.3); osc.start(now); osc.stop(now + 0.3); } else if (type === 'correct') { osc.type = 'sine'; osc.frequency.setValueAtTime(600, now); osc.frequency.setValueAtTime(800, now + 0.1); gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'fart') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); osc.frequency.linearRampToValueAtTime(60, now + 0.4); gain.gain.setValueAtTime(0.5, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4); osc.start(now); osc.stop(now + 0.4); } else if (type === 'laugh') { osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(600, now + 0.1); osc.frequency.linearRampToValueAtTime(400, now + 0.2); gain.gain.setValueAtTime(0.3, now); osc.start(now); osc.stop(now + 0.3); } else if (type === 'clapping') { /* 簡化掌聲 */ const o=ctx.createOscillator();o.type='triangle';o.frequency.setValueAtTime(150,now);const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);g.gain.setValueAtTime(0.5,now);g.gain.exponentialRampToValueAtTime(0.01,now+0.5);o.start(now);o.stop(now+0.5); } else { playCoinSound(); } }
     window.spinFood = () => { /* 保留舊版吃什麼功能 */ const iconEl = document.getElementById('food-result'); const textEl = document.getElementById('food-text'); let count = 0; const interval = setInterval(() => { const opts = [{icon:"🍜",name:"拉麵"},{icon:"🥩",name:"燒肉"},{icon:"🍣",name:"壽司"},{icon:"🍔",name:"漢堡"}]; const random = opts[Math.floor(Math.random() * opts.length)]; iconEl.innerText = random.icon; textEl.innerText = random.name; count++; if(count > 20) { clearInterval(interval); playCoinSound(); iconEl.classList.add('animate-pop'); setTimeout(() => iconEl.classList.remove('animate-pop'), 500); } }, 80); }
     
+	// === ⏳ 時空膠囊功能 (終極完整版) ===
+    
+    let currentEditId = null; // 記錄目前是否在編輯模式
+
+    function openCapsuleModal() {
+        document.getElementById('capsule-modal').classList.remove('hidden');
+        document.getElementById('capsule-modal').classList.add('flex');
+        renderCapsules(); 
+        resetForm();
+    }
+
+    function closeCapsuleModal() {
+        document.getElementById('capsule-modal').classList.add('hidden');
+        document.getElementById('capsule-modal').classList.remove('flex');
+        document.getElementById('capsule-form').classList.add('hidden');
+        resetForm();
+    }
+
+    function toggleCapsuleForm() {
+        const form = document.getElementById('capsule-form');
+        if (form.classList.contains('hidden')) {
+            form.classList.remove('hidden');
+            if (!currentEditId) resetForm(); // 如果不是編輯中，就重置為新增狀態
+        } else {
+            form.classList.add('hidden');
+            resetForm();
+        }
+    }
+
+    function resetForm() {
+        currentEditId = null;
+        document.getElementById('capsule-msg').value = "";
+        
+        // 預設日期：一個月後
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        document.getElementById('capsule-date').valueAsDate = nextMonth;
+
+        // 重置按鈕文字
+        const btn = document.getElementById('capsule-save-btn');
+        if(btn) btn.innerText = "埋藏";
+    }
+
+    // 編輯膠囊
+    function editCapsule(id) {
+        const capsules = JSON.parse(localStorage.getItem('my_capsules') || '[]');
+        const target = capsules.find(c => c.id === id);
+        
+        if (target) {
+            document.getElementById('capsule-msg').value = target.msg;
+            document.getElementById('capsule-date').value = target.unlockDate;
+            currentEditId = id;
+            
+            const form = document.getElementById('capsule-form');
+            form.classList.remove('hidden');
+            
+            const btn = document.getElementById('capsule-save-btn');
+            if(btn) btn.innerText = "確認修改";
+            
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // 存檔 (判斷是新增還是修改)
+    function saveCapsule() {
+        const msg = document.getElementById('capsule-msg').value;
+        const dateStr = document.getElementById('capsule-date').value;
+        
+        if (!msg || !dateStr) {
+            alert("請寫下訊息並選擇日期喔！");
+            return;
+        }
+
+        let capsules = JSON.parse(localStorage.getItem('my_capsules') || '[]');
+
+        if (currentEditId) {
+            // 修改
+            const index = capsules.findIndex(c => c.id === currentEditId);
+            if (index !== -1) {
+                capsules[index].msg = msg;
+                capsules[index].unlockDate = dateStr;
+                showToast("✅ 膠囊內容已更新！");
+            }
+        } else {
+            // 新增
+            capsules.push({
+                id: Date.now(),
+                msg: msg,
+                unlockDate: dateStr,
+                createDate: new Date().toLocaleDateString()
+            });
+            showToast("⏳ 膠囊已埋藏，等待未來開啟...");
+            playSound('magic');
+        }
+        
+        localStorage.setItem('my_capsules', JSON.stringify(capsules));
+        resetForm();
+        document.getElementById('capsule-form').classList.add('hidden');
+        renderCapsules();
+    }
+
+    // 顯示列表 (含鎖頭邏輯 & 編輯按鈕)
+    function renderCapsules() {
+        const list = document.getElementById('capsule-list');
+        const capsules = JSON.parse(localStorage.getItem('my_capsules') || '[]');
+        
+        if (capsules.length === 0) {
+            list.innerHTML = `<div class="text-center py-10 text-gray-400 opacity-60"><i class="fas fa-box-open text-4xl mb-2"></i><div class="text-xs">這裡空空的，埋下第一個回憶吧！</div></div>`;
+            return;
+        }
+
+        capsules.sort((a, b) => new Date(a.unlockDate) - new Date(b.unlockDate));
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        list.innerHTML = capsules.map(c => {
+            const unlockDay = new Date(c.unlockDate);
+            const isLocked = unlockDay > today;
+            const editBtn = `<button onclick="editCapsule(${c.id})" class="text-gray-300 hover:text-blue-500 px-2 active:scale-90 transition-transform"><i class="fas fa-pen"></i></button>`;
+
+            if (isLocked) {
+                return `
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-3 relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-slate-100/50 backdrop-blur-[1px] flex flex-col items-center justify-center z-10 pointer-events-none">
+                        <i class="fas fa-lock text-3xl text-gray-400 mb-2"></i>
+                        <div class="font-bold text-gray-500">封存中</div>
+                        <div class="text-xs text-gray-400">解鎖日：${c.unlockDate}</div>
+                    </div>
+                    <div class="opacity-20 blur-sm">
+                        <div class="text-xs text-gray-400 mb-1">${c.createDate} 埋藏</div>
+                        <div class="text-gray-800 font-bold truncate">這個訊息被鎖住了...</div>
+                    </div>
+                    <div class="absolute top-2 right-2 z-20 flex bg-white/80 rounded-lg shadow-sm border border-slate-100">
+                        ${editBtn}
+                        <button onclick="deleteCapsule(${c.id})" class="text-gray-300 hover:text-red-500 px-2 py-1 active:scale-90 transition-transform border-l border-slate-100"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>`;
+            } else {
+                return `
+                <div class="bg-gradient-to-br from-indigo-50 to-white p-4 rounded-2xl shadow-md border border-indigo-100 mb-3 animate-slide-up relative">
+                    <div class="absolute top-0 right-0 p-2 opacity-10"><i class="fas fa-envelope-open-text text-6xl text-indigo-500"></i></div>
+                    <div class="flex justify-between items-start mb-2 relative z-10">
+                        <div class="text-[10px] font-bold text-indigo-500 bg-white px-2 py-1 rounded-full border border-indigo-100">
+                            <i class="fas fa-check-circle mr-1"></i>來自 ${c.createDate} 的回憶
+                        </div>
+                        <div class="flex bg-white/50 rounded-lg">
+                            ${editBtn}
+                            <button onclick="deleteCapsule(${c.id})" class="text-gray-300 hover:text-red-500 px-2 border-l border-slate-200"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="text-gray-800 font-medium leading-relaxed whitespace-pre-line relative z-10 text-sm">${c.msg}</div>
+                </div>`;
+            }
+        }).join('');
+    }
+
+    function deleteCapsule(id) {
+        if(!confirm("確定要丟棄這個膠囊嗎？")) return;
+        let capsules = JSON.parse(localStorage.getItem('my_capsules') || '[]');
+        capsules = capsules.filter(c => c.id !== id);
+        localStorage.setItem('my_capsules', JSON.stringify(capsules));
+        if (currentEditId === id) resetForm();
+        renderCapsules();
+    }
+	
     // --- 每日出門檢查 (Daily Check) ---
     function checkDailyPopup() { const today = new Date().toISOString().split('T')[0]; const lastCheck = localStorage.getItem('last_departure_check'); const currentHour = new Date().getHours(); if (today !== lastCheck && currentHour >= 6 && currentHour <= 11) { document.getElementById('daily-check-modal').classList.add('open'); } }
     window.checkDailyItem = (cb) => { const all = document.querySelectorAll('#daily-check-modal input[type="checkbox"]'); const checked = document.querySelectorAll('#daily-check-modal input[type="checkbox"]:checked'); const btn = document.getElementById('daily-check-btn'); if(all.length === checked.length) { btn.disabled = false; btn.classList.remove('bg-gray-300'); btn.classList.add('bg-blue-600', 'shadow-lg'); } }
@@ -2883,6 +3054,41 @@ function closeScanner() {
         <button onclick="closeScanner()" class="absolute top-2 right-2 z-10 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
         <div id="reader" class="w-full h-64 bg-black"></div>
         <div class="p-4 text-center text-sm font-bold text-gray-600">請對準商品條碼</div>
+    </div>
+</div>
+
+</script>
+
+<div id="capsule-modal" class="fixed inset-0 z-[300] bg-black/90 hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+    <div class="w-full max-w-md bg-white rounded-3xl overflow-hidden relative shadow-2xl flex flex-col max-h-[85vh]">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 text-white flex justify-between items-center shrink-0">
+            <h3 class="font-black text-lg flex items-center gap-2"><i class="fas fa-rocket"></i> 時空膠囊</h3>
+            <button onclick="closeCapsuleModal()" class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center active:bg-white/40"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="p-4 overflow-y-auto flex-1 bg-slate-50" id="capsule-list">
+            </div>
+
+        <div class="p-4 bg-white border-t border-slate-100 shrink-0">
+            <button onclick="toggleCapsuleForm()" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg active:scale-95 transition-transform">
+                <i class="fas fa-plus mr-2"></i> 埋下一顆新膠囊
+            </button>
+            
+            <div id="capsule-form" class="hidden mt-4 space-y-3 animate-slide-up">
+                <div class="bg-yellow-50 p-3 rounded-xl border border-yellow-200 text-xs text-yellow-800 mb-2">
+                    <i class="fas fa-lightbulb mr-1"></i> 寫給未來的自己、或是長大後的奎奎。
+                </div>
+                <textarea id="capsule-msg" class="w-full h-24 p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-indigo-500" placeholder="想對未來説什麼..."></textarea>
+                <div class="flex gap-2 items-center">
+                    <span class="text-xs font-bold text-gray-500">解鎖日期：</span>
+                    <input type="date" id="capsule-date" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-2 text-sm font-bold">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button id="capsule-save-btn" onclick="saveCapsule()" class="flex-1 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-md">埋藏</button>
+                    <button onclick="toggleCapsuleForm()" class="flex-1 py-2 bg-gray-100 text-gray-500 font-bold rounded-xl">取消</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
