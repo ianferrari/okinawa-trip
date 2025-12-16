@@ -823,7 +823,7 @@ function initChecklistSync() {
         SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
     };
 
-    // 2. 行程資料庫 (已整合天氣與穿搭建議 v17.5)
+    // 2. 行程資料庫 (已整合天氣與穿搭建議 v17.5 + v20.6 自動導遊)
     let itineraryDB = [
         { 
             day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, 
@@ -839,9 +839,15 @@ function initChecklistSync() {
                 { time: "15:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane-arrival", note: "入境、拿行李、過稅關。", duration: "45m", travel: "🚶 步行" },
                 { time: "16:15", title: "機場補給 (Lawson)", icon: "fa-cart-shopping", note: "1F 入境大廳旁。買鮮奶或明治塊狀奶粉。", duration: "15m", travel: "🚌 接駁 15分" },
                 { time: "16:30", title: "搭接駁車往 OTS", icon: "fa-bus", note: "1F 大廳外 10-A 月台。", travel: "🚌 移動 20分" },
-                { time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "檢查車況、裝汽座。導航設定飯店。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "1h", travel: "🚗 開車 60分" },
+                { 
+                    time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "檢查車況、裝汽座。導航設定飯店。", map: "OTS 臨空豐崎營業所", lat: 24.1566, lon: 120.6532, duration: "1h", travel: "🚗 開車 60分",
+                    guide: "歡迎來到沖繩！我們快到 OTS 租車公司了。爸爸請記得，沖繩是右駕，方向燈在右手邊，雨刷在左手邊，慢慢開，不要緊張喔！"
+                },
                 { time: "18:00", title: "出發北上 (高速公路)", icon: "fa-road", note: "中途停 中城PA 或 伊芸SA 休息買水。", travel: "🚗 開車 30分" },
-                { time: "19:30", title: "飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western Kouki Beach。進房先看海！", map: "Best Western Okinawa Kouki Beach", mapcode: "206 473 354*11", lat: 26.5414, lon: 127.9458, duration: "30m" },
+                { 
+                    time: "19:30", title: "飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western Kouki Beach。進房先看海！", map: "Best Western Okinawa Kouki Beach", mapcode: "206 473 354*11", lat: 26.5414, lon: 127.9458, duration: "30m",
+                    guide: "終於到飯店了！這幾天我們都住這裡，房間窗戶打開就是大海喔！大家趕快下車 Check-in 休息一下吧。"
+                },
                 { time: "20:00", title: "晚餐：美拉花別邸", spotId: "dinner_d1", icon: "fa-utensils", note: "走路去吃，榻榻米包廂。", map: "Restaurant Columbin", duration: "1.5h" },
                 { time: "21:30", title: "休息 & 洗澡", icon: "fa-bed", note: "拿出陪睡玩偶，準備明天探險。" }
             ]
@@ -855,9 +861,15 @@ function initChecklistSync() {
             },
             events: [
                 { time: "08:30", title: "飯店早餐", icon: "fa-mug-hot", note: "享受海景早餐，幫奎奎帶水壺。", duration: "1h", travel: "🚗 10分" },
-                { time: "10:00", title: "部瀨名海中公園", spotId: "busena", icon: "fa-water", note: "搭玻璃底船看尼莫 🐠 (每20分一班)", map: "部瀨名海中公園", mapcode: "206 442 077*71", duration: "1.5h", lat: 26.5278, lon: 127.9306, rainy: { title: "Neo Park (雨天備案)", icon: "fa-leaf", note: "☔ 雨天改搭小火車" }, travel: "🚗 20分" },
+                { 
+                    time: "10:00", title: "部瀨名海中公園", spotId: "busena", icon: "fa-water", note: "搭玻璃底船看尼莫 🐠 (每20分一班)", map: "部瀨名海中公園", mapcode: "206 442 077*71", duration: "1.5h", lat: 26.5278, lon: 127.9306, rainy: { title: "Neo Park (雨天備案)", icon: "fa-leaf", note: "☔ 雨天改搭小火車" }, travel: "🚗 20分",
+                    guide: "奎奎你看！那個紅紅的塔就是海中展望塔，我們等一下要搭很酷的鯨魚玻璃船，去找尼莫和多莉喔！"
+                },
                 { time: "12:00", title: "午餐：Hama 壽司", spotId: "hama_sushi", icon: "fa-bowl-rice", note: "名護店。平板點餐，送餐像火車！", map: "HAMA壽司 名護店", lat: 26.5960, lon: 127.9830, duration: "1h", travel: "🚗 2分" },
-                { time: "13:30", title: "AEON 名護店", spotId: "aeon_nago", icon: "fa-cart-shopping", note: "大創掃貨(恐龍球)、超市買尿布水果。", map: "AEON 名護店", mapcode: "206 626 669*52", duration: "1.5h", travel: "🚗 10分" },
+                { 
+                    time: "13:30", title: "AEON 名護店", spotId: "aeon_nago", icon: "fa-cart-shopping", note: "大創掃貨(恐龍球)、超市買尿布水果。", map: "AEON 名護店", mapcode: "206 626 669*52", duration: "1.5h", travel: "🚗 10分",
+                    guide: "準備補貨囉！這裡是名護最大的超市，我們要去買水、買零食，還可以去大創買挖沙子的玩具！"
+                },
                 { time: "15:00", title: "許田休息站", spotId: "kyoda", icon: "fa-ticket", note: "必買水族館優惠票 (只收現金)。", map: "道の駅 許田", duration: "30m", travel: "🚗 15分" },
                 { time: "16:00", title: "飯店沙灘玩沙", spotId: "hotel_nago", icon: "fa-umbrella-beach", note: "拿出剛買的挖沙組大玩特玩。", lat: 26.5414, lon: 127.9458, duration: "1.5h" },
                 { time: "18:00", title: "晚餐：美拉花別邸", spotId: "dinner_d1", icon: "fa-utensils", note: "就在飯店隔壁，走路去吃。", map: "美拉花", duration: "1.5h" },
@@ -874,22 +886,15 @@ function initChecklistSync() {
             events: [
                 { time: "08:30", title: "飯店早餐 & 出發", icon: "fa-car", note: "準時出發避開人潮。", duration: "1h", travel: "🚗 40分" },
                 { 
-  time: "09:30", 
-  title: "美麗海水族館", 
-  spotId: "churaumi", 
-  icon: "fa-fish", 
-  note: "停 P7 停車場。直奔 2F 黑潮之海。", 
-  map: "海洋博公園P7立體停車場", 
-  mapcode: "553 075 797*77", 
-  duration: "3h", 
-  lat: 24.156671954080444, 
-  lon: 120.65306272604295,
-  // 👇 這是新加的導覽詞
-  guide: "各位旅客請注意，我們即將抵達美麗海水族館！聽說這裡有三隻巨大的鯨鯊，請大家準備好相機，我們要去停車場囉！" 
-},
+                    time: "09:30", title: "美麗海水族館", spotId: "churaumi", icon: "fa-fish", note: "停 P7 停車場。直奔 2F 黑潮之海。", map: "海洋博公園P7立體停車場", mapcode: "553 075 797*77", duration: "3h", lat: 26.6943, lon: 127.8779,
+                    guide: "各位旅客請注意，前方就是美麗海水族館！巨大的鯨鯊和鬼蝠魟正在等我們，記得要先去拿餵食秀的時刻表喔！"
+                },
                 { time: "10:30", title: "海豚劇場", icon: "fa-person-swimming", note: "戶外免費海豚秀 (無遮蔽，要戴帽子)。", map: "", duration: "30m" },
                 { time: "12:00", title: "午餐：館內自助餐", icon: "fa-utensils", note: "Inoh 自助餐或 Ocean Blue 咖啡。", map: "", duration: "1.5h", travel: "🚗 40分 (午睡)" },
-                { time: "13:30", title: "前往古宇利島", spotId: "kouri_drive", icon: "fa-bridge-water", note: "車程平穩，讓奎奎車上補眠。", travel: "🚗 5分" },
+                { 
+                    time: "13:30", title: "前往古宇利島", spotId: "kouri_drive", icon: "fa-bridge-water", note: "車程平穩，讓奎奎車上補眠。", travel: "🚗 5分",
+                    guide: "哇！快看窗外！我們現在正開在古宇利大橋上，兩邊都是藍色的大海，這就是傳說中的古宇利藍，是不是超漂亮的！"
+                },
                 { time: "14:30", title: "古宇利海洋塔", spotId: "kouri_tower", icon: "fa-tower-observation", note: "搭無人鳳梨車上山。", map: "古宇利海洋塔", lat: 26.7042, lon: 128.0286, duration: "1.5h", travel: "🚗 2分" },
                 { time: "16:00", title: "點心：蝦蝦飯", spotId: "kouri_shrimp", icon: "fa-shrimp", note: "Kouri Shrimp，人多就拍照打卡。", map: "Kouri Shrimp", duration: "30m" },
                 { time: "16:30", title: "橋下沙灘", spotId: "kouri_drive", icon: "fa-camera", note: "拍全家福，水淺沙白。", map: "古宇利海灘", duration: "30m", travel: "🚗 30分" },
@@ -906,12 +911,18 @@ function initChecklistSync() {
             },
             events: [
                 { time: "09:00", title: "飯店早餐", icon: "fa-mug-hot", note: "吃飽一點，今天要走森林步道。", duration: "1h", travel: "🚗 15分" },
-                { time: "10:00", title: "DINO 恐龍 PARK", spotId: "dino", icon: "fa-dragon", note: "⚠️ 用背巾。找 80 隻恐龍！", map: "DINO恐龍PARK 山原亞熱帶之森", mapcode: "206 745 056*82", lat: 26.6267, lon: 127.9620, duration: "1.5h", rainy: { title: "AEON 遊樂場 (雨天)", icon: "fa-gamepad", note: "☔ 雨天改去 AEON 玩室內設施" } },
+                { 
+                    time: "10:00", title: "DINO 恐龍 PARK", spotId: "dino", icon: "fa-dragon", note: "⚠️ 用背巾。找 80 隻恐龍！", map: "DINO恐龍PARK 山原亞熱帶之森", mapcode: "206 745 056*82", lat: 26.6267, lon: 127.9620, duration: "1.5h", rainy: { title: "AEON 遊樂場 (雨天)", icon: "fa-gamepad", note: "☔ 雨天改去 AEON 玩室內設施" },
+                    guide: "注意！偵測到前方有恐龍出沒！我們即將進入原始森林，奎奎你要保護爸爸媽媽，我們一起去把 80 隻恐龍都找出來！"
+                },
                 { time: "11:30", title: "午餐：御菓子御殿", spotId: "okashi", icon: "fa-bowl-food", note: "就在恐龍公園樓上。順便試吃紅芋塔。", map: "", duration: "1.5h", travel: "🚗 5分" },
                 { time: "13:00", title: "島豆腐甜甜圈", spotId: "shima_donuts", icon: "fa-cookie-bite", note: "買完回車上吃，順便午睡。", map: "Shima Donuts", duration: "30m", travel: "🚗 5分 (午睡)" },
                 { time: "13:30", title: "車上午睡充電", icon: "fa-battery-full", note: "開往 21 世紀之森公園 (讓奎奎睡 30-60分)。" },
                 { time: "15:00", title: "21世紀之森公園", spotId: "park_21", icon: "fa-train", note: "找黑色火車頭、玩溜滑梯。", map: "21世紀之森公園", mapcode: "206 626 779*74", duration: "1.5h", travel: "🚗 5分" },
-                { time: "16:30", title: "Blue Seal 冰淇淋", spotId: "blue_seal", icon: "fa-ice-cream", note: "名護旗艦店，吃 Kids Size。", map: "Blue Seal Nago", duration: "1h" },
+                { 
+                    time: "16:30", title: "Blue Seal 冰淇淋", spotId: "blue_seal", icon: "fa-ice-cream", note: "名護旗艦店，吃 Kids Size。", map: "Blue Seal Nago", duration: "1h",
+                    guide: "探險辛苦了！前方是好吃的 Blue Seal 冰淇淋，推薦吃紫薯口味或是鹽味金楚糕口味喔！"
+                },
                 { time: "17:30", title: "晚餐：名護七選一", icon: "fa-utensils", note: "A&W 漢堡 / 藏壽司 / 暖暮拉麵。", map: "", duration: "1.5h" },
                 { time: "19:30", title: "休息", icon: "fa-moon", note: "今天吃了甜點又吃冰，開心睡覺。" }
             ]
@@ -925,7 +936,10 @@ function initChecklistSync() {
             },
             events: [
                 { time: "09:30", title: "飯店早餐 & 悠閒出發", icon: "fa-mug-hot", note: "不用太早起，公園很近。", duration: "30m", travel: "🚗 5分" },
-                { time: "10:00", title: "Neo Park 動植物園", spotId: "neopark", icon: "fa-train-subway", note: "進門先搭復古小火車。鳥類放養。", map: "名護自然動植物公園", mapcode: "206 689 725*11", lat: 26.5986, lon: 127.9733, duration: "2.5h", travel: "🚗 3分" },
+                { 
+                    time: "10:00", title: "Neo Park 動植物園", spotId: "neopark", icon: "fa-train-subway", note: "進門先搭復古小火車。鳥類放養。", map: "名護自然動植物公園", mapcode: "206 689 725*11", lat: 26.5986, lon: 127.9733, duration: "2.5h", travel: "🚗 3分",
+                    guide: "火車快飛～我們到 Neo Park 了！這裡有一台復古的小火車可以搭，還有很多鳥會飛在你旁邊喔！"
+                },
                 { time: "12:30", title: "午餐：Cookhal", spotId: "cookhal", icon: "fa-leaf", note: "就在公園旁，或去吃幸醬沖繩麵。", map: "Cookhal", duration: "1.5h", travel: "🚗 15分" },
                 { time: "14:00", title: "回飯店午睡", icon: "fa-bed", note: "直接回房間舒服睡一覺。", map: "", duration: "1.5h" },
                 { time: "15:30", title: "飯店沙灘/泳池", spotId: "hotel_nago", icon: "fa-umbrella-beach", note: "睡飽下樓玩水，堆大城堡。", lat: 26.5414, lon: 127.9458, duration: "2.5h" },
@@ -942,9 +956,15 @@ function initChecklistSync() {
             },
             events: [
                 { time: "10:30", title: "退房往南", icon: "fa-car-side", note: "行李全上車。直奔浦添。", duration: "1h", travel: "🚗 60分" },
-                { time: "11:30", title: "PARCO CITY", spotId: "parco", icon: "fa-bag-shopping", note: "2F 美食街午餐 & 掃貨 (Uniqlo/阿卡將)。", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 062*55", lat: 26.2642, lon: 127.6934, duration: "2.5h", travel: "🚗 30分 (午睡)" },
+                { 
+                    time: "11:30", title: "PARCO CITY", spotId: "parco", icon: "fa-bag-shopping", note: "2F 美食街午餐 & 掃貨 (Uniqlo/阿卡將)。", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 062*55", lat: 26.2642, lon: 127.6934, duration: "2.5h", travel: "🚗 30分 (午睡)",
+                    guide: "準備好錢包了嗎？我們到 PARCO CITY 了！這裡超大超好逛，有阿卡將本舖還有 Uniqlo，想買什麼趁現在！"
+                },
                 { time: "14:00", title: "移動 & 午睡", icon: "fa-battery-half", note: "前往 DMM，車上讓奎奎補眠。" },
-                { time: "15:00", title: "DMM 水族館", spotId: "dmm", icon: "fa-fish-fins", note: "iias 商場內。看樹懶、摸魚。", map: "DMM Kariyushi Aquarium", mapcode: "232 543 400*25", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚗 25分" },
+                { 
+                    time: "15:00", title: "DMM 水族館", spotId: "dmm", icon: "fa-fish-fins", note: "iias 商場內。看樹懶、摸魚。", map: "DMM Kariyushi Aquarium", mapcode: "232 543 400*25", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚗 25分",
+                    guide: "我們到 DMM 水族館囉！這裡跟美麗海不一樣，有很多科技投影，還可以近距離摸魚，要輕輕的摸喔！"
+                },
                 { time: "17:00", title: "前往那霸市區", icon: "fa-city", note: "避開尖峰時段，開回那霸。", map: "" },
                 { time: "17:40", title: "那霸 Check-in", spotId: "daiwa", icon: "fa-hotel", note: "Daiwa Roynet 國際通。停 D-Parking 3F。", map: "Daiwa Roynet Hotel Naha Kokusai-dori", lat: 26.2163, lon: 127.6917, duration: "1h" },
                 { time: "19:00", title: "晚餐：國際通美食", spotId: "mcdonalds", icon: "fa-burger", note: "牛排或居酒屋。麥當勞是備案。", map: "McDonald's Kokusai Dori Makishi", duration: "1.5h" },
@@ -961,11 +981,17 @@ function initChecklistSync() {
             },
             events: [
                 { time: "09:00", title: "退房 & 出發", icon: "fa-suitcase-rolling", note: "行李全上車。", duration: "20m", travel: "🚗 20分" },
-                { time: "09:20", title: "波上宮", spotId: "naminoue", icon: "fa-torii-gate", note: "買御守、寫繪馬。去橋上拍懸崖神社。", map: "波上宮", lat: 26.2206, lon: 127.6713, duration: "1h", travel: "🚗 40分" },
+                { 
+                    time: "09:20", title: "波上宮", spotId: "naminoue", icon: "fa-torii-gate", note: "買御守、寫繪馬。去橋上拍懸崖神社。", map: "波上宮", lat: 26.2206, lon: 127.6713, duration: "1h", travel: "🚗 40分",
+                    guide: "最後一站是波上宮，這是一座蓋在懸崖上的神社。我們去買個書包御守，保佑奎奎平安長大！"
+                },
                 { time: "10:30", title: "前往豐見城", icon: "fa-road", note: "前往 Outlet 方向。", map: "" },
                 { time: "11:10", title: "ASHIBINAA Outlet", spotId: "ashibinaa", icon: "fa-shirt", note: "午餐 (2F美食街) + 最後衝刺。", map: "ASHIBINAA Outlet", mapcode: "232 544 452*22", lat: 26.1585, lon: 127.6570, duration: "1.5h", travel: "🚗 5分" },
                 { time: "12:40", title: "加油 (OTS旁)", spotId: "gas_station", icon: "fa-gas-pump", note: "務必加滿油！保留收據。", map: "ENEOS Dr.Drive Self Toyosaki SS", duration: "20m" },
-                { time: "13:00", title: "OTS 還車", spotId: "ots_rent", icon: "fa-check-double", note: "還鑰匙、檢查 ETC 拔了沒。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "45m", travel: "🚌 接駁 20分" },
+                { 
+                    time: "13:00", title: "OTS 還車", spotId: "ots_rent", icon: "fa-check-double", note: "還鑰匙、檢查 ETC 拔了沒。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "45m", travel: "🚌 接駁 20分",
+                    guide: "旅程即將結束了，我們要去還車囉。請確認垃圾都丟了嗎？ETC 卡拔了嗎？手機充電線有沒有帶走？"
+                },
                 { time: "13:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane", note: "辦理登機。逛免稅店。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "3h" },
                 { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "回家囉！", map: "", travel: "✈️ 飛行" },
                 { time: "17:25", title: "抵達台中", icon: "fa-house", note: "甜蜜的家。", map: "" },
@@ -2852,5 +2878,47 @@ function closeScanner() {
         <div class="p-4 text-center text-sm font-bold text-gray-600">請對準商品條碼</div>
     </div>
 </div>
+
+<div style="position: fixed; bottom: 200px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;">
+    
+    <button onclick="resetGuides()" style="background: red; color: white; padding: 10px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        🗑️ 清除導遊記憶
+    </button>
+
+    <button onclick="forceCheck()" style="background: blue; color: white; padding: 10px; border-radius: 10px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+        📍 強制檢查位置
+    </button>
+    
+</div>
+
+<script>
+    // 清除導覽紀錄
+    function resetGuides() {
+        // 清除所有 guide_ 開頭的紀錄
+        Object.keys(localStorage).forEach(key => {
+            if(key.startsWith('guide_')) localStorage.removeItem(key);
+        });
+        alert("記憶已清除！導遊現在會重新說話了。");
+    }
+
+    // 強制執行一次 GPS 檢查 (模擬定位更新)
+    function forceCheck() {
+        // 先隨便播個聲音，解鎖瀏覽器音效限制
+        playSound('coin'); 
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((p) => {
+                // 呼叫原本的檢查函式
+                checkGeofence(p.coords.latitude, p.coords.longitude);
+                // 顯示目前座標給你看，確認定位有沒有準
+                alert(`檢查中...\n目前座標: ${p.coords.latitude}, ${p.coords.longitude}`);
+            }, (e) => {
+                alert("定位失敗：" + e.message);
+            });
+        } else {
+            alert("瀏覽器不支援定位");
+        }
+    }
+</script>
 </body>
 </html>
