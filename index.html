@@ -1270,7 +1270,7 @@ if (savedItin) {
             const tideInfo = tideDB[d.day] || { sun: "18:40" };
 
             // === 🤖 [新功能] 智慧儀表板邏輯 (開始) ===
-            const nowHour = 12; // 測試時可暫時改成 const nowHour = 12;
+            const nowHour = new Date().getHours(); // 測試時可暫時改成 const nowHour = 12;
             let smartWidget = ""; 
 
             // 情境 A: 早上 (06:00 - 09:00) -> 提醒出門檢查
