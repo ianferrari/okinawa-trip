@@ -873,7 +873,20 @@ function initChecklistSync() {
             },
             events: [
                 { time: "08:30", title: "飯店早餐 & 出發", icon: "fa-car", note: "準時出發避開人潮。", duration: "1h", travel: "🚗 40分" },
-                { time: "09:30", title: "美麗海水族館", spotId: "churaumi", icon: "fa-fish", note: "停 P7 停車場。直奔 2F 黑潮之海。", map: "海洋博公園P7立體停車場", mapcode: "553 075 797*77", duration: "3h", lat: 26.6943, lon: 127.8779 },
+                { 
+  time: "09:30", 
+  title: "美麗海水族館", 
+  spotId: "churaumi", 
+  icon: "fa-fish", 
+  note: "停 P7 停車場。直奔 2F 黑潮之海。", 
+  map: "海洋博公園P7立體停車場", 
+  mapcode: "553 075 797*77", 
+  duration: "3h", 
+  lat: 24.156671954080444, 
+  lon: 120.65306272604295,
+  // 👇 這是新加的導覽詞
+  guide: "各位旅客請注意，我們即將抵達美麗海水族館！聽說這裡有三隻巨大的鯨鯊，請大家準備好相機，我們要去停車場囉！" 
+},
                 { time: "10:30", title: "海豚劇場", icon: "fa-person-swimming", note: "戶外免費海豚秀 (無遮蔽，要戴帽子)。", map: "", duration: "30m" },
                 { time: "12:00", title: "午餐：館內自助餐", icon: "fa-utensils", note: "Inoh 自助餐或 Ocean Blue 咖啡。", map: "", duration: "1.5h", travel: "🚗 40分 (午睡)" },
                 { time: "13:30", title: "前往古宇利島", spotId: "kouri_drive", icon: "fa-bridge-water", note: "車程平穩，讓奎奎車上補眠。", travel: "🚗 5分" },
@@ -2366,12 +2379,13 @@ if (savedItin) {
     window.restoreData = () => { const c=document.getElementById('importDataInput').value.trim(); if(!c)return; if(confirm("覆蓋資料？")){try{const d=JSON.parse(decodeURIComponent(atob(c))); if(d.user_rate)localStorage.setItem('user_rate',d.user_rate); if(d.trip_budget)localStorage.setItem('trip_budget',d.trip_budget); if(d.trip_expenses)localStorage.setItem('trip_expenses',d.trip_expenses); if(d.trip_gifts)localStorage.setItem('trip_gifts',d.trip_gifts); if(d.medical_data)localStorage.setItem('medical_data',d.medical_data); if(d.parking_data)localStorage.setItem('parking_data',d.parking_data); if(d.gasha_coins_used)localStorage.setItem('gasha_coins_used',d.gasha_coins_used); if(d.gasha_rewards)localStorage.setItem('gasha_rewards',d.gasha_rewards); if(d.items){for(let k in d.items)localStorage.setItem(k,d.items[k]);} alert("成功！"); location.reload();}catch(e){alert("代碼錯誤");}} }
     function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
     
-    // --- Geofence & HUD Helpers ---
+    // (v20.6 新增) GPS 圍籬檢查：包含任務解鎖 & 語音導覽
     function checkGeofence(userLat, userLon) {
+        // 1. 原有的任務檢查邏輯 (Missions)
         missionsDB.forEach(m => {
             if (localStorage.getItem(m.id) !== '1' && localStorage.getItem(m.id + '_notified') !== '1') {
                 const dist = getDistanceFromLatLonInKm(userLat, userLon, m.lat, m.lon);
-                if (dist < 0.5) { // 500m
+                if (dist < 0.5) { // 距離小於 500公尺 解鎖任務
                     showGeoToast(`接近任務點：${m.title}`);
                     localStorage.setItem(m.id + '_notified', '1');
                     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -2379,6 +2393,39 @@ if (savedItin) {
                 }
             }
         });
+
+        // 2. 🎧 [新功能] 自動語音導覽邏輯 (Audio Guide)
+        // 自動檢查「今天的行程」有沒有設定 guide
+        if (itineraryDB && itineraryDB[currentDayIdx]) {
+            const todayEvents = itineraryDB[currentDayIdx].events;
+            
+            todayEvents.forEach(e => {
+                // 必須要有座標 (lat, lon) 且要有導覽詞 (guide)
+                if (e.lat && e.lon && e.guide) {
+                    const dist = getDistanceFromLatLonInKm(userLat, userLon, e.lat, e.lon);
+                    
+                    // 設定觸發距離：開車通常比較快，設 2 公里提醒比較剛好
+                    if (dist < 2.0) { 
+                        // 用 unique key 避免重複一直講 (guide_景點名_DayX)
+                        const spokenKey = `guide_${e.title}_${currentDayIdx}`;
+                        
+                        if (!localStorage.getItem(spokenKey)) {
+                            // 觸發！
+                            showToast(`🎧 導遊模式：${e.title}`);
+                            
+                            // 先播個提示音，再說話
+                            playSound('correct'); 
+                            setTimeout(() => {
+                                speak(e.guide);
+                            }, 1000);
+
+                            // 標記已說過
+                            localStorage.setItem(spokenKey, '1');
+                        }
+                    }
+                }
+            });
+        }
     }
 
     function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
