@@ -796,12 +796,14 @@ function initChecklistSync() {
 
         // --- Day 6 ---
         "parco": { title: "PARCO CITY", tags: ["購物", "雨天"], image: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000", desc: "浦添西海岸最新最大的商場！Uniqlo, MUJI, 阿卡將本舖應有盡有。美食街可以直接看海。", tips: "💡 3F 的 Green Zone 兒童區可以放電。停車場非常大，記得拍照記位置。", map: "SAN-A 浦添西海岸 PARCO CITY" },
-		"dmm": { title: "DMM 水族館", tags: ["水族館", "科技"], image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=1000", desc: "結合最新影像技術的水族館，互動性很高。為了搶餵食票，一定要一開門就衝！", tips: "💡 爸媽分工：一人停車/帶小孩，一人先衝去櫃台買餵食票 (跟門票分開賣)！", map: "DMM Kariyushi Aquarium" },        "daiwa": { title: "Daiwa Roynet", tags: ["住宿", "市區"], image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000", desc: "就在國際通旁邊，交通超級方便，離單軌牧志站很近。房間乾淨舒適。", tips: "💡 飯店停車場是塔式的，如果車太大可能要停特約停車場。", map: "Daiwa Roynet Hotel Naha Kokusai-dori" },
+        "dmm": { title: "DMM 水族館", tags: ["水族館", "科技"], image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=1000", desc: "結合最新影像技術的水族館，雖然比美麗海小，但互動性很高。可以摸魚、看樹懶。", tips: "💡 位於 iias 商場內，逛完可以直接吃飯逛街。", map: "DMM Kariyushi Aquarium" },
+        "daiwa": { title: "Daiwa Roynet", tags: ["住宿", "市區"], image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000", desc: "就在國際通旁邊，交通超級方便，離單軌牧志站很近。房間乾淨舒適。", tips: "💡 飯店停車場是塔式的，如果車太大可能要停特約停車場。", map: "Daiwa Roynet Hotel Naha Kokusai-dori" },
         "mcdonalds": { title: "麥當勞 國際通", tags: ["晚餐", "救贖"], image: "https://images.unsplash.com/photo-1552895638-f7fe08d2f7d5?q=80&w=1000", desc: "當小孩不想吃日本料理時的救星。日本麥當勞的快樂兒童餐玩具通常很厲害！", tips: "💡 可以用機器點餐，有中文介面。", map: "McDonald's Kokusai Dori Makishi" },
         "fontana": { title: "Fontana Gelato", tags: ["甜點", "打卡"], image: "https://images.unsplash.com/photo-1560008511-11c63416e52d?q=80&w=1000", desc: "國際通巷子裡的義式冰淇淋，色彩繽紛的彩虹冰淇淋是拍照打卡必備！", tips: "💡 店面很小容易錯過，認明門口的大冰淇淋模型。", map: "Fontana Gelato" },
 
         // --- Day 7 ---
-		"naminoue": { title: "波上宮", tags: ["神社", "景點"], image: "https://images.unsplash.com/photo-1599464402636-6c2438883e1c?q=80&w=1000", desc: "那霸市內唯一的沙灘神社，建在懸崖上，非常有氣勢。可以買書包造型的御守。", tips: "💡 傍晚去比較不曬，旁邊就是波之上海灘，可以讓奎奎踩踩水。", map: "波上宮" },        "ashibinaa": { title: "ASHIBINAA Outlet", tags: ["購物", "Outlet"], image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000", desc: "位於機場附近，適合回程前最後衝刺。Adidas, Nike, GAP 常常有驚人的折扣。", tips: "💡 週末人很多，建議預留足夠時間去機場。", map: "ASHIBINAA Outlet" },
+        "naminoue": { title: "波上宮", tags: ["神社", "景點"], image: "https://images.unsplash.com/photo-1599464402636-6c2438883e1c?q=80&w=1000", desc: "那霸市內唯一的沙灘神社，建在懸崖上，非常有氣勢。可以買書包造型的御守。", tips: "💡 旁邊就是波之上海灘，拜完可以去踩踩水。", map: "波上宮" },
+        "ashibinaa": { title: "ASHIBINAA Outlet", tags: ["購物", "Outlet"], image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000", desc: "位於機場附近，適合回程前最後衝刺。Adidas, Nike, GAP 常常有驚人的折扣。", tips: "💡 週末人很多，建議預留足夠時間去機場。", map: "ASHIBINAA Outlet" },
         "gas_station": { title: "ENEOS 加油站", tags: ["加油", "還車"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 旁邊的加油站，還車前必須加滿油並保留收據。記得加 Regular (紅槍)。", tips: "💡 這裡通常排隊很長，建議預留 20 分鐘加油時間。", map: "ENEOS Dr.Drive Self Toyosaki SS" }
     };
 
@@ -918,45 +920,45 @@ function initChecklistSync() {
                 { time: "20:00", title: "打包行李", icon: "fa-suitcase", note: "明天要退房往南了。" }
             ]
         },
-        // ... 前面 D1-D5 保持不變 ...
-
-    { 
-        day: "D6", date: "4/02 (四)", title: "購物 & 祈福", highlights: "PARCO CITY / 波上宮夕陽 / 國際通", bg: bgImages.D6, 
-        weather: {
-            icon: "fa-cloud-rain", temp: "22°C - 26°C", rain: "40%", uv: "低",
-            wear: "方便穿脫的鞋 (試穿衣服)",
-            tips: "今日行程調整：專心逛街，傍晚回那霸避開正午，DMM 移至明天一早。"
+        { 
+            day: "D6", date: "4/02 (四)", title: "購物 & 水族", highlights: "PARCO CITY / DMM / 住那霸", bg: bgImages.D6, 
+            weather: {
+                icon: "fa-cloud-rain", temp: "22°C - 26°C", rain: "40%", uv: "低",
+                wear: "方便穿脫的鞋 (試穿衣服)",
+                tips: "室內行程為主，不用擔心下雨。商場冷氣通常很強。"
+            },
+            events: [
+                { time: "10:30", title: "退房往南", icon: "fa-car-side", note: "行李全上車。直奔浦添。", duration: "1h", travel: "🚗 60分" },
+                { time: "11:30", title: "PARCO CITY", spotId: "parco", icon: "fa-bag-shopping", note: "2F 美食街午餐 & 掃貨 (Uniqlo/阿卡將)。", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 062*55", lat: 26.2642, lon: 127.6934, duration: "2.5h", travel: "🚗 30分 (午睡)" },
+                { time: "14:00", title: "移動 & 午睡", icon: "fa-battery-half", note: "前往 DMM，車上讓奎奎補眠。" },
+                { time: "15:00", title: "DMM 水族館", spotId: "dmm", icon: "fa-fish-fins", note: "iias 商場內。看樹懶、摸魚。", map: "DMM Kariyushi Aquarium", mapcode: "232 543 400*25", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚗 25分" },
+                { time: "17:00", title: "前往那霸市區", icon: "fa-city", note: "避開尖峰時段，開回那霸。", map: "" },
+                { time: "17:40", title: "那霸 Check-in", spotId: "daiwa", icon: "fa-hotel", note: "Daiwa Roynet 國際通。停 D-Parking 3F。", map: "Daiwa Roynet Hotel Naha Kokusai-dori", lat: 26.2163, lon: 127.6917, duration: "1h" },
+                { time: "19:00", title: "晚餐：國際通美食", spotId: "mcdonalds", icon: "fa-burger", note: "牛排或居酒屋。麥當勞是備案。", map: "McDonald's Kokusai Dori Makishi", duration: "1.5h" },
+                { time: "20:30", title: "Fontana Gelato", spotId: "fontana", icon: "fa-ice-cream", note: "彩虹冰淇淋，完美結尾。", map: "Fontana Gelato" },
+                { time: "21:00", title: "最後打包", icon: "fa-box-open", note: "戰利品塞箱子，檢查護照。" }
+            ]
         },
-        events: [
-            { time: "10:30", title: "退房往南", icon: "fa-car-side", note: "行李全上車。直奔浦添。", duration: "1h", travel: "🚗 60分" },
-            { time: "11:30", title: "PARCO CITY", spotId: "parco", icon: "fa-bag-shopping", note: "2F 美食街午餐 & 3F 兒童區放電。時間充裕慢慢逛。", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 062*55", lat: 26.2642, lon: 127.6934, duration: "4h", travel: "🚗 30分 (午睡)" },
-            { time: "15:30", title: "前往那霸市區", icon: "fa-city", note: "避開最塞的 17:00-19:00 時段，提早進市區。", map: "" },
-            { time: "16:15", title: "波上宮 & 海灘", spotId: "naminoue", icon: "fa-torii-gate", note: "從 D7 移來這。傍晚去剛好，拍懸崖神社夕陽。", map: "波上宮", lat: 26.2206, lon: 127.6713, duration: "1h", travel: "🚗 15分" },
-            { time: "17:30", title: "那霸 Check-in", spotId: "daiwa", icon: "fa-hotel", note: "Daiwa Roynet 國際通。停 D-Parking 3F。", map: "Daiwa Roynet Hotel Naha Kokusai-dori", lat: 26.2163, lon: 127.6917, duration: "1h" },
-            { time: "18:30", title: "晚餐：國際通美食", spotId: "mcdonalds", icon: "fa-burger", note: "牛排或居酒屋。吃完去買彩虹冰淇淋。", map: "McDonald's Kokusai Dori Makishi", duration: "1.5h" },
-            { time: "20:30", title: "Fontana Gelato", spotId: "fontana", icon: "fa-ice-cream", note: "甜點胃開啟，犒賞今天開車的爸爸。", map: "Fontana Gelato" },
-            { time: "21:00", title: "最後打包", icon: "fa-box-open", note: "戰利品塞箱子。爸爸明天要衝刺買 DMM 票！" }
-        ]
-    },
-    { 
-        day: "D7", date: "4/03 (五)", title: "水族 & 返家", highlights: "DMM 搶票 / Outlet / 機場", bg: bgImages.D7, 
-        weather: {
-            icon: "fa-plane", temp: "21°C - 25°C", rain: "10%", uv: "中",
-            wear: "寬鬆舒適的衣服 (搭機)",
-            tips: "早上務必準時出門搶 DMM 餵食票！護照記得隨身帶。"
-        },
-        events: [
-            { time: "09:00", title: "退房 & 出發", icon: "fa-suitcase-rolling", note: "行李全上車。目標豐見城！", duration: "20m", travel: "🚗 20分" },
-            { time: "09:30", title: "DMM 水族館", spotId: "dmm", icon: "fa-fish-fins", note: "🌟 關鍵時刻！爸爸先衝櫃台買「餵食體驗票」。", map: "DMM Kariyushi Aquarium", mapcode: "232 543 400*25", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚶 步行" },
-            { time: "11:40", title: "ASHIBINAA Outlet", spotId: "ashibinaa", icon: "fa-shirt", note: "就在旁邊。先去 2F 吃午餐，吃完最後補貨。", map: "ASHIBINAA Outlet", mapcode: "232 544 452*22", lat: 26.1585, lon: 127.6570, duration: "1.5h", travel: "🚗 5分" },
-            { time: "13:10", title: "加油 (Outlet對面)", spotId: "gas_station", icon: "fa-gas-pump", note: "Outlet 對面的 ENEOS 比較不用排隊。保留收據！", map: "ENEOS", duration: "20m" },
-            { time: "13:30", title: "OTS 還車", spotId: "ots_rent", icon: "fa-check-double", note: "還鑰匙、檢查 ETC 拔了沒。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "30m", travel: "🚌 接駁 20分" },
-            { time: "14:00", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane", note: "辦理登機 JX303。逛免稅店。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "2.5h" },
-            { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "再見沖繩！回家囉！", map: "", travel: "✈️ 飛行" },
-            { time: "17:25", title: "抵達台中", icon: "fa-house", note: "甜蜜的家。", map: "" },
-            { time: "旅程回顧", title: "📊 查看數據", icon: "fa-chart-pie", note: "點擊查看這趟旅程的統計", spotId: null, map: null, action: "openWrapped()" }
-        ]
-    }
+        { 
+            day: "D7", date: "4/03 (五)", title: "祈福 & 返家", highlights: "波上宮 / Outlet / 機場", bg: bgImages.D7, 
+            weather: {
+                icon: "fa-plane", temp: "21°C - 25°C", rain: "10%", uv: "中",
+                wear: "寬鬆舒適的衣服 (搭機)",
+                tips: "回程行李多，隨身包盡量輕便，記得檢查護照在不在身上。"
+            },
+            events: [
+                { time: "09:00", title: "退房 & 出發", icon: "fa-suitcase-rolling", note: "行李全上車。", duration: "20m", travel: "🚗 20分" },
+                { time: "09:20", title: "波上宮", spotId: "naminoue", icon: "fa-torii-gate", note: "買御守、寫繪馬。去橋上拍懸崖神社。", map: "波上宮", lat: 26.2206, lon: 127.6713, duration: "1h", travel: "🚗 40分" },
+                { time: "10:30", title: "前往豐見城", icon: "fa-road", note: "前往 Outlet 方向。", map: "" },
+                { time: "11:10", title: "ASHIBINAA Outlet", spotId: "ashibinaa", icon: "fa-shirt", note: "午餐 (2F美食街) + 最後衝刺。", map: "ASHIBINAA Outlet", mapcode: "232 544 452*22", lat: 26.1585, lon: 127.6570, duration: "1.5h", travel: "🚗 5分" },
+                { time: "12:40", title: "加油 (OTS旁)", spotId: "gas_station", icon: "fa-gas-pump", note: "務必加滿油！保留收據。", map: "ENEOS Dr.Drive Self Toyosaki SS", duration: "20m" },
+                { time: "13:00", title: "OTS 還車", spotId: "ots_rent", icon: "fa-check-double", note: "還鑰匙、檢查 ETC 拔了沒。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "45m", travel: "🚌 接駁 20分" },
+                { time: "13:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane", note: "辦理登機。逛免稅店。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "3h" },
+                { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "回家囉！", map: "", travel: "✈️ 飛行" },
+                { time: "17:25", title: "抵達台中", icon: "fa-house", note: "甜蜜的家。", map: "" },
+                { time: "旅程回顧", title: "📊 查看數據", icon: "fa-chart-pie", note: "點擊查看這趟旅程的統計", spotId: null, map: null, action: "openWrapped()" }
+            ]
+        }
     ];
 
     // v17.4 修正: 美食圖片連結 (更換為穩定圖源)
