@@ -1155,13 +1155,15 @@
                         const current = isRainyItem ? { ...e, ...e.rainy } : e;
                         const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
                         const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
-                        const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${current.note || ''}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
-                        const isLast = idx === d.events.length - 1;
+                        const spotData = current.spotId ? spotInfoDB[current.spotId] : null;
+						const voiceBtn = spotData ? `<button onclick="playSpotGuide('${current.spotId}', this); event.stopPropagation();" class="glass px-3 py-1.5 rounded-full text-xs text-pink-600 font-bold border border-pink-100 active:bg-pink-50 mr-2"><i class="fas fa-headphones mr-1"></i>聽介紹</button>` : '';
+						const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${current.note || ''}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
+						const isLast = idx === d.events.length - 1;
                         const travelHtml = (current.travel && !isLast) ? `<div class="travel-pill">${current.travel}</div>` : '';
                         const durationTag = current.duration ? `<span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-md ml-2 font-bold shadow-sm"><i class="fas fa-clock mr-1"></i>停留 ${current.duration}</span>` : '';
                         const titleHtml = current.spotId ? `<div onclick="openSpotModal('${current.spotId}')" class="font-bold text-blue-600 text-lg cursor-pointer hover:underline decoration-blue-300 underline-offset-4 decoration-2 flex items-center gap-1">${current.title} <i class="fas fa-circle-info text-xs opacity-50"></i></div>` : `<h3 class="font-bold text-gray-800 text-lg" ${current.action ? `onclick="${current.action}"` : ''}>${current.title}</h3>`;
 
-                        return `<div class="relative group event-card-container"><div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : ""}">${badge}<div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white z-10 relative"><i class="fas ${current.icon}"></i></div></div><div class="flex-1 py-1 min-w-0"><div class="flex justify-between items-start mb-1"><div class="flex items-center"><h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3></div><div class="flex gap-2 shrink-0">${shareBtn}${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}</div></div><div class="flex items-center flex-wrap mb-2 gap-y-1">${titleHtml}${durationTag}</div>${current.note ? `<p class="text-xs text-gray-500 bg-slate-50 p-2 rounded-lg border border-slate-100 leading-relaxed"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}${current.mapcode ? `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}</div></div>${current.travel ? `<div class="timeline-connector"><div class="travel-pill">${current.travel}</div></div>` : '<div class="timeline-connector" style="border:none"></div>'}</div>`;
+                        return `<div class="relative group event-card-container"><div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : ""}">${badge}<div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white z-10 relative"><i class="fas ${current.icon}"></i></div></div><div class="flex-1 py-1 min-w-0"><div class="flex justify-between items-start mb-1"><div class="flex items-center"><h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3></div><div class="flex gap-2 shrink-0">${voiceBtn}${shareBtn}${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}</div></div><div class="flex items-center flex-wrap mb-2 gap-y-1">${titleHtml}${durationTag}</div>${current.note ? `<p class="text-xs text-gray-500 bg-slate-50 p-2 rounded-lg border border-slate-100 leading-relaxed"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}${current.mapcode ? `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}</div></div>${current.travel ? `<div class="timeline-connector"><div class="travel-pill">${current.travel}</div></div>` : '<div class="timeline-connector" style="border:none"></div>'}</div>`;
                 }).join('')}
                 </div>
                 <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative mb-6">
@@ -2011,8 +2013,9 @@
     window.restoreData = () => { const c=document.getElementById('importDataInput').value.trim(); if(!c)return; if(confirm("覆蓋資料？")){try{const d=JSON.parse(decodeURIComponent(atob(c))); if(d.user_rate)localStorage.setItem('user_rate',d.user_rate); if(d.trip_budget)localStorage.setItem('trip_budget',d.trip_budget); if(d.trip_expenses)localStorage.setItem('trip_expenses',d.trip_expenses); if(d.trip_gifts)localStorage.setItem('trip_gifts',d.trip_gifts); if(d.medical_data)localStorage.setItem('medical_data',d.medical_data); if(d.parking_data)localStorage.setItem('parking_data',d.parking_data); if(d.gasha_coins_used)localStorage.setItem('gasha_coins_used',d.gasha_coins_used); if(d.gasha_rewards)localStorage.setItem('gasha_rewards',d.gasha_rewards); if(d.items){for(let k in d.items)localStorage.setItem(k,d.items[k]);} alert("成功！"); location.reload();}catch(e){alert("代碼錯誤");}} }
     function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
     
-    // --- Geofence & HUD Helpers ---
+    // --- [修改] 強化版 GPS 偵測 (包含 任務 + 自動語音導覽) ---
     function checkGeofence(userLat, userLon) {
+        // 1. 原有的任務偵測 (保留原本功能)
         missionsDB.forEach(m => {
             if (localStorage.getItem(m.id) !== '1' && localStorage.getItem(m.id + '_notified') !== '1') {
                 const dist = getDistanceFromLatLonInKm(userLat, userLon, m.lat, m.lon);
@@ -2024,6 +2027,47 @@
                 }
             }
         });
+
+        // 2. [新增] 景點自動語音導覽
+        // 檢查「今天的行程」裡面有沒有景點
+        if (itineraryDB[currentDayIdx] && itineraryDB[currentDayIdx].events) {
+            const todayEvents = itineraryDB[currentDayIdx].events;
+            
+            todayEvents.forEach(e => {
+                // 只針對有設定 spotId (是景點) 且有 lat (有座標) 的項目
+                if (e.spotId && e.lat) {
+                    // 檢查是否已經自動播放過 (避免一直講話)
+                    const playedKey = `played_${currentDayIdx}_${e.spotId}`;
+                    
+                    if (localStorage.getItem(playedKey) !== '1') {
+                        const dist = getDistanceFromLatLonInKm(userLat, userLon, e.lat, e.lon);
+                        
+                        // 如果距離小於 0.8 公里 (800公尺)，代表快到了
+                        if (dist < 0.8) {
+                            showToast(`🎧 即將抵達：${e.title}，開始導覽...`);
+                            
+                            // 呼叫播放函式
+                            playSpotGuide(e.spotId);
+                            
+                            // 標記為「已播放」，今天不會再自動播放這一個
+                            localStorage.setItem(playedKey, '1'); 
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // --- [新增] 播放景點導覽函式 ---
+    window.playSpotGuide = (spotId, btn) => {
+        const spot = spotInfoDB[spotId];
+        if (!spot) return;
+        
+        // 組合導覽詞：標題 + 介紹 + 貼心提醒
+        const text = `我們要去${spot.title}。${spot.desc}。爸爸的貼心提醒：${spot.tips}`;
+        
+        // 使用原本就有的 speak 函式來發音
+        speak(text, btn);
     }
 
     function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
