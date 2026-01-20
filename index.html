@@ -822,7 +822,7 @@ const bgImages = {
     SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
 };
 
-// 2. 行程資料庫 (2026 v2版 - 奎奎 3歲版)
+// 2. 行程資料庫 (2026 v2版 - 修正 D5 10:00退房)
     let itineraryDB = [
         { 
             day: "D1", date: "3/28 (六)", title: "抵達 & 北上", highlights: "OTS取車 / 哥倫布牛排 / 住名護", bg: bgImages.D1, 
@@ -892,9 +892,9 @@ const bgImages = {
                 tips: "今天要退房換飯店，早上記得檢查行李是否收齊。"
             },
             events: [
-                { time: "11:00", title: "飯店退房", icon: "fa-suitcase-rolling", note: "往南移動。", duration: "1h", travel: "🚗 60分" },
-                { time: "12:00", title: "午餐：泡瀨漁港", spotId: "awase", icon: "fa-fish", note: "海膽焗烤龍蝦必吃！", map: "泡瀨漁港", duration: "1.5h", travel: "🚗 15分" },
-                { time: "13:30", title: "沖繩兒童王國", spotId: "okinawa_zoo", icon: "fa-hippo", note: "動物園 + 博物館，可以玩很久。", map: "Okinawa Zoo & Museum", duration: "2.5h", travel: "🚗 40分" },
+                { time: "10:00", title: "飯店退房", icon: "fa-suitcase-rolling", note: "提早退房，往南移動。", duration: "1h", travel: "🚗 60分" },
+                { time: "11:15", title: "午餐：泡瀨漁港", spotId: "awase", icon: "fa-fish", note: "海膽焗烤龍蝦必吃！(避開正午人潮)", map: "泡瀨漁港", duration: "1.5h", travel: "🚗 15分" },
+                { time: "13:00", title: "沖繩兒童王國", spotId: "okinawa_zoo", icon: "fa-hippo", note: "動物園 + 博物館，時間更充裕了。", map: "Okinawa Zoo & Museum", duration: "2.5h", travel: "🚗 40分" },
                 { time: "16:30", title: "那霸 Check-in", spotId: "daiwa", icon: "fa-hotel", note: "Daiwa Roynet 國際通。停樓上停車場。", map: "Daiwa Roynet Hotel Naha Kokusai-dori", lat: 26.2163, lon: 127.6917, duration: "1.5h" },
                 { time: "18:30", title: "晚餐：國際通", spotId: "kokusai_dinner", icon: "fa-utensils", note: "牛排或居酒屋自由選擇。", map: "國際通", duration: "2h" }
             ]
