@@ -821,113 +821,125 @@ const bgImages = {
     SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
 };
 
-// 2. 行程資料庫 (2026 v6.0版 - 奎奎3歲完全版)
+// 2. 行程資料庫 (2026 v6.0版 - 奎奎3歲完全細節版)
     let itineraryDB = [
         { 
-            day: "D1", date: "3/28 (六)", title: "抵達 & 北上", highlights: "OTS取車 / 哥倫布牛排 / 住名護", bg: bgImages.D1, 
+            day: "D1", date: "3/28 (六)", title: "啟程 & 適應", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, 
             weather: {
                 icon: "fa-plane-arrival", temp: "20°C - 24°C", rain: "10%", uv: "中",
-                wear: "舒適長褲 + 薄外套 (洋蔥式)",
-                tips: "飛機上給奎奎準備貼紙書或小零食平衡耳壓。"
+                wear: "舒適長褲 + 薄外套",
+                tips: "⚠️ 機場冷氣強，隨身包記得帶外套給奎奎。起降時準備果汁/軟糖平衡耳壓。"
             },
             events: [
-                { time: "13:15", title: "星宇 JX302 起飛", icon: "fa-plane-departure", note: "台中出發，飛行時間約 90 分鐘。", duration: "1.5h", travel: "✈️ 飛行" },
-                { time: "15:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane-arrival", note: "入境、拿行李。前往 OTS 接駁車處。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "45m", travel: "🚌 接駁" },
-                { time: "16:30", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "HB級別。檢查車況、裝汽座。導航設飯店。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "1h", travel: "🚗 北上 70分" },
-                { time: "19:00", title: "晚餐：哥倫布牛排", spotId: "columbia", icon: "fa-utensils", note: "Restaurant Columbia，享用名護在地牛排。", map: "Restaurant Columbia", lat: 26.5915, lon: 127.9773, duration: "1.5h", travel: "🚗 5分" },
-                { time: "20:30", title: "飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western Kouki Beach。休息整理。", map: "Best Western Okinawa Kouki Beach", lat: 26.5414, lon: 127.9458, duration: "一晚" }
+                { time: "09:00", title: "從家裡出發", icon: "fa-house", note: "預留 40-50 分鐘車程。護照帶了嗎？", duration: "1h" },
+                { time: "10:00", title: "抵達台中國際機場", spotId: "tpe_airport", icon: "fa-passport", note: "辦理托運。推車推到登機口再托運。", map: "台中國際機場", duration: "3h" },
+                { time: "13:15", title: "星宇 JX302 起飛", icon: "fa-plane-departure", note: "給奎奎喝果汁/吃軟糖平衡耳壓。", duration: "1.5h", travel: "✈️ 飛行" },
+                { time: "15:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane-arrival", note: "入境、拿行李。前往 1F 大廳外 10-A 月台。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "30m", travel: "🚶 入境" },
+                { time: "16:15", title: "機場 Lawson 補給", icon: "fa-store", note: "1F 入境大廳旁。先買好鮮奶或麵包點心。", duration: "15m" },
+                { time: "16:30", title: "搭接駁車往 OTS", icon: "fa-bus", note: "前往臨空豐崎營業所。", duration: "30m", travel: "🚌 接駁" },
+                { time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "HB級別。檢查車況、裝汽座。導航設飯店。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "1h", travel: "🚗 北上" },
+                { time: "18:00", title: "出發北上", icon: "fa-road", note: "走高速公路。中途可停「伊芸 SA」休息。", duration: "1.5h", travel: "🚗 70分" },
+                { time: "19:30", title: "晚餐：哥倫布牛排", spotId: "columbia", icon: "fa-utensils", note: "名護老牌牛排，適合第一天補體力。", map: "Restaurant Columbia", lat: 26.5915, lon: 127.9773, duration: "1h" },
+                { time: "20:30", title: "飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western。拿出陪睡玩偶，準備明天探險。", map: "Best Western Okinawa Kouki Beach", lat: 26.5414, lon: 127.9458, duration: "一晚" }
             ]
         },
         { 
-            day: "D2", date: "3/29 (日)", title: "恐龍 & 鳳梨", highlights: "鳳梨車 / 恐龍森林 / 玩沙", bg: bgImages.D2, 
+            day: "D2", date: "3/29 (日)", title: "恐龍 & 鳳梨", highlights: "鳳梨車 / 恐龍森林 / 泡澡球", bg: bgImages.D2, 
             weather: {
                 icon: "fa-sun", temp: "22°C - 26°C", rain: "0%", uv: "高",
                 wear: "短袖上衣 + 短褲 + 遮陽帽",
-                tips: "今天戶外行程多，記得幫小孩擦防曬和補水。"
+                tips: "⚠️ 恐龍公園是原始森林，務必幫小孩噴防蚊液。"
             },
             events: [
+                { time: "09:00", title: "飯店早餐", icon: "fa-mug-hot", note: "享受海景早餐，記得幫奎奎裝滿水壺。", duration: "30m" },
                 { time: "09:30", title: "名護鳳梨園", spotId: "pineapple", icon: "fa-leaf", note: "搭乘鳳梨造型自動車，還有恐龍區！", map: "Nago Pineapple Park", lat: 26.6133, lon: 127.9696, duration: "2.5h", travel: "🚗 10分" },
-                { time: "12:00", title: "午餐：山原そば", spotId: "yanbaru_soba", icon: "fa-bowl-rice", note: "Yanbaru Soba，排骨肉入口即化。", map: "Yanbaru Soba", lat: 26.6083, lon: 127.9575, duration: "1.5h", travel: "🚗 20分" },
-                { time: "14:00", title: "DINO 恐龍 PARK", spotId: "dino", icon: "fa-dragon", note: "山原亞熱帶之森，找找看有幾隻恐龍？", map: "DINO恐龍PARK 山原亞熱帶之森", lat: 26.6267, lon: 127.9620, duration: "2h", travel: "🚗 20分" },
-                { time: "16:00", title: "飯店沙灘玩水", spotId: "hotel_nago", icon: "fa-umbrella-beach", note: "回飯店休息，換泳褲下樓玩沙。", lat: 26.5414, lon: 127.9458, duration: "2.5h" },
-                { time: "18:30", title: "晚餐：Dining Yukino", spotId: "yukino", icon: "fa-utensils", note: "名護在地家庭料理居酒屋。", map: "Dining Yukino", lat: 26.5930, lon: 127.9850, duration: "1.5h" }
+                { time: "12:00", title: "午餐：山原そば", spotId: "yanbaru_soba", icon: "fa-bowl-rice", note: "排骨肉燉很軟嫩，湯頭濃郁。", map: "Yanbaru Soba", lat: 26.6083, lon: 127.9575, duration: "1.5h", travel: "🚗 20分" },
+                { time: "14:00", title: "DINO 恐龍 PARK", spotId: "dino", icon: "fa-dragon", note: "御菓子御殿旁，森林步道找 80 隻恐龍！", map: "DINO恐龍PARK 山原亞熱帶之森", lat: 26.6267, lon: 127.9620, duration: "2h", travel: "🚗 20分" },
+                { time: "16:00", title: "飯店沙灘玩沙", spotId: "hotel_nago", icon: "fa-umbrella-beach", note: "回飯店挖沙，享受午後悠閒時光。", lat: 26.5414, lon: 127.9458, duration: "2.5h" },
+                { time: "18:30", title: "晚餐：Dining Yukino", spotId: "yukino", icon: "fa-utensils", note: "在地家庭料理，有榻榻米座位。", map: "Dining Yukino", lat: 26.5930, lon: 127.9850, duration: "1.5h" },
+                { time: "20:30", title: "驚喜洗澡時間", icon: "fa-bath", note: "試用剛剛買的恐龍泡澡球！🛀", duration: "30m" }
             ]
         },
         { 
-            day: "D3", date: "3/30 (一)", title: "兒童王國折返跑", highlights: "動物園 / A&W / 車上補眠", bg: bgImages.D3, 
+            day: "D3", date: "3/30 (一)", title: "動物 & 折返跑", highlights: "避開人潮 / 動物園 / 休足時間", bg: bgImages.D3, 
             weather: {
-                icon: "fa-hippo", temp: "22°C - 27°C", rain: "10%", uv: "高",
-                wear: "輕便好活動的衣服",
-                tips: "今日車程較長，準備好車上安撫玩具和午睡小被被。"
+                icon: "fa-hippo", temp: "23°C - 27°C", rain: "10%", uv: "高",
+                wear: "好走的鞋 + 透氣衣物",
+                tips: "⚠️ 今天車程較長(辛苦爸爸)，準備車上玩具或安撫零食。"
             },
             events: [
-                { time: "09:30", title: "飯店出發", icon: "fa-car-side", note: "往南移動，前往兒童王國。", lat: 26.5414, lon: 127.9458, duration: "1h", travel: "🚗 南下 60分" },
-                { time: "10:30", title: "沖繩兒童王國", spotId: "okinawa_zoo", icon: "fa-hippo", note: "動物園+博物館。可以玩很久！", map: "Okinawa Zoo & Museum", lat: 26.3279, lon: 127.8013, duration: "3h", travel: "🚗 10分" },
-                { time: "13:30", title: "午餐：A&W 漢堡", spotId: "aw_awase", icon: "fa-burger", note: "泡瀨店。美式復古風，有遊樂區。", map: "A&W Awase", lat: 26.3145, lon: 127.8240, duration: "1.5h", travel: "🚗 北上 60分" },
-                { time: "15:00", title: "返回名護 (午睡)", icon: "fa-bed", note: "開車返回名護飯店，車上讓奎奎午睡。", lat: 26.5414, lon: 127.9458, duration: "1.5h" },
-                { time: "16:30", title: "許田休息站", spotId: "kyoda", icon: "fa-store", note: "買點心(炸開口笑)或回飯店休息。", map: "道の駅 許田", lat: 26.5333, lon: 127.9622, duration: "2h", travel: "🚗 20分" },
-                { time: "18:30", title: "晚餐：名護居酒屋", spotId: "nago_izakaya", icon: "fa-utensils", note: "或外帶餐點回飯店享用。", lat: 26.5915, lon: 127.9773, duration: "1.5h" }
+                { time: "09:30", title: "飯店出發", icon: "fa-car-side", note: "辛苦爸爸開車！往南前往沖繩市。", lat: 26.5414, lon: 127.9458, duration: "1h", travel: "🚗 南下 60分" },
+                { time: "10:30", title: "沖繩兒童王國", spotId: "okinawa_zoo", icon: "fa-hippo", note: "動物園+博物館。週一人少好逛。", map: "Okinawa Zoo & Museum", lat: 26.3279, lon: 127.8013, duration: "3h", travel: "🚗 10分" },
+                { time: "13:30", title: "午餐：A&W 漢堡", spotId: "aw_awase", icon: "fa-burger", note: "泡瀨店。必點捲捲薯條、麥根沙士。", map: "A&W Awase", lat: 26.3145, lon: 127.8240, duration: "1.5h", travel: "🚗 北上 60分" },
+                { time: "15:00", title: "返回名護 (午睡)", icon: "fa-bed", note: "這段車程剛好讓奎奎補眠。", lat: 26.5414, lon: 127.9458, duration: "1.5h" },
+                { time: "16:30", title: "許田休息站", spotId: "kyoda", icon: "fa-ice-cream", note: "買個冰淇淋或炸天婦羅點心。", map: "道の駅 許田", lat: 26.5333, lon: 127.9622, duration: "2h", travel: "🚗 20分" },
+                { time: "18:30", title: "晚餐：名護居酒屋", spotId: "nago_izakaya", icon: "fa-utensils", note: "或外帶回飯店房間吃，比較放鬆。", lat: 26.5915, lon: 127.9773, duration: "1.5h" },
+                { time: "20:00", title: "貼休足時間", icon: "fa-spa", note: "今天坐車久，早點休息。", duration: "一晚" }
             ]
         },
         { 
-            day: "D4", date: "3/31 (二)", title: "美麗海 & 古宇利", highlights: "鯨鯊 / 蝦蝦飯 / 溜滑梯", bg: bgImages.D4, 
+            day: "D4", date: "3/31 (二)", title: "海洋 & 古宇利", highlights: "週二水族館 / 蝦蝦飯 / 溜滑梯", bg: bgImages.D4, 
             weather: {
-                icon: "fa-water", temp: "21°C - 25°C", rain: "10%", uv: "中",
-                wear: "好走的鞋 + 防風外套",
-                tips: "海邊風大，注意帽子別飛走了。"
+                icon: "fa-water", temp: "22°C - 26°C", rain: "10%", uv: "中",
+                wear: "防風外套 (帽子要有繩子)",
+                tips: "⚠️ 古宇利大橋風很大，注意帽子不要飛走。"
             },
             events: [
-                { time: "08:30", title: "美麗海水族館", spotId: "churaumi", icon: "fa-fish", note: "停 P7 停車場。直奔黑潮之海看鯨鯊。", map: "沖繩美麗海水族館", lat: 26.6943, lon: 127.8779, duration: "4h", travel: "🚗 30分" },
-                { time: "12:30", title: "午餐：Kouri Shrimp", spotId: "kouri_shrimp", icon: "fa-shrimp", note: "古宇利島蝦蝦飯，可外帶去海邊吃。", map: "Kouri Shrimp", lat: 26.7032, lon: 128.0255, duration: "1h", travel: "🚗 5分" },
-                { time: "14:00", title: "古宇利海洋塔", spotId: "kouri_tower", icon: "fa-tower-observation", note: "搭無人鳳梨車上山看海景。", map: "古宇利海洋塔", lat: 26.7042, lon: 128.0286, duration: "1.5h", travel: "🚗 30分" },
-                { time: "16:00", title: "21世紀之森公園", spotId: "park_21", icon: "fa-child-reaching", note: "大型遊具放電。若太累則回飯店。", map: "21世紀之森公園", lat: 26.5960, lon: 127.9690, duration: "2h", travel: "🚗 5分" },
-                { time: "18:30", title: "晚餐：Hamazushi", spotId: "hamazushi", icon: "fa-sushi", note: "名護店。輕鬆吃迴轉壽司。", map: "HAMA壽司 名護店", lat: 26.5960, lon: 127.9830, duration: "1.5h" }
+                { time: "08:30", title: "美麗海水族館", spotId: "churaumi", icon: "fa-fish", note: "直奔 2F 黑潮之海餵食秀、戶外海豚劇場。", map: "沖繩美麗海水族館", lat: 26.6943, lon: 127.8779, duration: "4h", travel: "🚗 30分" },
+                { time: "12:30", title: "午餐：Kouri Shrimp", spotId: "kouri_shrimp", icon: "fa-shrimp", note: "古宇利島必吃蝦蝦飯。", map: "Kouri Shrimp", lat: 26.7032, lon: 128.0255, duration: "1h", travel: "🚗 5分" },
+                { time: "14:00", title: "古宇利海洋塔", spotId: "kouri_tower", icon: "fa-tower-observation", note: "搭無人鳳梨車上山看絕美海景。", map: "古宇利海洋塔", lat: 26.7042, lon: 128.0286, duration: "1.5h", travel: "🚗 30分" },
+                { time: "16:00", title: "21世紀之森公園", spotId: "park_21", icon: "fa-child-reaching", note: "還有體力就去溜滑梯，累了就回飯店。", map: "21世紀之森公園", lat: 26.5960, lon: 127.9690, duration: "2h", travel: "🚗 5分" },
+                { time: "18:30", title: "晚餐：Hamazushi", spotId: "hamazushi", icon: "fa-sushi", note: "送餐像火車，小孩最愛。", map: "HAMA壽司 名護店", lat: 26.5960, lon: 127.9830, duration: "1.5h" },
+                { time: "20:30", title: "打包行李", icon: "fa-suitcase", note: "明天要退房往南了，整理一下戰利品。", duration: "一晚" }
             ]
         },
         { 
             day: "D5", date: "4/01 (三)", title: "移動日 & 購物", highlights: "AEON Rycom / 麥當勞 / 唐吉軻德", bg: bgImages.D5, 
             weather: {
                 icon: "fa-bag-shopping", temp: "23°C - 28°C", rain: "0%", uv: "中",
-                wear: "舒適便服",
-                tips: "今天要退房換飯店，晚上逛街行程較多，推車必備。"
+                wear: "舒適便服 + 好走的鞋",
+                tips: "⚠️ 今天都在室內商場，不用擔心天氣，準備好信用卡！"
             },
             events: [
-                { time: "11:00", title: "飯店退房", icon: "fa-suitcase-rolling", note: "再見了名護！往南移動。", lat: 26.5414, lon: 127.9458, duration: "1h", travel: "🚗 南下 60分" },
-                { time: "12:00", title: "AEON Rycom", spotId: "rycom", icon: "fa-bag-shopping", note: "午餐+大採購。看巨型水族箱。", map: "Aeon Mall Okinawa Rycom", lat: 26.3138, lon: 127.7967, duration: "4h", travel: "🚗 40分" },
-                { time: "17:00", title: "那霸 Check-in", spotId: "daiwa", icon: "fa-hotel", note: "Daiwa Roynet 國際通。停樓上停車場。", map: "Daiwa Roynet Hotel Naha Kokusai-dori", lat: 26.2163, lon: 127.6917, duration: "1.5h", travel: "🚶 走路" },
-                { time: "18:30", title: "晚餐：麥當勞", spotId: "mcdonalds_makishi", icon: "fa-burger", note: "牧志店。離飯店超近，小孩最愛。", map: "McDonald's Kokusai Dori Makishi", lat: 26.2168, lon: 127.6890, duration: "1.5h", travel: "🚶 走路" },
-                { time: "20:00", title: "唐吉軻德 補貨", spotId: "donki_kokusai", icon: "fa-basket-shopping", note: "散步去逛，買齊伴手禮和藥妝。", map: "Don Quijote Kokusai Dori", lat: 26.2152, lon: 127.6853, duration: "2h" }
+                { time: "11:00", title: "飯店退房", icon: "fa-suitcase-rolling", note: "行李全上車。跟海邊飯店說再見！", lat: 26.5414, lon: 127.9458, duration: "1h", travel: "🚗 南下 60分" },
+                { time: "12:00", title: "AEON Rycom", spotId: "rycom", icon: "fa-bag-shopping", note: "4F 有兒童區 & 寶可夢中心。", map: "Aeon Mall Okinawa Rycom", lat: 26.3138, lon: 127.7967, duration: "4h", travel: "🚗 40分" },
+                { time: "17:00", title: "那霸 Check-in", spotId: "daiwa", icon: "fa-hotel", note: "Daiwa Roynet。車停飯店特約或附近停車場。", map: "Daiwa Roynet Hotel Naha Kokusai-dori", lat: 26.2163, lon: 127.6917, duration: "1.5h", travel: "🚶 走路" },
+                { time: "18:30", title: "晚餐：麥當勞", spotId: "mcdonalds_makishi", icon: "fa-burger", note: "牧志店。離飯店走路幾分鐘，快樂兒童餐！", map: "McDonald's Kokusai Dori Makishi", lat: 26.2168, lon: 127.6890, duration: "1.5h", travel: "🚶 走路" },
+                { time: "20:00", title: "唐吉軻德 補貨", spotId: "donki_kokusai", icon: "fa-basket-shopping", note: "散步去補貨 (藥妝/零食/伴手禮)。", map: "Don Quijote Kokusai Dori", lat: 26.2152, lon: 127.6853, duration: "2h" },
+                { time: "22:00", title: "晚安", icon: "fa-moon", note: "住在國際通就是方便，隨時可以回去睡覺。", duration: "一晚" }
             ]
         },
         { 
-            day: "D6", date: "4/02 (四)", title: "DMM & 波上宮", highlights: "水族館 / 懸崖神社 / PARCO", bg: bgImages.D6, 
+            day: "D6", date: "4/02 (四)", title: "DMM & 波上宮", highlights: "摸樹懶 / 懸崖神社 / PARCO 放電", bg: bgImages.D6, 
             weather: {
                 icon: "fa-fish", temp: "22°C - 26°C", rain: "10%", uv: "低",
                 wear: "方便穿脫的鞋 (試穿衣服)",
-                tips: "室內行程為主，不用擔心天氣。"
+                tips: "⚠️ PARCO CITY 冷氣較強，記得帶小外套。"
             },
             events: [
-                { time: "09:30", title: "DMM 水族館", spotId: "dmm", icon: "fa-fish-fins", note: "豐見城 iias 商場內。", map: "DMM Kariyushi Aquarium", lat: 26.1557, lon: 127.6533, duration: "2.5h", travel: "🚶 樓下" },
+                { time: "09:30", title: "DMM 水族館", spotId: "dmm", icon: "fa-fish-fins", note: "聲光效果佳，可摸小動物。", map: "DMM Kariyushi Aquarium", lat: 26.1557, lon: 127.6533, duration: "2.5h", travel: "🚶 樓下" },
                 { time: "12:00", title: "午餐：iias 商場", spotId: "iias", icon: "fa-utensils", note: "美食街覓食。", map: "iias Okinawa Toyosaki", lat: 26.1557, lon: 127.6533, duration: "1.5h", travel: "🚗 20分" },
-                { time: "14:00", title: "波上宮 & 海灘", spotId: "naminoue", icon: "fa-torii-gate", note: "參拜懸崖神社，去沙灘踩水。", map: "波上宮", lat: 26.2206, lon: 127.6713, duration: "1.5h", travel: "🚗 20分" },
-                { time: "16:00", title: "PARCO CITY", spotId: "parco", icon: "fa-bag-shopping", note: "3F 室內兒童區放電 + 逛街。", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934, duration: "3h" },
-                { time: "19:00", title: "晚餐：PARCO", icon: "fa-utensils", note: "商場內美食街解決。", duration: "1.5h" }
+                { time: "14:00", title: "波上宮 & 海灘", spotId: "naminoue", icon: "fa-torii-gate", note: "參拜、買御守。去沙灘拍懸崖上的神社。", map: "波上宮", lat: 26.2206, lon: 127.6713, duration: "1.5h", travel: "🚗 20分" },
+                { time: "16:00", title: "PARCO CITY", spotId: "parco", icon: "fa-bag-shopping", note: "室內兒童區 Asobi Park、阿卡將掃貨。", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934, duration: "3h" },
+                { time: "19:00", title: "晚餐：PARCO", icon: "fa-utensils", note: "看海景吃晚餐。推薦 88 Steak。", duration: "1.5h" },
+                { time: "21:00", title: "最後打包", icon: "fa-box-open", note: "戰利品塞箱子，檢查護照是否在隨身包。", duration: "一晚" }
             ]
         },
         { 
-            day: "D7", date: "4/03 (五)", title: "瀨長島 & 返家", highlights: "看飛機 / 還車 / 機場", bg: bgImages.D7, 
+            day: "D7", date: "4/03 (五)", title: "瀨長島 & 返家", highlights: "看飛機 / 加滿油 / 平安回家", bg: bgImages.D7, 
             weather: {
                 icon: "fa-plane-departure", temp: "21°C - 25°C", rain: "0%", uv: "中",
                 wear: "寬鬆舒適 (搭機)",
-                tips: "回程行李多，隨身包盡量輕便。"
+                tips: "⚠️ 回程行李多，隨身包輕便為主。"
             },
             events: [
-                { time: "10:00", title: "瀨長島", spotId: "senaga", icon: "fa-plane-up", note: "Umikaji Terrace 看飛機、吃鬆餅。", map: "Senagajima Umikaji Terrace", lat: 26.1764, lon: 127.6433, duration: "2h", travel: "🚗 15分" },
-                { time: "12:30", title: "前往加油", spotId: "gas_station", icon: "fa-gas-pump", note: "OTS 旁加滿油 (紅槍)。", map: "ENEOS Dr.Drive Self Toyosaki SS", lat: 26.1550, lon: 127.6530, duration: "30m", travel: "🚗 5分" },
-                { time: "13:30", title: "OTS 還車", spotId: "ots_rent", icon: "fa-check-double", note: "還車、搭接駁車去機場。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "1h", travel: "🚌 接駁" },
-                { time: "14:30", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-suitcase", note: "國內線買伴手禮、辦理登機。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "2h" },
-                { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "再見沖繩！", duration: "1.5h", travel: "✈️ 飛行" },
-                { time: "旅程回顧", title: "📊 查看數據", icon: "fa-chart-pie", note: "點擊查看這趟旅程的統計", spotId: null, map: null, action: "openWrapped()" }
+                { time: "09:30", title: "退房 & 出發", icon: "fa-suitcase-rolling", note: "行李全上車。", lat: 26.2163, lon: 127.6917, duration: "30m", travel: "🚗 15分" },
+                { time: "10:00", title: "瀨長島", spotId: "senaga", icon: "fa-plane-up", note: "找個露台看飛機起降、吃幸福鬆餅。", map: "Senagajima Umikaji Terrace", lat: 26.1764, lon: 127.6433, duration: "2h", travel: "🚗 5分" },
+                { time: "12:30", title: "前往加油", spotId: "gas_station", icon: "fa-gas-pump", note: "務必加滿油 (Regular)，保留收據。", map: "ENEOS Dr.Drive Self Toyosaki SS", lat: 26.1550, lon: 127.6530, duration: "30m", travel: "🚗 5分" },
+                { time: "13:00", title: "OTS 還車", spotId: "ots_rent", icon: "fa-check-double", note: "還鑰匙、檢查 ETC 卡拔了沒。搭接駁車。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "1h", travel: "🚌 接駁" },
+                { time: "14:30", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-suitcase", note: "辦理登機。最後買伴手禮。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "2h" },
+                { time: "16:45", title: "星宇 JX303 起飛", icon: "fa-paper-plane", note: "再見沖繩！回家囉！", duration: "1.5h", travel: "✈️ 飛行" },
+                { time: "17:25", title: "抵達台中", icon: "fa-house-user", note: "溫暖的家 🏠", spotId: null, map: null, action: "openWrapped()" }
             ]
         }
     ];
