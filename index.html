@@ -824,8 +824,8 @@ const bgImages = {
 
 // 2. 行程資料庫 (2026 v7.1版 - 奎奎3歲完全版)
     let itineraryDB = [
-        { 
-            day: "D1", date: "3/28 (六)", title: "啟程 & 北上", highlights: "機場買奶 / OTS取車 / 住名護", bg: bgImages.D1, 
+                { 
+            day: "D1", date: "3/28 (六)", title: "啟程 & 北上", highlights: "iias補給 / 豐崎晚餐 / 住名護", bg: bgImages.D1, 
             weather: {
                 icon: "fa-plane-arrival", temp: "20°C - 24°C", rain: "10%", uv: "中",
                 wear: "舒適長褲 + 薄外套",
@@ -835,15 +835,15 @@ const bgImages = {
                 { time: "09:00", title: "從家裡出發", icon: "fa-house", note: "預留 40-50 分鐘車程。護照帶了嗎？", duration: "1h" },
                 { time: "10:00", title: "抵達台中國際機場", spotId: "tpe_airport", icon: "fa-passport", note: "辦理托運。推車推到登機口再托運。", map: "台中國際機場", lat: 24.2586, lon: 120.5960, duration: "3h" },
                 { time: "13:15", title: "星宇 JX302 起飛", icon: "fa-plane-departure", note: "給奎奎喝果汁/吃軟糖平衡耳壓。", duration: "1.5h", travel: "✈️ 飛行" },
-                { time: "15:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane-arrival", note: "入境、拿行李。前往 1F 大廳外 10-A 月台。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "30m", travel: "🚶 入境" },
-                { time: "16:15", title: "機場 Lawson 補給", spotId: "lawson_airport", icon: "fa-store", note: "1F 入境大廳旁。先買好鮮奶或麵包點心。", map: "Lawson Naha Airport 1F", lat: 26.2048, lon: 127.6458, duration: "15m" },
+                { time: "15:45", title: "抵達那霸機場", spotId: "oka_airport", icon: "fa-plane-arrival", note: "入境、拿行李。直接前往 1F 大廳外 10-A 月台搭接駁車。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "45m", travel: "🚶 入境" },
                 { time: "16:30", title: "搭接駁車往 OTS", icon: "fa-bus", note: "前往臨空豐崎營業所。", duration: "30m", travel: "🚌 接駁" },
-                { time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "HB級別。檢查車況、裝汽座。導航設飯店。", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "1h", travel: "🚗 北上" },
-                { time: "18:00", title: "出發北上", icon: "fa-road", note: "走高速公路。中途可停「伊芸 SA」休息。", duration: "1.5h", travel: "🚗 70分" },
-                { time: "19:30", title: "晚餐：哥倫布牛排", spotId: "columbia", icon: "fa-utensils", note: "名護老牌牛排，適合第一天補體力。", map: "Restaurant Columbia", lat: 26.5915, lon: 127.9773, duration: "1h" },
-                { time: "20:30", title: "飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western。拿出陪睡玩偶，準備明天探險。", map: "Best Western Okinawa Kouki Beach", lat: 26.5414, lon: 127.9458, duration: "一晚" }
+                { time: "17:00", title: "OTS 臨空豐崎 取車", spotId: "ots_rent", icon: "fa-car", note: "HB級別。檢查車況、裝汽座。準備出發去旁邊的 iias！", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534, duration: "45m", travel: "🚗 5分" },
+                { time: "17:45", title: "iias 沖繩豐崎 (補給+晚餐)", spotId: "iias", icon: "fa-bag-shopping", note: "3F西松屋買育兒用品，1F AEON買零食。直接在美食街吃晚餐！", map: "iias Okinawa Toyosaki", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚗 北上" },
+                { time: "19:45", title: "出發北上名護", icon: "fa-road", note: "吃飽喝足，奎奎準備在車上睡覺。注意石川到許田的道路施工塞車！", duration: "1.5h", travel: "🚗 90分" },
+                { time: "21:15", title: "飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western。辛苦爸爸開車了，趕快休息看海景！", map: "Best Western Okinawa Kouki Beach", lat: 26.5414, lon: 127.9458, duration: "一晚" }
             ]
         },
+		
         { 
             day: "D2", date: "3/29 (日)", title: "恐龍 & 購物", highlights: "鳳梨車 / 恐龍森林 / 大創挖寶", bg: bgImages.D2, 
             weather: {
