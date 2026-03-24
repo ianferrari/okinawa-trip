@@ -804,7 +804,15 @@ function initChecklistSync() {
 
         // --- Day 7 ---
         "senaga": { title: "瀨長島", tags: ["飛機", "鬆餅"], image: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000", desc: "Umikaji Terrace，有「沖繩小希臘」之稱。可以近距離看飛機起降，吃幸福鬆餅。", tips: "💡 海風較大，注意帽子別飛走了。", map: "Senagajima Umikaji Terrace", lat: 26.1764, lon: 127.6433 },
-        "gas_station": { title: "ENEOS 加油站", tags: ["加油", "還車"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 旁邊的加油站，還車前必須加滿油並保留收據。記得加 Regular (紅槍)。", tips: "💡 建議預留 20 分鐘加油時間。", map: "ENEOS Dr.Drive Self Toyosaki SS", lat: 26.1550, lon: 127.6530 }
+        "gas_station": { title: "ENEOS 加油站", tags: ["加油", "還車"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 旁邊的加油站，還車前必須加滿油並保留收據。記得加 Regular (紅槍)。", tips: "💡 建議預留 20 分鐘加油時間。", map: "ENEOS Dr.Drive Self Toyosaki SS", lat: 26.1550, lon: 127.6530 },
+		
+		// --- 🦕 隱藏版神級放電公園 (名護與中部) ---
+        "park_ocean": { title: "海洋博公園 兒童樂園", tags: ["公園", "巨型網"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "美麗海水族館旁邊！有超大的藍色攀爬網跟溜滑梯，地板是軟墊超安全。", tips: "💡 去完水族館如果天氣好，直接走過來玩，奎奎保證玩瘋！", map: "海洋博公園 ちびっことりで", lat: 26.6943, lon: 127.8779 },
+        "park_nakagusuku": { title: "中城公園", tags: ["公園", "超大跳床"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "沖繩最強親子公園之一！有巨型白色彈跳床和幼兒版滾輪溜滑梯。", tips: "💡 佔地超大，導航記得設「西區停車場」離溜滑梯最近。", map: "中城公園", lat: 26.2806, lon: 127.8016 },
+        "park_comprehensive": { title: "綜合運動公園", tags: ["公園", "溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "遊具色彩繽紛，有大型紅藍溜滑梯，旁邊還有大草皮可以奔跑。", tips: "💡 離兒童王國不遠，可以當作去完動物園的備用放電點。", map: "沖縄県総合運動公園 大型遊具", lat: 26.3089, lon: 127.8286 },
+        "park_ginoza": { title: "宜野座 道の駅", tags: ["公園", "水陸雙拼"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "從幸喜飯店開車只要 15 分鐘！超大型溜滑梯+兒童戲水區，全沖繩最強休息站。", tips: "💡 對 3 歲小孩極度友善，玩累了旁邊直接買漢堡、冰淇淋吃！", map: "道の駅 ぎのざ", lat: 26.4746, lon: 127.9782 },
+        "park_yaedake": { title: "八重岳櫻之森公園", tags: ["公園", "森林溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "往水族館的路上會經過。森林裡有豐富的彩色溜滑梯與攀爬網，地板是軟墊！", tips: "💡 附近沒什麼商店，記得從飯店先買好點心和水去野餐。", map: "八重岳桜の森公園", lat: 26.6348, lon: 127.9224 },
+        "park_nago_central": { title: "名護中央公園", tags: ["公園", "滾輪溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "離名護市區超近，有經典的長長滾輪溜滑梯，還能俯瞰絕美海景！", tips: "💡 去 AEON 的大創買個滑草墊墊著屁股溜，才不會痛喔！", map: "名護中央公園", lat: 26.5912, lon: 127.9868 }
     };
 const bgImages = {
     D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
@@ -1636,6 +1644,10 @@ if (savedItin) {
                         <button onclick="quickSearch('convenience store')" class="flex-1 bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border border-slate-50">
                             <i class="fas fa-store text-orange-500 mb-1"></i> 
                             <span class="text-xs font-bold text-gray-600 block">找超商</span>
+                        </button>
+                        <button onclick="quickSearch('沖繩 公園 溜滑梯')" class="flex-1 bg-white p-3 rounded-2xl shadow-sm text-center active:scale-95 transition-transform border border-slate-50">
+                            <i class="fas fa-child-reaching text-green-500 mb-1"></i> 
+                            <span class="text-xs font-bold text-gray-600 block">找公園</span>
                         </button>
                     </div>
 
