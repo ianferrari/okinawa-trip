@@ -1667,63 +1667,113 @@ if (savedItin) {
                     </div>
 					
 					<div class="bg-orange-50 rounded-3xl p-5 border border-orange-100 mb-4 shadow-sm">
-                        <h3 class="text-xs font-bold text-orange-600 uppercase mb-3"><i class="fas fa-language mr-1"></i> 救急！手指對話卡 (豪華擴充版)</h3>
+                        <h3 class="text-xs font-bold text-orange-600 uppercase mb-3"><i class="fas fa-language mr-1"></i> 救急！手指對話卡 (有聲豪華版)</h3>
                         
                         <div class="space-y-3 max-h-[350px] overflow-y-auto hide-scrollbar pr-1 pb-2">
                             <div class="text-[10px] text-orange-500 font-bold tracking-widest bg-orange-100/50 p-1.5 rounded text-center sticky top-0 backdrop-blur-sm z-10">🍽️ 餐廳用餐</div>
-                            <div class="bg-white p-3 rounded-xl border border-orange-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-gray-500 font-bold mb-1">🚫 飲食防呆</span>
-                                <span class="text-lg font-bold text-gray-800">わさび抜きでお願いします</span>
-                                <span class="text-xs text-orange-600 mt-1">請不要加芥末 (小孩要吃)</span>
+                            <div class="bg-white p-3 rounded-xl border border-orange-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-gray-500 font-bold mb-1">🚫 飲食防呆</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">わさび抜きでお願いします</span>
+                                    <span class="text-xs text-orange-600 mt-1">請不要加芥末</span>
+                                </div>
+                                <button onclick="speak('わさび抜きでお願いします', this)" class="w-10 h-10 shrink-0 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-orange-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-gray-500 font-bold mb-1">✂️ 剪碎食物</span>
-                                <span class="text-[17px] font-bold text-gray-800 tracking-tight">フードカッターを貸してもらえますか？</span>
-                                <span class="text-xs text-orange-600 mt-1">可以借我食物剪刀嗎？</span>
+                            <div class="bg-white p-3 rounded-xl border border-orange-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-gray-500 font-bold mb-1">✂️ 剪碎食物</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">フードカッターを貸してもらえますか？</span>
+                                    <span class="text-xs text-orange-600 mt-1">可以借我食物剪刀嗎？</span>
+                                </div>
+                                <button onclick="speak('フードカッターを貸してもらえますか？', this)" class="w-10 h-10 shrink-0 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-orange-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-gray-500 font-bold mb-1">🪑 幼兒設備</span>
-                                <span class="text-[17px] font-bold text-gray-800 tracking-tight">子供用の椅子・食器はありますか？</span>
-                                <span class="text-xs text-orange-600 mt-1">請問有兒童餐椅和餐具嗎？</span>
+                            <div class="bg-white p-3 rounded-xl border border-orange-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-gray-500 font-bold mb-1">🪑 幼兒設備</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">子供用の椅子・食器はありますか？</span>
+                                    <span class="text-xs text-orange-600 mt-1">有兒童餐椅和餐具嗎？</span>
+                                </div>
+                                <button onclick="speak('子供用の椅子と食器はありますか？', this)" class="w-10 h-10 shrink-0 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-orange-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-gray-500 font-bold mb-1">🧻 弄髒求救</span>
-                                <span class="text-lg font-bold text-gray-800">おしぼりをもう少しもらえますか？</span>
-                                <span class="text-xs text-orange-600 mt-1">可以多給我一些濕紙巾嗎？</span>
+                            <div class="bg-white p-3 rounded-xl border border-orange-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-gray-500 font-bold mb-1">🧻 弄髒求救</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">おしぼりをもう少しもらえますか？</span>
+                                    <span class="text-xs text-orange-600 mt-1">可以多給我濕紙巾嗎？</span>
+                                </div>
+                                <button onclick="speak('おしぼりをもう少しもらえますか？', this)" class="w-10 h-10 shrink-0 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
 
                             <div class="text-[10px] text-blue-500 font-bold tracking-widest bg-blue-100/50 p-1.5 rounded text-center mt-4 sticky top-0 backdrop-blur-sm z-10">🛍️ 逛街與設施</div>
-                            <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-gray-500 font-bold mb-1">🚼 處理黃金</span>
-                                <span class="text-lg font-bold text-gray-800">おむつ交換台はどこですか？</span>
-                                <span class="text-xs text-blue-600 mt-1">請問換尿布台在哪裡？</span>
+                            <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-gray-500 font-bold mb-1">🚼 處理黃金</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">おむつ交換台はどこですか？</span>
+                                    <span class="text-xs text-blue-600 mt-1">請問換尿布台在哪裡？</span>
+                                </div>
+                                <button onclick="speak('おむつ交換台はどこですか？', this)" class="w-10 h-10 shrink-0 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-gray-500 font-bold mb-1">🛗 推車必備</span>
-                                <span class="text-lg font-bold text-gray-800">エレベーターはどこですか？</span>
-                                <span class="text-xs text-blue-600 mt-1">請問電梯在哪裡？</span>
+                            <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-gray-500 font-bold mb-1">🛗 推車必備</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">エレベーターはどこですか？</span>
+                                    <span class="text-xs text-blue-600 mt-1">請問電梯在哪裡？</span>
+                                </div>
+                                <button onclick="speak('エレベーターはどこですか？', this)" class="w-10 h-10 shrink-0 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-gray-500 font-bold mb-1">💰 媽媽血拚</span>
-                                <span class="text-lg font-bold text-gray-800">これは免税になりますか？</span>
-                                <span class="text-xs text-blue-600 mt-1">請問這個可以免稅嗎？</span>
+                            <div class="bg-white p-3 rounded-xl border border-blue-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-gray-500 font-bold mb-1">💰 媽媽血拚</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">これは免税になりますか？</span>
+                                    <span class="text-xs text-blue-600 mt-1">請問這個可以免稅嗎？</span>
+                                </div>
+                                <button onclick="speak('これは免税になりますか？', this)" class="w-10 h-10 shrink-0 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
 
                             <div class="text-[10px] text-red-500 font-bold tracking-widest bg-red-100/50 p-1.5 rounded text-center mt-4 sticky top-0 backdrop-blur-sm z-10">🚨 醫療與緊急</div>
-                            <div class="bg-white p-3 rounded-xl border border-red-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-red-500 font-bold mb-1">🤢 暈車/嘔吐</span>
-                                <span class="text-[17px] font-bold text-gray-800 tracking-tight">子供が吐きました。掃除するものはありますか？</span>
-                                <span class="text-xs text-red-600 mt-1">小孩吐了，請問有可以清理的工具嗎？</span>
+                            <div class="bg-white p-3 rounded-xl border border-red-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-red-500 font-bold mb-1">🤢 暈車/嘔吐</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">子供が吐きました。掃除するものはありますか？</span>
+                                    <span class="text-xs text-red-600 mt-1">小孩吐了，有清理工具嗎？</span>
+                                </div>
+                                <button onclick="speak('子供が吐きました。掃除するものはありますか？', this)" class="w-10 h-10 shrink-0 bg-red-100 text-red-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-red-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-red-500 font-bold mb-1">💊 買藥應急</span>
-                                <span class="text-lg font-bold text-gray-800">近くに薬局はありますか？</span>
-                                <span class="text-xs text-red-600 mt-1">請問附近有藥局嗎？</span>
+                            <div class="bg-white p-3 rounded-xl border border-red-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-red-500 font-bold mb-1">💊 買藥應急</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">近くに薬局はありますか？</span>
+                                    <span class="text-xs text-red-600 mt-1">請問附近有藥局嗎？</span>
+                                </div>
+                                <button onclick="speak('近くに薬局はありますか？', this)" class="w-10 h-10 shrink-0 bg-red-100 text-red-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-red-100 shadow-sm flex flex-col">
-                                <span class="text-[10px] text-red-500 font-bold mb-1">🌡️ 發燒/生病</span>
-                                <span class="text-[17px] font-bold text-gray-800 tracking-tight">子供が熱を出しました。近くの病院を教えてください。</span>
-                                <span class="text-xs text-red-600 mt-1">小孩發燒了，請告訴我附近的醫院。</span>
+                            <div class="bg-white p-3 rounded-xl border border-red-100 shadow-sm flex justify-between items-center gap-2">
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-[10px] text-red-500 font-bold mb-1">🌡️ 發燒/生病</span>
+                                    <span class="text-[16px] font-bold text-gray-800 leading-tight">子供が熱を出しました。近くの病院を教えてください。</span>
+                                    <span class="text-xs text-red-600 mt-1">小孩發燒了，請告訴我醫院。</span>
+                                </div>
+                                <button onclick="speak('子供が熱を出しました。近くの病院を教えてください。', this)" class="w-10 h-10 shrink-0 bg-red-100 text-red-500 rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+                                    <i class="fas fa-volume-high"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
