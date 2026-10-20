@@ -1336,12 +1336,12 @@ function initChecklistSync() {
         }
     }
 
-    // 渲染上方子選單
+    // 修正後的頂部子選單生成
     function renderHeaderSubNav() {
         const container = document.getElementById('sub-nav-container');
         
         if (activeTab === 'itinerary') {
-            container.innerHTML = `<div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar px-2">${itineraryDB.map((d, i) => `<button onclick="currentDayIdx=${i}; renderContent(); updateHeaderActive()" class="day-btn flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-all duration-300 ${i === currentDayIdx ? 'tab-active' : 'tab-inactive'}"><div class="text-[10px] opacity-80 uppercase">${d.day}</div><div>${d.date.split(' ')[0]}</div></button>`).join('')}</div>`;
+            container.innerHTML = `<div class="flex overflow-x-auto gap-3 pb-2 hide-scrollbar px-2">${itineraryDB.map((d, i) => `<button onclick="currentDayIdx=${i}; updateHeaderActive(); renderContent();" class="day-btn flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-all duration-300 ${i === currentDayIdx ? 'tab-active' : 'tab-inactive'}"><div class="text-[10px] opacity-80 uppercase">${d.day}</div><div>${d.date.split(' ')[0]}</div></button>`).join('')}</div>`;
             document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
         
         } else if (activeTab === 'checklist') {
@@ -1370,11 +1370,14 @@ function initChecklistSync() {
         }
     }
 
+    // 修正後的按鈕激活狀態更新（移除多餘花括號）
     function updateHeaderActive() {
         document.querySelectorAll('.day-btn').forEach((btn, i) => {
-            btn.className = `day-btn flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-all duration-300 ${i === currentDayIdx ? 'tab-active' : 'tab-inactive'}}`;
+            btn.className = `day-btn flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-all duration-300 ${i === currentDayIdx ? 'tab-active' : 'tab-inactive'}`;
         });
-        document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
+        if (itineraryDB[currentDayIdx]) {
+            document.getElementById('bg-layer').style.backgroundImage = `url('${itineraryDB[currentDayIdx].bg}')`;
+        }
         if(navigator.geolocation) {
              navigator.geolocation.getCurrentPosition((p) => updateDinoGPS(p.coords.latitude, p.coords.longitude));
         }
