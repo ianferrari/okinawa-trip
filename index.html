@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩二刷 🦕 v21.0 Ultimate (2027)</title>
+    <title>奎奎全家沖繩二沖 🦕 v21.0 Ultimate (2027)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -827,51 +827,52 @@ function initChecklistSync() {
     ];
     let rewardsDB = JSON.parse(localStorage.getItem('gasha_rewards')) || [...defaultRewards];
     
-    // 1. 景點詳細資料庫 (2027 二刷 3+3 黃金平衡版)
+    // 1. 景點詳細資料庫 (2027 名護 Yugaf Inn + 浦添 Ala COOJU 定案版)
     const spotInfoDB = {
         // --- Day 1 ---
         "tpe_airport": { title: "台中國際機場 (RMQ)", tags: ["出發", "星宇JX302"], image: "https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?q=80&w=1000", desc: "2027 二刷沖繩的起點！搭乘 13:15 星宇航空 JX302 飛往那霸。", tips: "💡 輕便推車記得跟地勤說要 Gate-check (推到登機口)。過安檢前把奎奎水壺倒空。", map: "台中國際機場", lat: 24.2586, lon: 120.5960 },
-        "oka_airport": { title: "那霸機場 (OKA)", tags: ["抵達", "國內線2F"], image: "https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=1000", desc: "熟悉的蘭花香！入境後直接去 1F 大廳外 10-A 月台搭 OTS 接駁車。回程則可逛國內線 2F 買伴手禮與寶可夢。", tips: "💡 回程在機場國內線可以買豬肉蛋飯糰當點心，還有滿滿扭蛋機可以把零錢花光。", map: "那霸機場", lat: 26.2048, lon: 127.6458 },
+        "oka_airport": { title: "那霸機場 (OKA)", tags: ["抵達", "國內線2F"], image: "https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=1000", desc: "入境後直接去 1F 大廳外 10-A 月台搭 OTS 接駁車。回程則可逛國內線 2F 買伴手禮、寶可夢中心與豬肉蛋飯糰。", tips: "💡 國內線 2F 有滿滿扭蛋機，回程可以把身上的日幣零錢全部花光。", map: "那霸機場", lat: 26.2048, lon: 127.6458 },
         "ots_rent": { title: "OTS 臨空豐崎營業所", tags: ["租還車", "自駕基地"], image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000", desc: "全程自駕起點與終點。取車時務必仔細錄影外觀、確認兒童汽座安裝穩固，以及 ETC 卡是否插入。", tips: "💡 營業所旁邊就是 iias 豐崎，取完車直接開過去吃晚餐加採買，動線 100 分！", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534 },
-        "iias": { title: "iias 沖繩豐崎", tags: ["第一站補給", "西松屋"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "離 OTS 車程僅 2 分鐘！1F 有大型 AEON 超市與美食街，3F 有西松屋。", tips: "💡 第一天先在 1F 超市買齊這幾天車上要喝的大罐水、水果、零食與恐龍/奧特曼泡澡球！", map: "iias Okinawa Toyosaki", lat: 26.1557, lon: 127.6533 },
-        "hotel_nago": { title: "Best Western Kouki Beach", tags: ["前3晚住宿", "下樓即沙灘"], image: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1000", desc: "Day 1 ~ Day 3 連住三晚免收行李！位於名護幸喜海灘正前方，陽台看出去就是無敵海景。", tips: "💡 樓下就有全家便利商店，沙灘平緩很適合傍晚帶奎奎散步踩水。", map: "Best Western Okinawa Kouki Beach", lat: 26.5414, lon: 127.9458 },
+        "iias": { title: "iias 沖繩豐崎", tags: ["第一站補給", "AEON超市"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "離 OTS 車程僅 2 分鐘！美食街吃沖繩麵/白飯，1F 有大型 AEON 超市，3F 有西松屋。", tips: "💡 第一天先在 1F 超市買齊大瓶水、零食、水果與恐龍/奧特曼泡澡球！", map: "iias Okinawa Toyosaki", lat: 26.1557, lon: 127.6533 },
+        "hotel_nago": { title: "Yugaf Inn 飯店沖繩", tags: ["前3晚基地", "訂單:1788180243"], image: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1000", desc: "【已付款｜含早餐】Triple Executive 海景行政房 (3張單人床)。\n📍地址：453-1, Miyazato, Nago-city\n📞電話：+81 980-51-7700\n🔢Mapcode：206 626 528*55", tips: "💡 免費平面停車場超好停！過馬路就是 21世紀之森海灘與公園，去 Neo Park 僅 8 分鐘、Hama 壽司僅 3 分鐘！", map: "Hotel Yugaf Inn Okinawa", lat: 26.5947, lon: 127.9681 },
 
         // --- Day 2 ---
-        "neopark": { title: "Neo Park 名護自然動植物公園", tags: ["搭小火車", "餵水豚"], image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=1000", desc: "假日戶外免走路首選！一入園就搭「沖繩輕便鐵道」復古小火車環園，還能在無柵欄區近距離餵水豚、狐猴與大嘴鳥。", tips: "💡 鳥類區會有非常多鳥跟著你走，如果奎奎會怕，先搭小火車跟去溫馴的可愛動物區餵水豚！", map: "Neo Park Okinawa", lat: 26.6056, lon: 127.9997 },
-        "kouri_shrimp": { title: "Kouri Shrimp 蝦蝦飯", tags: ["古宇利島", "蒜香奶油蝦"], image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000", desc: "跨越絕美古宇利大橋後的必吃美食！濃郁蒜香奶油蝦配上兩球白飯，還能加點薯條給奎奎。", tips: "💡 12:00 前抵達最剛好，停好車一人先衝點餐機買票，另一人帶奎奎找座位或準備外帶。", map: "Kouri Shrimp", lat: 26.7032, lon: 128.0255 },
-        "kouri_tower": { title: "古宇利海洋塔", tags: ["無人高球車", "冷氣看海"], image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000", desc: "搭乘自動駕駛的高爾夫球車悠閒上山，沿途有中文語音導覽，塔內冷氣超涼，可拍 180 度古宇利藍海景！", tips: "💡 1F 有世界貝殼博物館，奎奎可以找找看有沒有漂亮的螺跟海星。", map: "古宇利海洋塔", lat: 26.7042, lon: 128.0286 },
-        "aeon_nago": { title: "AEON 名護店 & Daiso", tags: ["大創挖寶", "玩具藥妝"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "名護超好停車的大型商場，裡面有超大間 Daiso 大創、超市與玩具區，媽媽也能順便小逛藥妝。", tips: "💡 可以在大創買幾組便宜的挖沙工具，明天去瀨底島和後天去北谷海灘就能大派用場！", map: "AEON Nago", lat: 26.6010, lon: 127.9940 },
+        "neopark": { title: "Neo Park 名護自然動植物公園", tags: ["搭小火車", "餵水豚"], image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=1000", desc: "從 Yugaf Inn 開車僅 8 分鐘！一入園就搭「沖繩輕便鐵道」復古小火車環園免走路，還能在無柵欄區近距離餵水豚、狐猴與大嘴鳥。", tips: "💡 鳥類區會有非常多鳥跟著走，若奎奎會怕，先搭小火車跟去溫馴的可愛動物區餵水豚！", map: "Neo Park Okinawa", lat: 26.6056, lon: 127.9997 },
+        "kouri_shrimp": { title: "Kouri Shrimp 蝦蝦飯", tags: ["古宇利島", "蒜香奶油蝦"], image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000", desc: "跨越古宇利大橋後的必吃美食！濃郁蒜香奶油蝦配上兩球白飯，還能加點薯條給奎奎。", tips: "💡 12:00 前抵達避開排隊尖峰，一人先衝點餐機買票，另一人帶奎奎找座位。", map: "Kouri Shrimp", lat: 26.7032, lon: 128.0255 },
+        "kouri_tower": { title: "古宇利海洋塔", tags: ["無人高球車", "冷氣看海"], image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000", desc: "搭乘自動駕駛的高爾夫球車悠閒上山，沿途有中文語音導覽，塔內冷氣超涼，可拍 180 度古宇利藍海景！", tips: "💡 1F 有貝殼博物館，奎奎可以找找看漂亮的螺跟海星。", map: "古宇利海洋塔", lat: 26.7042, lon: 128.0286 },
+        "aeon_nago": { title: "AEON 名護店 / 21世紀之森海灘", tags: ["大創挖寶", "飯店對面挖沙"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "彈性雙選：去 AEON 名護店逛大創買玩具與藥妝；或是直接回 Yugaf Inn 過馬路到「21世紀之森海灘」挖沙！", tips: "💡 在大創買好挖沙工具，飯店對面沙灘或明天去瀨底島馬上能用！累了隨時回房睡午覺。", map: "AEON Nago", lat: 26.6010, lon: 127.9940 },
 
         // --- Day 3 ---
-        "okichan_dolphin": { title: "海洋博公園・免費海豚劇場", tags: ["免費海豚秀", "餵海豚/海龜"], image: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?q=80&w=1000", desc: "二刷聰明玩法：不進水族館主館人擠人！直接停 P7 免費立體停車場，散步去看免費海龜館、海牛館與精彩海豚秀。", tips: "💡 海豚秀場次為 10:30 / 11:30。看完一定要去隔壁「海豚潟湖」花 ¥500 買一桶魚，讓奎奎親手餵海豚！", map: "オキちゃん劇場", lat: 26.6931, lon: 127.8767 },
-        "kishimoto_soba": { title: "岸本食堂 (八重岳店)", tags: ["百年老店", "沖繩麵+炊飯"], image: "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=1000", desc: "沖繩百年手工木灰麵老店！推薦去「八重岳店」，店面寬敞、座位多、有榻榻米且超好停車。", tips: "💡 柴魚高湯非常清甜，三層肉燉得入口即化，必點限量手工沖繩炊飯 (Jushi) 給奎奎吃！", map: "きしもと食堂 八重岳店", lat: 26.6472, lon: 127.9094 },
-        "sesoko_beach": { title: "瀨底島 (瀨底海灘 / Anti 濱)", tags: ["透明獨木舟", "果凍海挖沙"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "開車就能過橋抵達的漸層果凍海！體驗全透明獨木舟或玻璃底船看珊瑚礁熱帶魚，接著在潔白沙灘瘋狂挖沙踏浪。", tips: "💡 13:30 先到櫃台報到準備 14:00 船班。幫奎奎穿好防曬水母衣、戴遮陽帽與護趾水鞋！", map: "瀬底ビーチ", lat: 26.6492, lon: 127.8556 },
-        "hamazushi": { title: "Hama 壽司 / 暖暮拉麵 (名護)", tags: ["晚餐", "火車送餐"], image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1000", desc: "玩水放電完最棒的晚餐選擇！Hama 壽司有新幹線軌道送餐、玉子燒、烏龍麵與薯條，小孩超買單。", tips: "💡 也可以視當天心情改吃名護暖暮拉麵或燒肉。", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830 },
+        "okichan_dolphin": { title: "海洋博公園・免費海豚劇場", tags: ["免費海豚秀", "餵海豚/海龜"], image: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?q=80&w=1000", desc: "從 Yugaf Inn 出發僅 25 分鐘！不進水族館主館，直接停 P7 免費立體停車場，散步看免費海龜館、海牛館與精彩海豚秀。", tips: "💡 海豚秀場次 10:30 / 11:30。看完去隔壁「海豚潟湖」花 ¥500 讓奎奎親手體驗餵海豚！", map: "オキちゃん劇場", lat: 26.6931, lon: 127.8767 },
+        "kishimoto_soba": { title: "岸本食堂 (本部町/八重岳店)", tags: ["百年老店", "沖繩麵+炊飯"], image: "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=1000", desc: "離海洋博園區僅 8~15 分鐘！手工柴魚高湯沖繩麵＋限量炊飯，八重岳店寬敞好停車、有榻榻米。", tips: "💡 柴魚高湯非常清甜，三層肉燉得入口即化，必點限量手工沖繩炊飯 (Jushi) 給奎奎吃！", map: "きしもと食堂 八重岳店", lat: 26.6472, lon: 127.9094 },
+        "sesoko_beach": { title: "瀨底島 (瀨底海灘 / Anti 濱)", tags: ["透明獨木舟", "果凍海挖沙"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "開車過橋即達的漸層果凍海！13:30 報到、14:00 體驗全透明獨木舟或玻璃底船看珊瑚礁熱帶魚，15:00~16:30 白沙灘瘋狂挖沙踏浪。", tips: "💡 玩完水開回 Yugaf Inn 飯店只要 18 分鐘，回房沖熱水澡超方便！", map: "瀬底ビーチ", lat: 26.6492, lon: 127.8556 },
+        "hamazushi": { title: "Hama 壽司 / 暖暮拉麵 (名護)", tags: ["離飯店3分鐘", "火車送餐"], image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1000", desc: "Hama 壽司名護店離 Yugaf Inn 車程僅 3 分鐘！有新幹線軌道送餐、玉子燒、烏龍麵與薯條。", tips: "💡 周邊還有暖暮拉麵、燒肉乃我那霸、Dining Yukino 可選。", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830 },
 
         // --- Day 4 ---
-        "fishing_kingdom": { title: "沖繩釣魚尋寶冒險王國", tags: ["全室內冷氣", "釣魚+挖寶石"], image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000", desc: "位於宇流麻市石川（名護南下北谷順路）！全室內冷氣房，可用安全無鉤釣竿釣熱帶魚、撈小魚、釣螯蝦，還能拿鏟子在沙道挖掘恐龍化石與水晶寶石帶回家！", tips: "💡 攻略重點：需事先網路預約！我們 10:45 進場玩到 13:15 離開，精準避開 13:30~14:00 的清場維護時間！", map: "釣って見つけるぼうけんの国 沖縄", lat: 26.4258, lon: 127.8256 },
-        "hotel_chatan": { title: "Vessel Hotel Campana Okinawa", tags: ["後3晚基地", "美國村核心"], image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000", desc: "Day 4 ~ Day 6 連住三晚！位於北谷美國村正核心，下樓就是日落海灘，免費立體停車場超好停，頂樓還有海景大浴場！", tips: "💡 18歲以下兒童與父母同床免費，館內有免費冰棒可吃，過馬路就能逛街買東西提回房間。", map: "Vessel Hotel Campana Okinawa", lat: 26.3156, lon: 127.7536 },
-        "sunset_beach": { title: "北谷日落海灘 & 美國村", tags: ["絕美夕陽", "美式街景"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "就在飯店樓下！6 月初傍晚 17:00 後陽光變得柔和，最適合下樓挖沙，等待 19:20 的絕美落日，接著在彩色美式建築群散步吃晚餐。", tips: "💡 玩完沙在海灘旁沖個腳，3分鐘直接走回飯店房間洗澡，爽度破表！", map: "Chatan Sunset Beach", lat: 26.3144, lon: 127.7531 },
+        "fishing_kingdom": { title: "沖繩釣魚尋寶冒險王國", tags: ["全室內冷氣", "釣魚+挖寶石"], image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000", desc: "位於宇流麻市石川（Yugaf Inn 南下約 35 分鐘）！全室內冷氣房，無鉤釣竿釣熱帶魚、撈小魚、釣螯蝦，再去尋寶沙道拿鏟子刷子挖掘恐龍化石與水晶寶石帶回家！", tips: "💡 需事先預約！10:45 進場玩到 13:15 離開，精準避開 13:30~14:00 的清場維護時間！", map: "釣って見つけるぼうけんの国 沖縄", lat: 26.4258, lon: 127.8256 },
+        "sunset_beach": { title: "北谷美國村 & 日落海灘", tags: ["美式街景", "AEON北谷"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "中午於美國村內享用美食，下午媽媽逛美國村特色服飾與 AEON 北谷店，爸爸推車拍美式彩色街景與日落海灘。", tips: "💡 逛到 17:30 上車往南開 15 分鐘，就能抵達今晚連住三晚的浦添飯店！", map: "Chatan Sunset Beach", lat: 26.3144, lon: 127.7531 },
+        "hotel_urasoe": { title: "沖繩阿拉科喬飯店 (Ala COOJU)", tags: ["後3晚基地", "訂單:1788173221"], image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000", desc: "【2027/6/3付款｜含早餐】豪華海景房－附榻榻米墊 (36㎡｜2張雙人床)。\n📍地址：512-55 Minatogawa, Urasoe-shi\n📞電話：+81 98-943-5300\n🔢Mapcode：33 341 780*30", tips: "💡 停室內立體停車場，上 9F 大廳 Check-in！9F 有無邊際泳池＋兒童淺水池(免費借手臂圈)。⚠️1F Lawson 約 20:00 打烊！", map: "HOTEL Ala COOJU OKINAWA", lat: 26.2655, lon: 127.7176 },
+        "aw_makiminato": { title: "A&W 牧港店 & 漫畫倉庫 浦添店", tags: ["復古美式遊戲區", "挖寶奧特曼"], image: "https://images.unsplash.com/photo-1552895638-f7fe08d2f7d5?q=80&w=1000", desc: "就在 Ala COOJU 飯店旁邊！晚餐吃復古美式 A&W 牧港店（有戶外兒童遊戲區）或七輪安安燒肉，吃飽走路逛「漫畫倉庫 浦添店」！", tips: "💡 漫畫倉庫有整面牆的超便宜奧特曼軟膠公仔與變身器，奎奎保證逛到不想走！", map: "マンガ倉庫 浦添店", lat: 26.2662, lon: 127.7185 },
 
         // --- Day 5 ---
-        "araha_park": { title: "安良波公園 & 海灘", tags: ["1:1海盜船", "大沙坑"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "離美國村車程僅 5 分鐘！潔白沙灘上直接停著一艘 1:1 超巨大海盜船溜滑梯與攀爬網，腳下就是天然大沙坑，視覺震撼力滿分！", tips: "💡 旁邊就有免費停車場、販賣機與沖腳水龍頭。早上 09:30 來玩比較不曬！", map: "アラハビーチ", lat: 26.3039, lon: 127.7583 },
-        "aeon_chatan": { title: "AEON 北谷店 & 美國村商圈", tags: ["媽媽血拚主場", "父子午睡"], image: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000", desc: "離飯店走路就到！1F 有超大型食品超市與藥妝，2F 有兒童玩具、服飾與生活雜貨。", tips: "💡 下午最熱的時候，爸爸可以帶奎奎回飯店吹冷氣睡午覺，讓庭伃自己優雅逛街血拚！", map: "AEON Chatan", lat: 26.3125, lon: 127.7575 },
+        "araha_park": { title: "安良波公園 & 海灘", tags: ["1:1海盜船", "離飯店12分"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "從浦添飯店往北開車僅 12 分鐘！沙灘上停著一艘 1:1 超巨大海盜船溜滑梯與攀爬網，腳下就是大沙坑，旁邊就有沖洗水龍頭！", tips: "💡 早上 09:30 來玩最涼爽，12:00 回飯店沖澡換衣服，下午去 9F 無邊際泳池玩水＋睡午覺！", map: "アラハビーチ", lat: 26.3039, lon: 127.7583 },
+        "parco": { title: "浦添西海岸 PARCO CITY", tags: ["離飯店僅5分", "首刷+二刷"], image: "https://images.unsplash.com/photo-1595995567786-8f3b25e16548?q=80&w=1000", desc: "離 Ala COOJU 飯店車程僅 5 分鐘！我們霸氣分成 Day 5 首刷 + Day 6 二刷：\n👩媽媽主場：2F 阿卡將本舖、Uniqlo、GU、松本清、日系女裝\n🦸‍♂️父子主場：3F 玩具區買奧特曼、轉扭蛋、Asobi Park Plus 室內沙坑放電！", tips: "💡 晚餐直接在 PARCO 海景餐廳吃敘敘苑燒肉或迴轉壽司，吃飽開 5 分鐘秒回飯店！", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934 },
 
         // --- Day 6 ---
-        "naminoue": { title: "波上宮 & 波之上海灘", tags: ["懸崖神社", "書包御守"], image: "https://images.unsplash.com/photo-1599464440263-6c2438883e1c?q=80&w=1000", desc: "聳立在珊瑚礁懸崖上的絕美神社！參拜祈求全家平安、幫奎奎買個紅色的交通安全書包御守，再走下沙灘拍懸崖神社全景。", tips: "💡 拍懸崖神社的最佳角度在旁邊的跨海高架橋人行步道上喔！", map: "波上宮", lat: 26.2206, lon: 127.6713 },
-        "parco": { title: "浦添西海岸 PARCO CITY", tags: ["阿卡將/Uniqlo", "奧特曼/Asobi"], image: "https://images.unsplash.com/photo-1595995567786-8f3b25e16548?q=80&w=1000", desc: "沖繩最強海景購物中心！媽媽主攻 2F 阿卡將本舖、Uniqlo、GU、日系女裝與松本清；父子主攻 3F Asobi Park Plus 室內沙坑與玩具區買奧特曼！", tips: "💡 午餐推薦去吃海景敘敘苑燒肉（記得提早抽號碼牌或預約）或美食街。傍晚從美食街大落地窗看海超美！", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934 },
+        "naminoue": { title: "波上宮 & 波之上海灘", tags: ["懸崖神社", "書包御守"], image: "https://images.unsplash.com/photo-1599464440263-6c2438883e1c?q=80&w=1000", desc: "從浦添飯店往南開車僅 15 分鐘！參拜祈求全家平安、幫奎奎買交通安全書包御守，再走下沙灘拍懸崖神社全景與踏浪。", tips: "💡 拍懸崖神社的最佳角度在旁邊的跨海高架橋人行步道上喔！", map: "波上宮", lat: 26.2206, lon: 127.6713 },
+        "minatogawa": { title: "港川外人住宅街", tags: ["離飯店僅3分", "水果塔/雞湯拉麵"], image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1000", desc: "就在我們住的浦添港川區，離飯店車程僅 3 分鐘！平地散步拍美式彩色平房、買 oHacorte 水果塔、吃屋宜家或雞湯拉麵當午餐。", tips: "💡 吃完午餐開 3 分鐘直接回飯店吹冷氣睡午覺，16:00 再精神飽滿去 PARCO 二刷！", map: "港川ステイツサイドタウン", lat: 26.2625, lon: 127.7147 },
 
         // --- Day 7 ---
-        "ashibinaa": { title: "ASHIBINAA Outlet", tags: ["精品球鞋", "還車前衝刺"], image: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000", desc: "就在 OTS 臨空豐崎營業所隔壁！各大運動品牌球鞋、日系服飾、精品應有盡有，還車前最後補貨與吃早午餐的好地方。", tips: "💡 看到喜歡的鞋子直接用首頁「秒算匯率」算一下，滿 ¥5,500 還能直接退稅！", map: "Okinawa Outlet Mall Ashibinaa", lat: 26.1583, lon: 127.6569 },
-        "gas_station": { title: "ENEOS 加油站 (豐崎)", tags: ["紅槍加滿", "保留收據"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 營業所正旁邊的加油站，還車前必須加滿油 (Regular 紅槍)，並把收據交給 OTS 檢查人員。", tips: "💡 記得檢查車門邊、座椅縫隙有沒有遺落奎奎的小玩具或太陽眼鏡，並拔下 ETC 卡！", map: "ENEOS Dr.Drive Self Toyosaki SS", lat: 26.1550, lon: 127.6530 },
+        "ashibinaa": { title: "ASHIBINAA Outlet / iias 豐崎", tags: ["精品球鞋", "還車前衝刺"], image: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000", desc: "從浦添飯店走西海岸道路南下，只要 20~25 分鐘就到豐崎！還車前最後採買運動球鞋與吃早午餐。", tips: "💡 看到喜歡的鞋子直接用首頁「秒算匯率」算台幣價，滿 ¥5,500 直接退稅！", map: "Okinawa Outlet Mall Ashibinaa", lat: 26.1583, lon: 127.6569 },
+        "gas_station": { title: "ENEOS 加油站 (豐崎)", tags: ["紅槍加滿", "保留收據"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 營業所正旁邊的加油站，還車前必須加滿油 (Regular 紅槍)，並把收據交給 OTS 檢查人員。", tips: "💡 記得檢查車門邊、座椅縫隙有沒有遺落奎奎的奧特曼或太陽眼鏡，並拔下 ETC 卡！", map: "ENEOS Dr.Drive Self Toyosaki SS", lat: 26.1550, lon: 127.6530 },
         
         // --- 🦕 隱藏版神級放電公園備用庫 ---
         "park_ocean": { title: "海洋博公園 兒童樂園", tags: ["公園", "巨型網"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "海豚劇場旁邊！有超大的藍色攀爬網跟溜滑梯，地板是軟墊超安全。", tips: "💡 看完海豚秀如果時間充裕，可以順路走過去玩 20 分鐘！", map: "海洋博公園 ちびっことりで", lat: 26.6943, lon: 127.8779 },
-        "park_nakagusuku": { title: "中城公園", tags: ["公園", "超大跳床"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "沖繩最強親子公園之一！有巨型白色彈跳床和滾輪溜滑梯，離北谷車程約 20 分鐘。", tips: "💡 導航記得設「西區停車場」離溜滑梯最近。", map: "中城公園", lat: 26.2806, lon: 127.8016 },
+        "park_nakagusuku": { title: "中城公園", tags: ["公園", "超大跳床"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "沖繩最強親子公園之一！有巨型白色彈跳床和滾輪溜滑梯。", tips: "💡 導航記得設「西區停車場」離溜滑梯最近。", map: "中城公園", lat: 26.2806, lon: 127.8016 },
         "park_comprehensive": { title: "綜合運動公園", tags: ["公園", "溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "遊具色彩繽紛，有大型紅藍溜滑梯，旁邊還有大草皮可以奔跑。", tips: "💡 位於泡瀨附近，空間非常寬敞。", map: "沖縄県総合運動公園 大型遊具", lat: 26.3089, lon: 127.8286 },
-        "park_ginoza": { title: "宜野座 道の駅", tags: ["公園", "水陸雙拼"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "從幸喜飯店開車只要 15 分鐘！超大型溜滑梯+免費兒童戲水池，6月夏天玩水超消暑！", tips: "💡 玩水池水深只到小腿肚，非常適合 4 歲小孩放電！", map: "道の駅 ぎのざ", lat: 26.4746, lon: 127.9782 },
+        "park_ginoza": { title: "宜野座 道の駅", tags: ["公園", "水陸雙拼"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "超大型溜滑梯+免費兒童戲水池，6月夏天玩水超消暑！", tips: "💡 玩水池水深只到小腿肚，非常適合 4 歲小孩放電！", map: "道の駅 ぎのざ", lat: 26.4746, lon: 127.9782 },
         "park_yaedake": { title: "八重岳櫻之森公園", tags: ["公園", "森林溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "就在岸本食堂八重岳店旁邊！森林裡有豐富的彩色溜滑梯與攀爬網，地板是軟墊！", tips: "💡 Day 3 吃完岸本食堂如果還有時間，開車 3 分鐘就能上去溜滑梯！", map: "八重岳桜の森公園", lat: 26.6348, lon: 127.9224 },
-        "park_nago_central": { title: "名護中央公園", tags: ["公園", "滾輪溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "離名護市區超近，有經典的長長滾輪溜滑梯，還能俯瞰絕美海景！", tips: "💡 去 AEON 的大創買個滑草墊墊著屁股溜，才不會痛喔！", map: "名護中央公園", lat: 26.5912, lon: 127.9868 }
+        "park_nago_central": { title: "名護中央公園", tags: ["公園", "滾輪溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "離 Yugaf Inn 超近，有經典的長長滾輪溜滑梯，還能俯瞰絕美海景！", tips: "💡 去 AEON 的大創買個滑草墊墊著屁股溜，才不會痛喔！", map: "名護中央公園", lat: 26.5912, lon: 127.9868 }
     };
 
     const bgImages = {
@@ -890,10 +891,10 @@ function initChecklistSync() {
         SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
     };
 
-    // 2. 行程資料庫 (2027 奎奎4歲沖繩二刷：3晚名護 + 3晚北谷 黃金平衡版)
+    // 2. 行程資料庫 (2027 名護 Yugaf Inn + 浦添 Ala COOJU 定案版)
     let itineraryDB = [
         { 
-            day: "D1", date: "6/05 (六)", title: "啟程北上 & 採買補給", highlights: "星宇JX302 / iias買泡澡球 / 連住名護3晚", bg: bgImages.D1, 
+            day: "D1", date: "6/05 (六)", title: "啟程北上 & 採買補給", highlights: "星宇JX302 / iias買泡澡球 / 住名護 Yugaf Inn", bg: bgImages.D1, 
             weather: {
                 icon: "fa-cloud-sun", temp: "25°C - 29°C", rain: "30%", uv: "高",
                 wear: "透氣短袖套裝 + 薄棉外套 (機上與商場冷氣用)",
@@ -905,106 +906,109 @@ function initChecklistSync() {
                 { time: "13:15", title: "搭乘星宇航空 JX302 起飛", icon: "fa-plane-departure", note: "準備果汁/軟糖平衡耳壓，機上畫畫看卡通。", duration: "1.5h", travel: "🛬 降落" },
                 { time: "15:45", title: "抵達那霸機場 (OKA)", spotId: "oka_airport", icon: "fa-plane-arrival", note: "入境領行李後，直接至 1F 大廳外 10-A 月台搭 OTS 免費接駁車。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "1h", travel: "🚌 接駁 20分" },
                 { time: "17:00", title: "OTS 臨空豐崎營業所取車", spotId: "ots_rent", icon: "fa-car", note: "檢查車況、安裝兒童汽座、確認 ETC 卡已插入。", map: "OTS 臨空豐崎營業所", mapcode: "232 543 532*25", lat: 26.1558, lon: 127.6534, duration: "45m", travel: "🚗 2分" },
-                { time: "17:45", title: "iias 沖繩豐崎 (晚餐+補給)", spotId: "iias", icon: "fa-bag-shopping", note: "美食街吃沖繩麵/白飯；1F AEON 超市買大瓶水、零食、水果與恐龍/奧特曼泡澡球！", map: "iias Okinawa Toyosaki", mapcode: "232 543 400*25", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚗 高速北上 80分" },
-                { time: "19:45", title: "上高速公路直奔名護", icon: "fa-road", note: "吃飽喝足，讓奎奎在車上舒服睡覺，爸爸安心開往許田 IC。", duration: "1.5h", travel: "🚗 抵達" },
-                { time: "21:15", title: "名護飯店 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "Best Western 連住三晚免收行李！開一顆剛買的泡澡球洗香香休息！", map: "Best Western Okinawa Kouki Beach", mapcode: "206 444 214*88", lat: 26.5414, lon: 127.9458, duration: "連住3晚" }
+                { time: "17:45", title: "iias 沖繩豐崎 (晚餐+補給)", spotId: "iias", icon: "fa-bag-shopping", note: "美食街吃沖繩麵/白飯；1F AEON 超市買水、零食、水果與恐龍/奧特曼泡澡球！", map: "iias Okinawa Toyosaki", mapcode: "232 543 400*25", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚗 高速北上 85分" },
+                { time: "19:45", title: "上高速公路直奔名護市區", icon: "fa-road", note: "吃飽喝足，讓奎奎在車上舒服休息，爸爸開往許田 IC。", duration: "1.5h", travel: "🚗 抵達" },
+                { time: "21:15", title: "Yugaf Inn 飯店沖繩 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "訂單：1788180243 (已付款｜含早餐｜海景行政3床房)。連住三晚免收行李，免費平面停車！", map: "Hotel Yugaf Inn Okinawa", mapcode: "206 626 528*55", lat: 26.5947, lon: 127.9681, duration: "連住3晚" }
             ]
         },
         { 
-            day: "D2", date: "6/06 (日)", title: "小火車餵動物 & 古宇利藍", highlights: "Neo Park小火車 / 蝦蝦飯 / 海洋塔 / 大創", bg: bgImages.D2, 
+            day: "D2", date: "6/06 (日)", title: "小火車餵動物 & 古宇利藍絕景", highlights: "8分鐘到Neo Park / 蝦蝦飯 / 21世紀之森海灘", bg: bgImages.D2, 
             weather: {
                 icon: "fa-sun", temp: "26°C - 30°C", rain: "20%", uv: "極高",
                 wear: "涼爽短袖短褲 + 遮陽帽 + 防蚊液",
-                tips: "⚠️ 動植物公園有自然樹蔭，記得幫奎奎噴防蚊液；古宇利島陽光耀眼，大人小孩墨鏡帽子必備！"
+                tips: "⚠️ 從 Yugaf Inn 去 Neo Park 開車只要 8 分鐘！過馬路就是 21世紀之森海灘，隨時能回房睡午覺。"
             },
             events: [
-                { time: "09:30", title: "Neo Park 名護自然動植物公園", spotId: "neopark", icon: "fa-train", note: "搭「沖繩輕便鐵道」復古小火車環園免走路！近距離餵食水豚、狐猴與大嘴鳥。", map: "Neo Park Okinawa", mapcode: "206 689 670*28", lat: 26.6056, lon: 127.9997, duration: "2h", travel: "🚗 25分",
-                  rainy: { title: "DINO 恐龍館 / 御菓子御殿", icon: "fa-cookie-bite", note: "若遇大雨改逛名護御菓子御殿看紅芋塔生產線，或去海洋塔室內吹冷氣看海！" }
+                { time: "08:30", title: "飯店享用海景早餐", spotId: "hotel_nago", icon: "fa-mug-hot", note: "悠閒吃早餐，幫奎奎水壺裝滿水。", lat: 26.5947, lon: 127.9681, duration: "1h", travel: "🚗 8分" },
+                { time: "09:30", title: "Neo Park 名護自然動植物公園", spotId: "neopark", icon: "fa-train", note: "離飯店僅 8 分鐘！搭「沖繩輕便鐵道」復古小火車環園免走路，近距離餵食水豚、狐猴與大嘴鳥。", map: "Neo Park Okinawa", mapcode: "206 689 670*28", lat: 26.6056, lon: 127.9997, duration: "2h", travel: "🚗 25分",
+                  rainy: { title: "御菓子御殿 / 古宇利海洋塔室內", icon: "fa-cookie-bite", note: "若遇大雨改逛名護御菓子御殿看紅芋塔生產線，或去海洋塔室內吹冷氣看海！" }
                 },
                 { time: "12:00", title: "午餐：古宇利島蝦蝦飯", spotId: "kouri_shrimp", icon: "fa-shrimp", note: "開車跨越古宇利大橋！12點前抵達避開排隊尖峰，大啖蒜香奶油蝦。", map: "Kouri Shrimp", mapcode: "485 692 168*22", lat: 26.7032, lon: 128.0255, duration: "1.5h", travel: "🚗 3分" },
                 { time: "13:30", title: "古宇利海洋塔", spotId: "kouri_tower", icon: "fa-tower-observation", note: "搭無人自動高爾夫球車上山，逛貝殼館、吹冷氣拍 180 度古宇利藍海景！", map: "古宇利海洋塔", mapcode: "485 693 485*14", lat: 26.7042, lon: 128.0286, duration: "1.5h", travel: "🚗 25分" },
-                { time: "15:30", title: "AEON 名護店 & Daiso 大創", spotId: "aeon_nago", icon: "fa-basket-shopping", note: "買挖沙玩具、泡澡球、媽媽小逛藥妝；若累了可直接回飯店睡午覺或去飯店沙灘玩沙。", map: "AEON Nago", mapcode: "206 688 642*33", lat: 26.6010, lon: 127.9940, duration: "2h", travel: "🚗 10分" },
-                { time: "18:00", title: "晚餐：名護市區家庭料理/燒肉", icon: "fa-utensils", note: "挑選有榻榻米座位的家庭料理居酒屋 (如 Dining Yukino) 或燒肉店悠閒享用餐點。", map: "名護市", lat: 26.5930, lon: 127.9850, duration: "2h" }
+                { time: "15:30", title: "AEON 名護店大創 或 對面海灘挖沙", spotId: "aeon_nago", icon: "fa-umbrella-beach", note: "去 AEON 買玩具、逛大創與藥妝；或回 Yugaf Inn 過馬路到「21世紀之森海灘」挖沙，累了隨時回房午睡！", map: "AEON Nago", mapcode: "206 688 642*33", lat: 26.6010, lon: 127.9940, duration: "2h", travel: "🚗 5分" },
+                { time: "18:00", title: "晚餐：名護市區美食", icon: "fa-utensils", note: "飯店周邊有暖暮拉麵、燒肉乃我那霸、Dining Yukino 或玉家沖繩麵。", map: "Hotel Yugaf Inn Okinawa", lat: 26.5947, lon: 127.9681, duration: "2h" }
             ]
         },
         { 
-            day: "D3", date: "6/07 (一)", title: "免費海豚秀 & 瀨底島透明船", highlights: "P7免費看海豚餵海豚 / 岸本食堂 / 瀨底島挖沙", bg: bgImages.D3, 
+            day: "D3", date: "6/07 (一)", title: "免費海豚秀 & 瀨底島透明船挖沙", highlights: "25分到海洋博餵海豚 / 岸本食堂 / 瀨底島透明船", bg: bgImages.D3, 
             weather: {
                 icon: "fa-sun", temp: "26°C - 31°C", rain: "10%", uv: "極高",
                 wear: "快乾短袖 + 兒童防曬泳衣/水母衣 + 護趾水鞋",
-                tips: "⚠️ 今天下午是重頭戲「瀨底島透明船與挖沙」，記得帶大毛巾、挖沙工具組與一套乾淨替換衣物放車上！"
+                tips: "⚠️ 瀨底島玩完水開回 Yugaf Inn 只要 18 分鐘！記得帶大毛巾、挖沙工具組放車上。"
             },
             events: [
-                { time: "09:45", title: "海洋博公園 (停 P7 免費停車場)", spotId: "okichan_dolphin", icon: "fa-square-parking", note: "不進水族館主館！直接停 P7 立體停車場 (完全免費)，散步看戶外免費海龜館、海牛館。", map: "海洋博公園 P7駐車場", mapcode: "553 075 797*77", lat: 26.6943, lon: 127.8779, duration: "45m", travel: "🚶 步行 3分" },
-                { time: "10:30", title: "海豚劇場 (Okichan Theater)", spotId: "okichan_dolphin", icon: "fa-water", note: "看 10:30 免費海豚秀 (睡晚可看 11:30 場)；再去隔壁海豚潟湖花 ¥500 體驗親手餵海豚！", map: "オキちゃん劇場", lat: 26.6931, lon: 127.8767, duration: "1h", travel: "🚗 15分" },
-                { time: "11:45", title: "午餐：岸本食堂 (八重岳店)", spotId: "kishimoto_soba", icon: "fa-bowl-rice", note: "百年老店手工柴魚高湯沖繩麵＋限量炊飯，八重岳店寬敞好停車、有榻榻米。", map: "きしもと食堂 八重岳店", mapcode: "206 812 396*55", lat: 26.6472, lon: 127.9094, duration: "1.5h", travel: "🚗 15分" },
-                { time: "13:30", title: "瀨底島 (瀨底海灘 / 橋下 Anti 濱)", spotId: "sesoko_beach", icon: "fa-sailboat", note: "13:30 櫃台報到 ➔ 14:00~15:00 體驗「全透明獨木舟/玻璃底船」看熱帶魚 ➔ 15:00~16:30 白沙灘瘋狂挖沙踏浪！", map: "瀬底ビーチ", mapcode: "206 822 265*25", lat: 26.6492, lon: 127.8556, duration: "3h", travel: "🚗 25分",
+                { time: "08:30", title: "飯店享用早餐", spotId: "hotel_nago", icon: "fa-mug-hot", note: "吃飽準備出發前往本部町 (車程僅 25 分鐘)。", lat: 26.5947, lon: 127.9681, duration: "1h", travel: "🚗 25分" },
+                { time: "09:45", title: "海洋博公園 (停 P7 免費停車場)", spotId: "okichan_dolphin", icon: "fa-square-parking", note: "不進水族館主館！直接停 P7 立體停車場 (完全免費)，散步去戶外免費的海龜館、海牛館。", map: "海洋博公園 P7駐車場", mapcode: "553 075 797*77", lat: 26.6943, lon: 127.8779, duration: "45m", travel: "🚶 步行 3分" },
+                { time: "10:30", title: "海豚劇場 (Okichan Theater)", spotId: "okichan_dolphin", icon: "fa-water", note: "看 10:30 免費海豚秀 (睡晚可改看 11:30 場)；再去隔壁海豚潟湖花 ¥500 體驗餵海豚！", map: "オキちゃん劇場", lat: 26.6931, lon: 127.8767, duration: "1h", travel: "🚗 8分" },
+                { time: "11:45", title: "午餐：岸本食堂 (本部町或八重岳店)", spotId: "kishimoto_soba", icon: "fa-bowl-rice", note: "手工柴魚高湯沖繩麵＋限量炊飯，離園區僅 8~15 分鐘。", map: "きしもと食堂 八重岳店", mapcode: "206 812 396*55", lat: 26.6472, lon: 127.9094, duration: "1.5h", travel: "🚗 15分" },
+                { time: "13:30", title: "瀨底島 (瀨底海灘 / 橋下 Anti 濱)", spotId: "sesoko_beach", icon: "fa-sailboat", note: "13:30 櫃台報到 ➔ 14:00~15:00 體驗「全透明獨木舟/玻璃底船」看珊瑚礁與熱帶魚 ➔ 15:00~16:30 白沙灘瘋狂挖沙踏浪！", map: "瀬底ビーチ", mapcode: "206 822 265*25", lat: 26.6492, lon: 127.8556, duration: "3h", travel: "🚗 18分",
                   rainy: { title: "美麗海水族館主館 (雨備方案)", spotId: "okichan_dolphin", icon: "fa-fish", note: "若遇風雨船班取消，直接轉進美麗海水族館室內看巨大黑潮之海鯨鯊！" }
                 },
-                { time: "17:30", title: "回名護飯店沖澡 & 市區晚餐", spotId: "hamazushi", icon: "fa-bath", note: "先回 Best Western 沖熱水澡換乾爽衣服，晚餐去吃暖暮拉麵或 Hama 壽司！", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830, duration: "2.5h" }
+                { time: "17:00", title: "返回 Yugaf Inn 沖澡 & Hama 壽司晚餐", spotId: "hamazushi", icon: "fa-bath", note: "車程僅 18 分鐘回飯店沖澡休息！晚餐去吃 Hama 壽司名護店 (離飯店僅 3 分鐘)。", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830, duration: "2.5h" }
             ]
         },
         { 
-            day: "D4", date: "6/08 (二)", title: "室內釣魚挖寶石 ➔ 進駐美國村", highlights: "冷氣房釣魚挖恐龍化石 / 移防北谷連住3晚 / 日落海灘", bg: bgImages.D4, 
+            day: "D4", date: "6/08 (二)", title: "釣魚挖寶石 ➔ 美國村 ➔ 進駐浦添", highlights: "冷氣房釣魚挖化石 / 順遊美國村 / 漫畫倉庫挖寶奧特曼", bg: bgImages.D4, 
             weather: {
                 icon: "fa-cloud-sun", temp: "26°C - 30°C", rain: "30%", uv: "高",
-                wear: "輕便舒適親子裝 + 涼鞋 (傍晚踩沙)",
-                tips: "⚠️ 釣魚尋寶王國在全室內冷氣房，完全不怕正中午太陽！記得 13:15 準時撤退避開清場維護。"
+                wear: "輕便舒適親子裝 + 好走休閒鞋",
+                tips: "⚠️ 釣魚王國玩到 13:15 準時離開避開清場！晚上飯店旁就有 A&W 牧港店跟「漫畫倉庫」可以挖寶超便宜奧特曼公仔！"
             },
             events: [
-                { time: "10:00", title: "名護飯店退房南下", spotId: "hotel_nago", icon: "fa-suitcase-rolling", note: "行李上車，告別名護海景飯店，開車前往宇流麻市石川 (約 35 分鐘)。", lat: 26.5414, lon: 127.9458, duration: "40m", travel: "🚗 南下 35分" },
-                { time: "10:45", title: "沖繩釣魚尋寶冒險王國", spotId: "fishing_kingdom", icon: "fa-gem", note: "全室內冷氣房！無鉤釣竿釣熱帶魚、撈小魚、釣螯蝦；去尋寶沙道拿鏟子刷子挖掘恐龍化石與水晶寶石帶回家！(⚠️玩到13:15離開，避開13:30清場)", map: "釣って見つけるぼうけんの国 沖縄", mapcode: "33 892 496*55", lat: 26.4258, lon: 127.8256, duration: "2.5h", travel: "🚗 25分" },
-                { time: "13:30", title: "午餐：前往北谷途中覓食", icon: "fa-burger", note: "順路吃 A&W 漢堡 (喝麥根沙士配捲捲薯條)、迴轉壽司或丸龜製麵。", map: "A&W 美浜店", lat: 26.3180, lon: 127.7590, duration: "1.5h", travel: "🚗 10分" },
-                { time: "15:00", title: "北谷美國村飯店 Check-in", spotId: "hotel_chatan", icon: "fa-hotel", note: "進駐 Vessel Hotel Campana Okinawa！連住三晚免收行李，車位免費超好停。", map: "Vessel Hotel Campana Okinawa", mapcode: "33 525 322*55", lat: 26.3156, lon: 127.7536, duration: "2h", travel: "🚶 下樓即達" },
-                { time: "17:00", title: "北谷日落海灘 & 美國村漫步", spotId: "sunset_beach", icon: "fa-sun", note: "下樓到 Sunset Beach 玩沙踏浪、爸爸拍美式街景與 19:20 絕美夕陽，晚餐直接在美國村內享用！", map: "Chatan Sunset Beach", lat: 26.3144, lon: 127.7531, duration: "3h" }
+                { time: "10:00", title: "Yugaf Inn 退房南下", spotId: "hotel_nago", icon: "fa-suitcase-rolling", note: "行李上車，告別名護往南至宇流麻市石川 (車程約 35 分鐘)。", lat: 26.5947, lon: 127.9681, duration: "40m", travel: "🚗 南下 35分" },
+                { time: "10:45", title: "沖繩釣魚尋寶冒險王國", spotId: "fishing_kingdom", icon: "fa-gem", note: "全室內冷氣房！無鉤釣竿釣熱帶魚、撈小魚、釣螯蝦；去尋寶挖沙道拿鏟子與刷子挖掘恐龍化石與寶石帶回家！(⚠️玩到13:15離開，避開13:30清場)", map: "釣って見つけるぼうけんの国 沖縄", mapcode: "33 892 496*55", lat: 26.4258, lon: 127.8256, duration: "2.5h", travel: "🚗 25分" },
+                { time: "13:45", title: "北谷美國村 & 日落海灘", spotId: "sunset_beach", icon: "fa-sun", note: "午餐於美國村內享用，下午媽媽逛美國村特色服飾與 AEON 北谷店，爸爸推車拍美式街景與海灘。", map: "Chatan Sunset Beach", mapcode: "33 526 360*03", lat: 26.3144, lon: 127.7531, duration: "3.5h", travel: "🚗 南下 15分" },
+                { time: "17:30", title: "沖繩阿拉科喬飯店 (Ala COOJU) Check-in", spotId: "hotel_urasoe", icon: "fa-hotel", note: "訂單：1788173221 (含早餐｜豪華海景榻榻米房)。停室內立體停車場，上 9F 大廳辦理入住，連住三晚！", map: "HOTEL Ala COOJU OKINAWA", mapcode: "33 341 780*30", lat: 26.2655, lon: 127.7176, duration: "1h", travel: "🚶 飯店旁" },
+                { time: "18:30", title: "晚餐：A&W 牧港店 & 逛漫畫倉庫", spotId: "aw_makiminato", icon: "fa-burger", note: "吃飯店旁 A&W 牧港店 (有戶外遊戲區) 或走路吃拉麵/七輪安安燒肉，順便逛旁邊「漫畫倉庫 浦添店」挖寶超便宜奧特曼公仔！", map: "マンガ倉庫 浦添店", lat: 26.2662, lon: 127.7185, duration: "2.5h" }
             ]
         },
         { 
-            day: "D5", date: "6/09 (三·端午)", title: "巨型海盜船沙坑 & 媽媽血拚日", highlights: "安良波1:1海盜船 / 父子回房午睡 / 庭伃逛街主場", bg: bgImages.D5, 
+            day: "D5", date: "6/09 (三·端午)", title: "海盜船沙坑 & 無邊際泳池 & PARCO首刷", highlights: "安良波1:1海盜船 / 9F無邊際泳池 / 5分鐘到PARCO", bg: bgImages.D5, 
             weather: {
                 icon: "fa-sun", temp: "27°C - 31°C", rain: "20%", uv: "極高",
-                wear: "早上海灘防曬裝 / 下午媽媽美美逛街裝",
-                tips: "⚠️ 早上趁 09:30 還沒太熱去攻佔海盜船；下午最熱時段父子回飯店吹冷氣睡午覺，把時間留給庭伃大逛特逛！"
+                wear: "早上海灘防曬裝 + 泳衣 / 下午輕鬆逛街裝",
+                tips: "⚠️ 阿拉科喬飯店開去 PARCO CITY 只要 5 分鐘！下午先在飯店 9F 無邊際泳池玩水午睡，16:00 再去逛街超優雅。"
             },
             events: [
-                { time: "09:30", title: "安良波公園 & 海灘 (Araha Beach)", spotId: "araha_park", icon: "fa-ship", note: "離美國村車程 5 分鐘！玩沙灘上的 1:1 超巨大海盜船溜滑梯＋大沙坑，旁邊就有沖洗水龍頭。", map: "アラハビーチ", mapcode: "33 496 196*11", lat: 26.3039, lon: 127.7583, duration: "2.5h", travel: "🚗 5分",
-                  rainy: { title: "永旺夢樂城 AEON Mall Rycom (雨備)", icon: "fa-bag-shopping", note: "若遇下雨海盜船濕滑，開車 15 分鐘直奔沖繩最大 Rycom 商場看巨型水族箱與寶可夢中心！" }
+                { time: "08:30", title: "阿拉科喬飯店 9F 海景早餐", spotId: "hotel_urasoe", icon: "fa-mug-hot", note: "在 9F 餐廳邊看海邊吃早餐。", lat: 26.2655, lon: 127.7176, duration: "1h", travel: "🚗 北上 12分" },
+                { time: "09:30", title: "安良波公園 & 海灘 (Araha Beach)", spotId: "araha_park", icon: "fa-ship", note: "從飯店往北開車僅 12 分鐘！玩沙灘上的 1:1 超巨大海盜船溜滑梯＋大沙坑，旁有沖洗水龍頭。", map: "アラハビーチ", mapcode: "33 496 196*11", lat: 26.3039, lon: 127.7583, duration: "2.5h", travel: "🚗 12分",
+                  rainy: { title: "提早前進 PARCO CITY 室內樂園", spotId: "parco", icon: "fa-bag-shopping", note: "若遇下雨海盜船濕滑，直接開 5 分鐘去 PARCO CITY 室內吹冷氣逛街放電！" }
                 },
-                { time: "12:00", title: "午餐：AEON 北谷店 或 美國村餐廳", spotId: "aeon_chatan", icon: "fa-utensils", note: "吹冷氣吃午餐，補充體力。", map: "AEON Chatan", lat: 26.3125, lon: 127.7575, duration: "2h", travel: "🚶 步行 5分" },
-                { time: "14:00", title: "媽媽主場：AEON 北谷店 & 美國村商圈", spotId: "aeon_chatan", icon: "fa-bag-shopping", note: "父子回飯店吹冷氣睡午覺 (或去頂樓泡大浴場)！媽媽自由逛街買服飾、藥妝、超市零食，買完直接提回房超輕鬆。", map: "American Village Okinawa", mapcode: "33 526 360*03", lat: 26.3160, lon: 127.7565, duration: "4h", travel: "🚶 下樓" },
-                { time: "18:00", title: "晚餐：美國村海景餐廳 或 燒肉大餐", spotId: "sunset_beach", icon: "fa-fire-burner", note: "全家集合！在美國村吃頓豐盛的燒肉或海景牛排慶祝端午節。", lat: 26.3156, lon: 127.7536, duration: "2h" }
+                { time: "12:00", title: "回浦添飯店沖澡 & 午餐", spotId: "hotel_urasoe", icon: "fa-shower", note: "返回飯店沖澡換乾淨衣服，午餐可於途經餐廳或 PARCO CITY 解決。", lat: 26.2655, lon: 127.7176, duration: "2h", travel: "🏊 9F 泳池" },
+                { time: "14:00", title: "飯店午睡 & 9F 海景無邊際泳池", spotId: "hotel_urasoe", icon: "fa-water-ladder", note: "享受飯店 9F 無邊際泳池（附專屬兒童淺水池，可免費借手臂圈）與房內榻榻米午睡充電！", lat: 26.2655, lon: 127.7176, duration: "2h", travel: "🚗 5分" },
+                { time: "16:00", title: "浦添西海岸 PARCO CITY 首刷", spotId: "parco", icon: "fa-bag-shopping", note: "離飯店車程僅 5 分鐘！\n👩媽媽主場：2F 阿卡將本舖、Uniqlo、GU、松本清藥妝\n🦸‍♂️父子主場：3F 玩具區挑奧特曼變身器與軟膠、轉扭蛋！", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 276*41", lat: 26.2642, lon: 127.6934, duration: "2.5h", travel: "🍽️ 館內晚餐" },
+                { time: "18:30", title: "晚餐：PARCO CITY 海景餐廳", spotId: "parco", icon: "fa-utensils", note: "吃敘敘苑燒肉、迴轉壽司或美食街，吃飽開 5 分鐘秒回飯店休息！", lat: 26.2642, lon: 127.6934, duration: "2h" }
             ]
         },
         { 
-            day: "D6", date: "6/10 (四)", title: "波上宮懸崖神社 & PARCO 終極掃貨", highlights: "買書包御守 / 阿卡將&女裝 / 買奧特曼&室內沙坑", bg: bgImages.D6, 
+            day: "D6", date: "6/10 (四)", title: "波上宮神社 & 外人住宅 & PARCO二刷", highlights: "波上宮買書包御守 / 港川水果塔 / Asobi室內樂園", bg: bgImages.D6, 
             weather: {
                 icon: "fa-cloud-sun", temp: "26°C - 30°C", rain: "20%", uv: "高",
-                wear: "好穿脫休閒鞋 (試穿衣服鞋子最方便) + 薄罩衫",
-                tips: "⚠️ 在 PARCO CITY 兵分兩路效率最高！記得善用首頁「秒算匯率」跟「家人雷達」隨時集合！"
+                wear: "好穿脫休閒鞋 + 拍照好看的親子穿搭",
+                tips: "⚠️ 港川外人住宅離我們飯店只有 3 分鐘！⚠️特別注意：飯店 1F Lawson 約 20:00 打烊，宵夜飲料記得先買好！"
             },
             events: [
-                { time: "09:30", title: "波上宮 & 波之上海灘", spotId: "naminoue", icon: "fa-torii-gate", note: "車程約 25-30 分鐘。參拜買交通安全書包御守，走下沙灘拍懸崖神社美景與踏浪。", map: "波上宮", mapcode: "33 185 023*00", lat: 26.2206, lon: 127.6713, duration: "1.5h", travel: "🚗 北上 15分",
-                  rainy: { title: "波上宮快速參拜 ➔ 提早進駐 PARCO", spotId: "naminoue", icon: "fa-torii-gate", note: "雨天不去沙灘，撐傘快速買完御守直接去 PARCO CITY 室內吹冷氣！" }
-                },
-                { time: "11:30", title: "浦添西海岸 PARCO CITY (午餐)", spotId: "parco", icon: "fa-utensils", note: "12:00 海景美食街或餐廳吃午餐 (推薦敘敘苑燒肉、沖繩麵、拉麵)。", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 276*41", lat: 26.2642, lon: 127.6934, duration: "2h", travel: "🚶 館內分頭逛" },
-                { time: "13:30", title: "PARCO 雙路線終極掃貨 & 放電", spotId: "parco", icon: "fa-robot", note: "👩媽媽路線：2F 阿卡將本舖、Uniqlo、GU、日系女裝、松本清藥妝\n🦸‍♂️父子路線：3F Asobi Park Plus 室內遊樂場(有沙坑)、玩具區挑奧特曼軟膠公仔與變身器、扭蛋！", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934, duration: "5h", travel: "🚶 館內集合" },
-                { time: "18:30", title: "晚餐：PARCO CITY 內享用", spotId: "parco", icon: "fa-bowl-food", note: "邊看浦添西海岸夕陽邊吃晚餐，吃飽開車 15 分鐘回北谷飯店。", lat: 26.2642, lon: 127.6934, duration: "1.5h", travel: "🚗 15分" },
-                { time: "20:30", title: "最後打包整理戰利品", spotId: "hotel_chatan", icon: "fa-box-open", note: "用衣物壓縮袋把髒衣服壓扁，果凍、布丁、食物剪刀與免稅密封袋務必放進托運行李箱！", lat: 26.3156, lon: 127.7536, duration: "一晚" }
+                { time: "08:30", title: "飯店享用早餐", spotId: "hotel_urasoe", icon: "fa-mug-hot", note: "吃飽往南出發前往那霸波上宮 (車程僅 15 分鐘)。", lat: 26.2655, lon: 127.7176, duration: "1h", travel: "🚗 南下 15分" },
+                { time: "09:30", title: "波上宮 & 波之上海灘", spotId: "naminoue", icon: "fa-torii-gate", note: "參拜買交通安全書包御守，走下沙灘拍懸崖神社美景與踏浪玩沙。", map: "波上宮", mapcode: "33 185 023*00", lat: 26.2206, lon: 127.6713, duration: "1.5h", travel: "🚗 北上 15分" },
+                { time: "11:30", title: "港川外人住宅街 (午餐+甜點)", spotId: "minatogawa", icon: "fa-store", note: "回飯店路上順遊 (離飯店僅 3 分鐘)！平地散步拍美式彩色平房、買 oHacorte 水果塔、吃雞湯拉麵當午餐。", map: "港川ステイツサイドタウン", mapcode: "33 341 002*28", lat: 26.2625, lon: 127.7147, duration: "2h", travel: "🚗 3分" },
+                { time: "14:00", title: "回阿拉科喬飯店吹冷氣睡午覺", spotId: "hotel_urasoe", icon: "fa-bed", note: "避開正中午烈日，回房午睡補眠。", lat: 26.2655, lon: 127.7176, duration: "2h", travel: "🚗 5分" },
+                { time: "16:00", title: "PARCO CITY 二刷補貨 & 室內樂園", spotId: "parco", icon: "fa-robot", note: "媽媽把日系女裝與伴手禮買齊；爸爸帶奎奎在 3F Asobi Park Plus 室內樂園玩沙坑放電！晚餐於館內享用。", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934, duration: "4h", travel: "🚗 5分" },
+                { time: "20:00", title: "返回飯店最後打包整理戰利品", spotId: "hotel_urasoe", icon: "fa-box-open", note: "⚠️ 提醒：飯店 1F Lawson 約 20:00 打烊，宵夜飲料記得先買好！果凍、剪刀與免稅袋務必放托運。", lat: 26.2655, lon: 127.7176, duration: "一晚" }
             ]
         },
         { 
-            day: "D7", date: "6/11 (五)", title: "悠閒退房 & 滿載而歸", highlights: "Outlet最後衝刺 / 紅槍加油還車 / 平安返台", bg: bgImages.D7, 
+            day: "D7", date: "6/11 (五)", title: "超近距離南下 & 滿載而歸", highlights: "20分鐘直達豐崎Outlet / 紅槍加油還車 / 平安返台", bg: bgImages.D7, 
             weather: {
                 icon: "fa-plane-departure", temp: "26°C - 30°C", rain: "10%", uv: "中",
                 wear: "寬鬆舒適搭機服 + 隨身小外套",
-                tips: "⚠️ 還車前務必檢查車充、ETC 卡與門邊隙縫！行動電源確認都在隨身包包裡。"
+                tips: "⚠️ 從浦添走西海岸道路南下豐崎只要 20~25 分鐘，完全不用趕早！還車前務必拔下 ETC 卡。"
             },
             events: [
-                { time: "09:30", title: "飯店早餐 & 最後看海散步", spotId: "hotel_chatan", icon: "fa-mug-hot", note: "在北谷美國村享受最後一個悠閒早晨。", lat: 26.3156, lon: 127.7536, duration: "1h", travel: "🚗 南下 40分" },
-                { time: "10:30", title: "退房出發南下豐崎", icon: "fa-suitcase-rolling", note: "行李全上車，檢查房間插座與保險箱。", duration: "45m", travel: "🚗 抵達豐崎" },
-                { time: "11:15", title: "ASHIBINAA Outlet 或 iias 豐崎", spotId: "ashibinaa", icon: "fa-shoe-prints", note: "還車前彈性採買球鞋精品與吃早午餐！", map: "Okinawa Outlet Mall Ashibinaa", mapcode: "232 544 452*22", lat: 26.1583, lon: 127.6569, duration: "1h15m", travel: "🚗 3分" },
-                { time: "12:30", title: "ENEOS 加滿油 ➔ OTS 還車", spotId: "gas_station", icon: "fa-gas-pump", note: "加滿紅槍 (Regular) 留收據 ➔ OTS 臨空豐崎還車 (拔ETC卡) ➔ 搭免費接駁車往機場。", map: "ENEOS Dr.Drive Self Toyosaki SS", mapcode: "232 543 500*11", lat: 26.1550, lon: 127.6530, duration: "1h", travel: "🚌 接駁 15分" },
-                { time: "13:30", title: "抵達那霸機場 (逛國內線 2F)", spotId: "oka_airport", icon: "fa-gift", note: "國際線報到托運後，走去國內線 2F 買伴手禮、逛寶可夢中心、買豬肉蛋飯糰！", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "3h", travel: "✈️ 飛行" },
+                { time: "09:00", title: "飯店悠閒早餐 & 9F 泳池畔看海拍照", spotId: "hotel_urasoe", icon: "fa-camera-retro", note: "在 Ala COOJU 享受最後一個悠閒早晨。", lat: 26.2655, lon: 127.7176, duration: "1.5h", travel: "🚗 南下 22分" },
+                { time: "10:30", title: "退房出發南下豐崎", icon: "fa-suitcase-rolling", note: "從浦添走西海岸道路，車程僅約 20～25 分鐘！", duration: "30m", travel: "🚗 抵達豐崎" },
+                { time: "11:00", title: "ASHIBINAA Outlet 或 iias 豐崎", spotId: "ashibinaa", icon: "fa-shoe-prints", note: "還車前最後採買球鞋精品與吃早午餐！", map: "Okinawa Outlet Mall Ashibinaa", mapcode: "232 544 452*22", lat: 26.1583, lon: 127.6569, duration: "1.5h", travel: "🚗 3分" },
+                { time: "12:30", title: "ENEOS 加滿油 ➔ OTS 還車", spotId: "gas_station", icon: "fa-gas-pump", note: "加滿紅槍 (Regular) 留收據 ➔ OTS 臨空豐崎營業所還車 (拔ETC卡) ➔ 搭免費接駁車往機場。", map: "ENEOS Dr.Drive Self Toyosaki SS", mapcode: "232 543 500*11", lat: 26.1550, lon: 127.6530, duration: "1h", travel: "🚌 接駁 15分" },
+                { time: "13:30", title: "抵達那霸機場 (逛國內線 2F)", spotId: "oka_airport", icon: "fa-gift", note: "國際線報到托運後，逛國內線 2F 買伴手禮、寶可夢中心、豬肉蛋飯糰！", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "3h", travel: "✈️ 飛行" },
                 { time: "16:45", title: "搭乘星宇航空 JX303 起飛返台", icon: "fa-paper-plane", note: "再見沖繩！我們三刷見！", duration: "1.5h", travel: "🏠 返家" },
                 { time: "17:25", title: "平安抵達台中國際機場", icon: "fa-house-user", note: "返回溫暖的家 🏠 (點此觀看 2027 旅程總回顧 Wrapped！)", spotId: null, map: null, action: "openWrapped()" }
             ]
@@ -2850,19 +2854,19 @@ function initChecklistSync() {
     function startHudClock() { const u=()=>{const d=new Date(); document.getElementById('hud-clock').innerText=`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`; if(!document.getElementById('driver-hud').classList.contains('hidden'))requestAnimationFrame(()=>setTimeout(u,1000));}; u(); }
     function copyHudMapCode() { const t=document.getElementById('hud-mapcode'); if(t.innerText!=="NO MAPCODE"){navigator.clipboard.writeText(t.innerText); t.style.color="#4ade80"; setTimeout(()=>t.style.color="",300); showToast("MapCode 已複製");} }
     
-    // v21.0 升級：智慧判斷 3+3 雙飯店基地 (Day 1~3 名護 Best Western / Day 4~7 北谷美國村 Vessel Hotel)
+    // v21.1 定案版：智慧判斷 3晚名護 Yugaf Inn / 3晚浦添 Ala COOJU
     window.goBackHotel = () => {
         let hotel = "";
-        let label = "";
-        if (currentDayIdx <= 2) { // Day 1 - Day 3 (idx 0, 1, 2) 住名護
-            hotel = "Best Western Okinawa Kouki Beach";
-            label = "名護喜瀨海景飯店 (Day 1~3 基地)";
-        } else { // Day 4 - Day 7 (idx 3, 4, 5, 6) 住北谷美國村
-            hotel = "Vessel Hotel Campana Okinawa";
-            label = "北谷美國村 Vessel 飯店 (Day 4~6 基地)";
+        let info = "";
+        if (currentDayIdx <= 2) { // Day 1 - Day 3 住名護 Yugaf Inn
+            hotel = "Hotel Yugaf Inn Okinawa";
+            info = "🏨 名護 Yugaf Inn (訂單: 1788180243)\n🔢 Mapcode: 206 626 528*55\n📞 電話: +81 980-51-7700";
+        } else { // Day 4 - Day 7 住浦添 Ala COOJU
+            hotel = "HOTEL Ala COOJU OKINAWA";
+            info = "🏨 浦添阿拉科喬 Ala COOJU (訂單: 1788173221)\n🔢 Mapcode: 33 341 780*30\n📞 電話: +81 98-943-5300";
         }
 
-        if(confirm(`導航回今晚住宿基地？\n🏨 ${label}\n📍 ${hotel}`)) {
+        if(confirm(`導航回今晚住宿基地？\n\n${info}`)) {
             window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel)}`, '_blank');
         }
     }
