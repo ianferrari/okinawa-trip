@@ -827,70 +827,6 @@ function initChecklistSync() {
     ];
     let rewardsDB = JSON.parse(localStorage.getItem('gasha_rewards')) || [...defaultRewards];
     
-    // 1. 景點詳細資料庫 (2027 名護 Yugaf Inn + 浦添 Ala COOJU 定案版)
-    const spotInfoDB = {
-        // --- Day 1 ---
-        "tpe_airport": { title: "台中國際機場 (RMQ)", tags: ["出發", "星宇JX302"], image: "https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?q=80&w=1000", desc: "2027 二刷沖繩的起點！搭乘 13:15 星宇航空 JX302 飛往那霸。", tips: "💡 輕便推車記得跟地勤說要 Gate-check (推到登機口)。過安檢前把奎奎水壺倒空。", map: "台中國際機場", lat: 24.2586, lon: 120.5960 },
-        "oka_airport": { title: "那霸機場 (OKA)", tags: ["抵達", "國內線2F"], image: "https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=1000", desc: "入境後直接去 1F 大廳外 10-A 月台搭 OTS 接駁車。回程則可逛國內線 2F 買伴手禮、寶可夢中心與豬肉蛋飯糰。", tips: "💡 國內線 2F 有滿滿扭蛋機，回程可以把身上的日幣零錢全部花光。", map: "那霸機場", lat: 26.2048, lon: 127.6458 },
-        "ots_rent": { title: "OTS 臨空豐崎營業所", tags: ["租還車", "自駕基地"], image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000", desc: "全程自駕起點與終點。取車時務必仔細錄影外觀、確認兒童汽座安裝穩固，以及 ETC 卡是否插入。", tips: "💡 營業所旁邊就是 iias 豐崎，取完車直接開過去吃晚餐加採買，動線 100 分！", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534 },
-        "iias": { title: "iias 沖繩豐崎", tags: ["第一站補給", "AEON超市"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "離 OTS 車程僅 2 分鐘！美食街吃沖繩麵/白飯，1F 有大型 AEON 超市，3F 有西松屋。", tips: "💡 第一天先在 1F 超市買齊大瓶水、零食、水果與恐龍/奧特曼泡澡球！", map: "iias Okinawa Toyosaki", lat: 26.1557, lon: 127.6533 },
-        "hotel_nago": { title: "Yugaf Inn 飯店沖繩", tags: ["前3晚基地", "訂單:1788180243"], image: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1000", desc: "【已付款｜含早餐】Triple Executive 海景行政房 (3張單人床)。\n📍地址：453-1, Miyazato, Nago-city\n📞電話：+81 980-51-7700\n🔢Mapcode：206 626 528*55", tips: "💡 免費平面停車場超好停！過馬路就是 21世紀之森海灘與公園，去 Neo Park 僅 8 分鐘、Hama 壽司僅 3 分鐘！", map: "Hotel Yugaf Inn Okinawa", lat: 26.5947, lon: 127.9681 },
-
-        // --- Day 2 ---
-        "neopark": { title: "Neo Park 名護自然動植物公園", tags: ["搭小火車", "餵水豚"], image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=1000", desc: "從 Yugaf Inn 開車僅 8 分鐘！一入園就搭「沖繩輕便鐵道」復古小火車環園免走路，還能在無柵欄區近距離餵水豚、狐猴與大嘴鳥。", tips: "💡 鳥類區會有非常多鳥跟著走，若奎奎會怕，先搭小火車跟去溫馴的可愛動物區餵水豚！", map: "Neo Park Okinawa", lat: 26.6056, lon: 127.9997 },
-        "kouri_shrimp": { title: "Kouri Shrimp 蝦蝦飯", tags: ["古宇利島", "蒜香奶油蝦"], image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000", desc: "跨越古宇利大橋後的必吃美食！濃郁蒜香奶油蝦配上兩球白飯，還能加點薯條給奎奎。", tips: "💡 12:00 前抵達避開排隊尖峰，一人先衝點餐機買票，另一人帶奎奎找座位。", map: "Kouri Shrimp", lat: 26.7032, lon: 128.0255 },
-        "kouri_tower": { title: "古宇利海洋塔", tags: ["無人高球車", "冷氣看海"], image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000", desc: "搭乘自動駕駛的高爾夫球車悠閒上山，沿途有中文語音導覽，塔內冷氣超涼，可拍 180 度古宇利藍海景！", tips: "💡 1F 有貝殼博物館，奎奎可以找找看漂亮的螺跟海星。", map: "古宇利海洋塔", lat: 26.7042, lon: 128.0286 },
-        "aeon_nago": { title: "AEON 名護店 / 21世紀之森海灘", tags: ["大創挖寶", "飯店對面挖沙"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "彈性雙選：去 AEON 名護店逛大創買玩具與藥妝；或是直接回 Yugaf Inn 過馬路到「21世紀之森海灘」挖沙！", tips: "💡 在大創買好挖沙工具，飯店對面沙灘或明天去瀨底島馬上能用！累了隨時回房睡午覺。", map: "AEON Nago", lat: 26.6010, lon: 127.9940 },
-
-        // --- Day 3 ---
-        "okichan_dolphin": { title: "海洋博公園・免費海豚劇場", tags: ["免費海豚秀", "餵海豚/海龜"], image: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?q=80&w=1000", desc: "從 Yugaf Inn 出發僅 25 分鐘！不進水族館主館，直接停 P7 免費立體停車場，散步看免費海龜館、海牛館與精彩海豚秀。", tips: "💡 海豚秀場次 10:30 / 11:30。看完去隔壁「海豚潟湖」花 ¥500 讓奎奎親手體驗餵海豚！", map: "オキちゃん劇場", lat: 26.6931, lon: 127.8767 },
-        "kishimoto_soba": { title: "岸本食堂 (本部町/八重岳店)", tags: ["百年老店", "沖繩麵+炊飯"], image: "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=1000", desc: "離海洋博園區僅 8~15 分鐘！手工柴魚高湯沖繩麵＋限量炊飯，八重岳店寬敞好停車、有榻榻米。", tips: "💡 柴魚高湯非常清甜，三層肉燉得入口即化，必點限量手工沖繩炊飯 (Jushi) 給奎奎吃！", map: "きしもと食堂 八重岳店", lat: 26.6472, lon: 127.9094 },
-        "sesoko_beach": { title: "瀨底島 (瀨底海灘 / Anti 濱)", tags: ["透明獨木舟", "果凍海挖沙"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "開車過橋即達的漸層果凍海！13:30 報到、14:00 體驗全透明獨木舟或玻璃底船看珊瑚礁熱帶魚，15:00~16:30 白沙灘瘋狂挖沙踏浪。", tips: "💡 玩完水開回 Yugaf Inn 飯店只要 18 分鐘，回房沖熱水澡超方便！", map: "瀬底ビーチ", lat: 26.6492, lon: 127.8556 },
-        "hamazushi": { title: "Hama 壽司 / 暖暮拉麵 (名護)", tags: ["離飯店3分鐘", "火車送餐"], image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1000", desc: "Hama 壽司名護店離 Yugaf Inn 車程僅 3 分鐘！有新幹線軌道送餐、玉子燒、烏龍麵與薯條。", tips: "💡 周邊還有暖暮拉麵、燒肉乃我那霸、Dining Yukino 可選。", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830 },
-
-        // --- Day 4 ---
-        "fishing_kingdom": { title: "沖繩釣魚尋寶冒險王國", tags: ["全室內冷氣", "釣魚+挖寶石"], image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000", desc: "位於宇流麻市石川（Yugaf Inn 南下約 35 分鐘）！全室內冷氣房，無鉤釣竿釣熱帶魚、撈小魚、釣螯蝦，再去尋寶沙道拿鏟子刷子挖掘恐龍化石與水晶寶石帶回家！", tips: "💡 需事先預約！10:45 進場玩到 13:15 離開，精準避開 13:30~14:00 的清場維護時間！", map: "釣って見つけるぼうけんの国 沖縄", lat: 26.4258, lon: 127.8256 },
-        "sunset_beach": { title: "北谷美國村 & 日落海灘", tags: ["美式街景", "AEON北谷"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "中午於美國村內享用美食，下午媽媽逛美國村特色服飾與 AEON 北谷店，爸爸推車拍美式彩色街景與日落海灘。", tips: "💡 逛到 17:30 上車往南開 15 分鐘，就能抵達今晚連住三晚的浦添飯店！", map: "Chatan Sunset Beach", lat: 26.3144, lon: 127.7531 },
-        "hotel_urasoe": { title: "沖繩阿拉科喬飯店 (Ala COOJU)", tags: ["後3晚基地", "訂單:1788173221"], image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000", desc: "【2027/6/3付款｜含早餐】豪華海景房－附榻榻米墊 (36㎡｜2張雙人床)。\n📍地址：512-55 Minatogawa, Urasoe-shi\n📞電話：+81 98-943-5300\n🔢Mapcode：33 341 780*30", tips: "💡 停室內立體停車場，上 9F 大廳 Check-in！9F 有無邊際泳池＋兒童淺水池(免費借手臂圈)。⚠️1F Lawson 約 20:00 打烊！", map: "HOTEL Ala COOJU OKINAWA", lat: 26.2655, lon: 127.7176 },
-        "aw_makiminato": { title: "A&W 牧港店 & 漫畫倉庫 浦添店", tags: ["復古美式遊戲區", "挖寶奧特曼"], image: "https://images.unsplash.com/photo-1552895638-f7fe08d2f7d5?q=80&w=1000", desc: "就在 Ala COOJU 飯店旁邊！晚餐吃復古美式 A&W 牧港店（有戶外兒童遊戲區）或七輪安安燒肉，吃飽走路逛「漫畫倉庫 浦添店」！", tips: "💡 漫畫倉庫有整面牆的超便宜奧特曼軟膠公仔與變身器，奎奎保證逛到不想走！", map: "マンガ倉庫 浦添店", lat: 26.2662, lon: 127.7185 },
-
-        // --- Day 5 ---
-        "araha_park": { title: "安良波公園 & 海灘", tags: ["1:1海盜船", "離飯店12分"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "從浦添飯店往北開車僅 12 分鐘！沙灘上停著一艘 1:1 超巨大海盜船溜滑梯與攀爬網，腳下就是大沙坑，旁邊就有沖洗水龍頭！", tips: "💡 早上 09:30 來玩最涼爽，12:00 回飯店沖澡換衣服，下午去 9F 無邊際泳池玩水＋睡午覺！", map: "アラハビーチ", lat: 26.3039, lon: 127.7583 },
-        "parco": { title: "浦添西海岸 PARCO CITY", tags: ["離飯店僅5分", "首刷+二刷"], image: "https://images.unsplash.com/photo-1595995567786-8f3b25e16548?q=80&w=1000", desc: "離 Ala COOJU 飯店車程僅 5 分鐘！我們霸氣分成 Day 5 首刷 + Day 6 二刷：\n👩媽媽主場：2F 阿卡將本舖、Uniqlo、GU、松本清、日系女裝\n🦸‍♂️父子主場：3F 玩具區買奧特曼、轉扭蛋、Asobi Park Plus 室內沙坑放電！", tips: "💡 晚餐直接在 PARCO 海景餐廳吃敘敘苑燒肉或迴轉壽司，吃飽開 5 分鐘秒回飯店！", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934 },
-
-        // --- Day 6 ---
-        "naminoue": { title: "波上宮 & 波之上海灘", tags: ["懸崖神社", "書包御守"], image: "https://images.unsplash.com/photo-1599464440263-6c2438883e1c?q=80&w=1000", desc: "從浦添飯店往南開車僅 15 分鐘！參拜祈求全家平安、幫奎奎買交通安全書包御守，再走下沙灘拍懸崖神社全景與踏浪。", tips: "💡 拍懸崖神社的最佳角度在旁邊的跨海高架橋人行步道上喔！", map: "波上宮", lat: 26.2206, lon: 127.6713 },
-        "minatogawa": { title: "港川外人住宅街", tags: ["離飯店僅3分", "水果塔/雞湯拉麵"], image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1000", desc: "就在我們住的浦添港川區，離飯店車程僅 3 分鐘！平地散步拍美式彩色平房、買 oHacorte 水果塔、吃屋宜家或雞湯拉麵當午餐。", tips: "💡 吃完午餐開 3 分鐘直接回飯店吹冷氣睡午覺，16:00 再精神飽滿去 PARCO 二刷！", map: "港川ステイツサイドタウン", lat: 26.2625, lon: 127.7147 },
-
-        // --- Day 7 ---
-        "ashibinaa": { title: "ASHIBINAA Outlet / iias 豐崎", tags: ["精品球鞋", "還車前衝刺"], image: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000", desc: "從浦添飯店走西海岸道路南下，只要 20~25 分鐘就到豐崎！還車前最後採買運動球鞋與吃早午餐。", tips: "💡 看到喜歡的鞋子直接用首頁「秒算匯率」算台幣價，滿 ¥5,500 直接退稅！", map: "Okinawa Outlet Mall Ashibinaa", lat: 26.1583, lon: 127.6569 },
-        "gas_station": { title: "ENEOS 加油站 (豐崎)", tags: ["紅槍加滿", "保留收據"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 營業所正旁邊的加油站，還車前必須加滿油 (Regular 紅槍)，並把收據交給 OTS 檢查人員。", tips: "💡 記得檢查車門邊、座椅縫隙有沒有遺落奎奎的奧特曼或太陽眼鏡，並拔下 ETC 卡！", map: "ENEOS Dr.Drive Self Toyosaki SS", lat: 26.1550, lon: 127.6530 },
-        
-        // --- 🦕 隱藏版神級放電公園備用庫 ---
-        "park_ocean": { title: "海洋博公園 兒童樂園", tags: ["公園", "巨型網"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "海豚劇場旁邊！有超大的藍色攀爬網跟溜滑梯，地板是軟墊超安全。", tips: "💡 看完海豚秀如果時間充裕，可以順路走過去玩 20 分鐘！", map: "海洋博公園 ちびっことりで", lat: 26.6943, lon: 127.8779 },
-        "park_nakagusuku": { title: "中城公園", tags: ["公園", "超大跳床"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "沖繩最強親子公園之一！有巨型白色彈跳床和滾輪溜滑梯。", tips: "💡 導航記得設「西區停車場」離溜滑梯最近。", map: "中城公園", lat: 26.2806, lon: 127.8016 },
-        "park_comprehensive": { title: "綜合運動公園", tags: ["公園", "溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "遊具色彩繽紛，有大型紅藍溜滑梯，旁邊還有大草皮可以奔跑。", tips: "💡 位於泡瀨附近，空間非常寬敞。", map: "沖縄県総合運動公園 大型遊具", lat: 26.3089, lon: 127.8286 },
-        "park_ginoza": { title: "宜野座 道の駅", tags: ["公園", "水陸雙拼"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "超大型溜滑梯+免費兒童戲水池，6月夏天玩水超消暑！", tips: "💡 玩水池水深只到小腿肚，非常適合 4 歲小孩放電！", map: "道の駅 ぎのざ", lat: 26.4746, lon: 127.9782 },
-        "park_yaedake": { title: "八重岳櫻之森公園", tags: ["公園", "森林溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "就在岸本食堂八重岳店旁邊！森林裡有豐富的彩色溜滑梯與攀爬網，地板是軟墊！", tips: "💡 Day 3 吃完岸本食堂如果還有時間，開車 3 分鐘就能上去溜滑梯！", map: "八重岳桜の森公園", lat: 26.6348, lon: 127.9224 },
-        "park_nago_central": { title: "名護中央公園", tags: ["公園", "滾輪溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "離 Yugaf Inn 超近，有經典的長長滾輪溜滑梯，還能俯瞰絕美海景！", tips: "💡 去 AEON 的大創買個滑草墊墊著屁股溜，才不會痛喔！", map: "名護中央公園", lat: 26.5912, lon: 127.9868 }
-    };
-
-    const bgImages = {
-        D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
-        D2: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000&fit=crop",
-        D3: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000&fit=crop",
-        D4: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000&fit=crop",
-        D5: "https://images.unsplash.com/photo-1534234828569-2f2249520468?q=80&w=1000&fit=crop",
-        D6: "https://images.unsplash.com/photo-1570533412033-662309e3df4e?q=80&w=1000&fit=crop",
-        D7: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000&fit=crop",
-        SHOP: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000&fit=crop",
-        TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
-        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop",
-        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop",
-        SYNC: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&fit=crop",
-        SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
-    };
-
     // 1. 景點詳細資料庫 (2027 A/B 雙方案 ＋ ☔ 終極雨備旗艦版)
     const spotInfoDB = {
         // --- Day 1 & 7 機場與豐崎 ---
@@ -2995,21 +2931,6 @@ function initChecklistSync() {
         });
 
         const todayEvents = getActiveDayEvents(itineraryDB[currentDayIdx]);
-        todayEvents.forEach(e => {
-            if (e.spotId && e.lat) {
-                const playedKey = `played27_${currentDayIdx}_${e.spotId}`;
-                if (localStorage.getItem(playedKey) !== '1') {
-                    const dist = getDistanceFromLatLonInKm(userLat, userLon, e.lat, e.lon);
-                    if (dist < 0.8) {
-                        showToast(`🎧 即將抵達：${e.title}，開始語音導覽...`);
-                        playSpotGuide(e.spotId);
-                        localStorage.setItem(playedKey, '1');
-                    }
-                }
-            }
-        });
-    }
-        const todayEvents = itineraryDB[currentDayIdx].events;
         todayEvents.forEach(e => {
             if (e.spotId && e.lat) {
                 const playedKey = `played27_${currentDayIdx}_${e.spotId}`;
