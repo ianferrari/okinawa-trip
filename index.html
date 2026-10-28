@@ -1571,32 +1571,34 @@ function initChecklistSync() {
 
             main.innerHTML = `
             <div class="animate-slide-up">
-                <!-- 方案 A：首頁置頂「秒算匯率膠囊」 -->
-                <div id="home-fx-bar" class="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 rounded-3xl p-3.5 mb-4 border-2 border-yellow-300 shadow-md relative overflow-hidden">
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center gap-1.5">
-                            <span class="bg-yellow-400 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm"><i class="fas fa-bolt mr-0.5"></i>秒算匯率</span>
-                            <span class="text-[11px] font-bold text-gray-500">1¥ =</span>
-                            <input type="number" id="homeRateInput" step="0.0001" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="w-14 bg-white border border-yellow-300 rounded-md px-1 py-0.5 text-center text-xs font-black text-amber-700 focus:outline-yellow-500">
+                <!-- 方案 A：首頁置頂「秒算匯率膠囊」(Sticky 永遠固定置頂版) -->
+                <div class="sticky -top-4 z-30 pt-2 pb-2 -mx-1 px-1 bg-gradient-to-b from-slate-50 via-slate-50/95 to-transparent">
+                    <div id="home-fx-bar" class="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 rounded-3xl p-3.5 border-2 border-yellow-300 shadow-lg relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="bg-yellow-400 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm"><i class="fas fa-bolt mr-0.5"></i>秒算匯率</span>
+                                <span class="text-[11px] font-bold text-gray-500">1¥ =</span>
+                                <input type="number" id="homeRateInput" step="0.0001" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="w-14 bg-white border border-yellow-300 rounded-md px-1 py-0.5 text-center text-xs font-black text-amber-700 focus:outline-yellow-500">
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="fetchExchangeRate()" id="homeFetchRateBtn" class="bg-white border border-yellow-300 text-amber-700 px-2 py-1 rounded-lg text-[10px] font-bold active:scale-90 transition-transform shadow-sm">
+                                    <i class="fas fa-sync-alt mr-0.5"></i>更新匯率
+                                </button>
+                                <button onclick="transferHomeFxToExpense()" class="bg-pink-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold active:scale-90 transition-transform shadow-sm">
+                                    <i class="fas fa-plus mr-0.5"></i>記這筆
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="fetchExchangeRate()" id="homeFetchRateBtn" class="bg-white border border-yellow-300 text-amber-700 px-2 py-1 rounded-lg text-[10px] font-bold active:scale-90 transition-transform shadow-sm">
-                                <i class="fas fa-sync-alt mr-0.5"></i>更新匯率
-                            </button>
-                            <button onclick="transferHomeFxToExpense()" class="bg-pink-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold active:scale-90 transition-transform shadow-sm">
-                                <i class="fas fa-plus mr-0.5"></i>記這筆
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div class="relative flex-1">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-black text-base">¥</span>
-                            <input type="number" id="homeJpyInput" value="${homeFxInputVal}" oninput="convertHomeCurrency(this.value)" placeholder="輸入日幣標價..." class="w-full bg-white border-2 border-yellow-200 rounded-2xl pl-7 pr-7 py-2 text-lg font-black text-gray-800 focus:outline-yellow-500 shadow-inner">
-                            <button onclick="clearHomeFx()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 text-xs"><i class="fas fa-times-circle"></i></button>
-                        </div>
-                        <div class="flex flex-col justify-center bg-white border border-green-200 rounded-2xl px-3 py-1.5 min-w-[130px] text-right shadow-sm">
-                            <div class="text-xs font-bold text-gray-400 leading-none mb-0.5">折合台幣 <span class="text-[9px] text-pink-500 font-black" id="homeTaxFreeHint">${curHomeJpy > 0 ? `(免稅$${curHomeTaxFreeTwd.toLocaleString()})` : ''}</span></div>
-                            <div class="text-xl font-black text-green-600 leading-tight font-mono">NT$ <span id="homeTwdOutput">${curHomeTwd.toLocaleString()}</span></div>
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex-1">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-black text-base">¥</span>
+                                <input type="number" id="homeJpyInput" value="${homeFxInputVal}" oninput="convertHomeCurrency(this.value)" placeholder="輸入日幣標價..." class="w-full bg-white border-2 border-yellow-200 rounded-2xl pl-7 pr-7 py-2 text-lg font-black text-gray-800 focus:outline-yellow-500 shadow-inner">
+                                <button onclick="clearHomeFx()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 text-xs"><i class="fas fa-times-circle"></i></button>
+                            </div>
+                            <div class="flex flex-col justify-center bg-white border border-green-200 rounded-2xl px-3 py-1.5 min-w-[130px] text-right shadow-sm">
+                                <div class="text-xs font-bold text-gray-400 leading-none mb-0.5">折合台幣 <span class="text-[9px] text-pink-500 font-black" id="homeTaxFreeHint">${curHomeJpy > 0 ? `(免稅$${curHomeTaxFreeTwd.toLocaleString()})` : ''}</span></div>
+                                <div class="text-xl font-black text-green-600 leading-tight font-mono">NT$ <span id="homeTwdOutput">${curHomeTwd.toLocaleString()}</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3057,7 +3059,7 @@ function initChecklistSync() {
         dayMap = L.map('day-map-container', { zoomControl: false, attributionControl: false });
         familyRadarLayer = L.layerGroup().addTo(dayMap);
         
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19
         }).addTo(dayMap);
 
