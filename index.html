@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
-    <title>奎奎全家沖繩二沖 🦕 v21.0 Ultimate (2027)</title>
+    <title>奎奎全家沖繩二刷 🦕 v21.0 Ultimate (2027)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -891,14 +891,103 @@ function initChecklistSync() {
         SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
     };
 
-    // 2. 行程資料庫 (2027 名護 Yugaf Inn + 浦添 Ala COOJU 定案版)
+    // 1. 景點詳細資料庫 (2027 A/B 雙方案 ＋ ☔ 終極雨備旗艦版)
+    const spotInfoDB = {
+        // --- Day 1 & 7 機場與豐崎 ---
+        "tpe_airport": { title: "台中國際機場 (RMQ)", tags: ["出發", "星宇JX302"], image: "https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?q=80&w=1000", desc: "2027 二刷沖繩的起點！搭乘 13:15 星宇航空 JX302 飛往那霸。", tips: "💡 輕便推車記得跟地勤說要 Gate-check (推到登機口)。過安檢前把奎奎水壺倒空。", map: "台中國際機場", lat: 24.2586, lon: 120.5960 },
+        "oka_airport": { title: "那霸機場 (OKA)", tags: ["抵達", "國內線2F"], image: "https://images.unsplash.com/photo-1542332213-31f87348057f?q=80&w=1000", desc: "入境後直接去 1F 大廳外 10-A 月台搭 OTS 接駁車。回程則可逛國內線 2F 買伴手禮、寶可夢中心與豬肉蛋飯糰。", tips: "💡 國內線 2F 有滿滿扭蛋機，回程可以把身上的日幣零錢全部花光。", map: "那霸機場", lat: 26.2048, lon: 127.6458 },
+        "ots_rent": { title: "OTS 臨空豐崎營業所", tags: ["租還車", "自駕基地"], image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000", desc: "全程自駕起點與終點。取車時務必仔細錄影外觀、確認兒童汽座安裝穩固，以及 ETC 卡是否插入。", tips: "💡 營業所旁邊就是 iias 豐崎，取完車直接開過去吃晚餐加採買，動線 100 分！", map: "OTS 臨空豐崎營業所", lat: 26.1558, lon: 127.6534 },
+        "iias": { title: "iias 沖繩豐崎 (含DMM水族館)", tags: ["100%全室內", "AEON/西松屋"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "全室內商場，有立體停車場免淋雨！美食街吃沖繩麵/白飯，1F 有 AEON 超市，3F 有西松屋，2F 還有 DMM 水族館。", tips: "💡 Day 1 買齊水、零食與泡澡球；Day 7 若下雨也是取代 Outlet 的完美室內雨備！", map: "iias Okinawa Toyosaki", lat: 26.1557, lon: 127.6533 },
+        "ashibinaa": { title: "ASHIBINAA Outlet", tags: ["精品球鞋", "還車前衝刺"], image: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000", desc: "從宜野灣王子走西海岸道路約 25 分鐘即達！還車前最後採買運動球鞋與吃早午餐。", tips: "💡 半露天商場，若遇大雨可直接轉進隔壁 100% 室內的 iias 豐崎！", map: "Okinawa Outlet Mall Ashibinaa", lat: 26.1583, lon: 127.6569 },
+        "gas_station": { title: "ENEOS 加油站 (豐崎)", tags: ["紅槍加滿", "保留收據"], image: "https://images.unsplash.com/photo-1626863905121-3b0c0ed7b94c?q=80&w=1000", desc: "OTS 營業所正旁邊的加油站，還車前必須加滿油 (Regular 紅槍)，並把收據交給 OTS 檢查人員。", tips: "💡 記得檢查車門邊、座椅縫隙有沒有遺落奎奎的奧特曼或太陽眼鏡，並拔下 ETC 卡！", map: "ENEOS Dr.Drive Self Toyosaki SS", lat: 26.1550, lon: 127.6530 },
+
+        // --- 住宿基地 (3晚名護 + 3晚宜野灣) ---
+        "hotel_nago": { title: "Yugaf Inn 飯店沖繩", tags: ["前3晚基地", "訂單:1788180243"], image: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1000", desc: "【已付款｜含早餐｜15:00入住】Triple Executive 海景行政房 (3張單人床)。\n📍地址：453-1, Miyazato, Nago-city\n📞電話：+81 980-51-7700\n🔢Mapcode：206 626 528*55", tips: "💡 免費平面停車場！過馬路就是 21世紀之森海灘，去 Neo Park 8分、Hama 壽司 3分！", map: "Hotel Yugaf Inn Okinawa", lat: 26.5947, lon: 127.9681 },
+        "hotel_prince": { title: "沖繩王子宜野灣海景大飯店", tags: ["後3晚五星基地", "訂單:2062367465"], image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1000", desc: "【含早餐｜14:00提早入住】豪華海景雙床房 (38㎡｜2027/6/1扣款 JPY 103,713)。\n📍地址：3-28-1 Mashiki, Ginowan\n📞電話：+81 98-898-1110\n🔢Mapcode：33 403 331*41", tips: "💡 免費室內立體停車場，走 2F 連通道進飯店完全免淋雨！內建 2F 戶外無邊際泳池＋室內恆溫泳池＋天然溫泉大浴場＋1F 兒童遊戲室！", map: "Okinawa Prince Hotel Ocean View Ginowan", lat: 26.2778, lon: 127.7314 },
+
+        // --- 名護 A 方案與雨備景點 ---
+        "neopark": { title: "Neo Park 名護自然動植物公園", tags: ["名護A", "小火車餵水豚"], image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?q=80&w=1000", desc: "從 Yugaf Inn 開車僅 8 分鐘！搭「沖繩輕便鐵道」復古小火車環園免走路，近距離餵食水豚、狐猴與大嘴鳥。", tips: "💡 ☔雨備：若下雨改去 5 分鐘車程的「名護鳳梨園(有遮雨棚鳳梨車)」或「Orion啤酒名護觀光工廠」！", map: "Neo Park Okinawa", lat: 26.6056, lon: 127.9997 },
+        "pineapple": { title: "名護鳳梨園 / Orion啤酒廠", tags: ["名護雨備", "遮雨棚鳳梨車"], image: "https://images.unsplash.com/photo-1589308107877-4348615e449a?q=80&w=1000", desc: "雨天救星！鳳梨園自動駕駛車有遮雨棚，室內還有酒莊與恐龍區；或可選全室內的 Orion 啤酒觀光工廠試飲果汁與啤酒。", tips: "💡 離 Neo Park 與 Yugaf Inn 都只有 5~8 分鐘車程！", map: "Nago Pineapple Park", lat: 26.6164, lon: 127.9714 },
+        "kouri_shrimp": { title: "Kouri Shrimp 蝦蝦飯", tags: ["古宇利島", "室內冷氣座"], image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1000", desc: "跨越古宇利大橋後的必吃蒜香奶油蝦！1F 點餐後有室內冷氣座位區可避雨。", tips: "💡 12:00 前抵達避開排隊尖峰，加點薯條給奎奎吃。", map: "Kouri Shrimp", lat: 26.7032, lon: 128.0255 },
+        "kouri_tower": { title: "古宇利海洋塔", tags: ["小雨照常玩", "冷氣貝殼館"], image: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000", desc: "無人高爾夫球車有遮頂，塔內為全室內貝殼博物館與冷氣展望台，小雨照常可玩！", tips: "💡 ☔大暴雨備案：若風雨過大不過橋，改去本部町「海洋博海洋文化館（室內大船模型+天文館，大人¥190/兒童免費）」。", map: "古宇利海洋塔", lat: 26.7042, lon: 128.0286 },
+        "aeon_nago": { title: "21世紀之森海灘 / AEON名護店", tags: ["飯店對面挖沙", "大創/西松屋"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "☀️晴天：Yugaf Inn 過馬路就是 21世紀之森海灘挖沙！\n☔雨天：逛 AEON 名護店＋Daiso 大創＋西松屋名護店，室內買玩具童裝與泡澡球。", tips: "💡 累了隨時回飯店房間吹冷氣睡午覺！", map: "AEON Nago", lat: 26.6010, lon: 127.9940 },
+        "okichan_dolphin": { title: "海洋博公園・海豚劇場 / 美麗海主館", tags: ["停P7免費", "遮雨棚看海豚"], image: "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?q=80&w=1000", desc: "☀️晴/小雨：看免費海龜館(有室內地下室)、海牛館與 10:30 海豚劇場(觀眾席有超大擋雨棚，下雨照常表演！)＋¥500餵海豚。\n☔大暴雨：車已停 P7，直接買票進「美麗海水族館」主館室內吹冷氣看鯨鯊！", tips: "💡 晴雨無敵的雙保險動線，停好車看當時雨勢決定即可！", map: "オキちゃん劇場", lat: 26.6931, lon: 127.8767 },
+        "kishimoto_soba": { title: "岸本食堂 (本部町/八重岳店)", tags: ["百年老店", "沖繩麵+炊飯"], image: "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=1000", desc: "離海洋博園區僅 8~15 分鐘！手工柴魚高湯沖繩麵＋限量炊飯，八重岳店寬敞好停車、有榻榻米。", tips: "💡 三層肉燉得入口即化，必點手工沖繩炊飯 (Jushi) 給奎奎吃！", map: "きしもと食堂 八重岳店", lat: 26.6472, lon: 127.9094 },
+        "sesoko_beach": { title: "瀨底島 (透明船 & 瀨底海灘)", tags: ["名護A", "透明獨木舟"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "13:30 報到、14:00 體驗全透明獨木舟或玻璃底船看珊瑚礁熱帶魚，15:00~16:30 白沙灘瘋狂挖沙踏浪。", tips: "💡 ☔雨天停航備案：改去「御菓子御殿名護店(看紅芋塔產線)」＋「MEGA唐吉軻德名護店(超大玩具區買奧特曼)」！", map: "瀬底ビーチ", lat: 26.6492, lon: 127.8556 },
+        "donki_nago": { title: "御菓子御殿 & MEGA唐吉軻德 名護店", tags: ["名護雨備", "室內買玩具伴手禮"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "雨天或風浪大時的完美室內備案！去御菓子御殿看紅芋塔生產線喝下午茶，再去 MEGA 唐吉軻德名護店逛超大玩具區。", tips: "💡 MEGA 唐吉軻德離 Yugaf Inn 飯店只有 5 分鐘車程！", map: "MEGA Don Quijote Nago", lat: 26.5843, lon: 127.9856 },
+        "hamazushi": { title: "Hama 壽司 名護店", tags: ["離飯店3分鐘", "火車送餐"], image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=1000", desc: "離 Yugaf Inn 車程僅 3 分鐘！平板點餐、火車軌道送餐，有玉子燒、烏龍麵與薯條。", tips: "💡 周邊還有暖暮拉麵、燒肉乃我那霸、Dining Yukino 可選。", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830 },
+
+        // --- 名護 B 方案專屬景點 ---
+        "busena": { title: "部瀨名海中公園", tags: ["名護B", "鯨魚玻璃船+展望塔"], image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1000", desc: "搭免費接駁車、乘鯨魚造型玻璃底船餵魚，走進海底 5 公尺「海中展望塔」360度看小丑魚！", tips: "💡 ☔雨備：風浪大玻璃船停駛時展望塔通常仍開放；大雨則改去「恩納之驛」吃美食或「菓子工坊恩納店」看海喝咖啡。", map: "ブセナ海中公園", lat: 26.5303, lon: 127.9250 },
+        "ufuya": { title: "百年古家 大家 (Ufuya)", tags: ["名護B午餐", "瀑布古民家"], image: "https://images.unsplash.com/photo-1552611052-33e04de081de?q=80&w=1000", desc: "隱身名護山林的百年古民家餐廳！室內座位看著窗外森林與瀑布吃阿咕豬沖繩麵，就算下雨也超有氣氛！", tips: "💡 建議事先網路預約或提早抵達抽號碼牌。", map: "百年古家 大家", lat: 26.6214, lon: 127.9653 },
+        "junglia": { title: "JUNGLIA OKINAWA / 備瀨水牛車", tags: ["名護B重頭戲", "最新恐龍主題樂園"], image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000", desc: "沖繩北部最新叢林亞恐龍主題樂園（搭裝甲車看巨型恐龍）！或可選海洋博免費海豚秀＋備瀨福木林道搭水牛車。", tips: "💡 ☔雨備：若下大雨不適合戶外叢林，直接改去全室內「美麗海水族館」或讀谷村「Gala 青海(室內海鹽冰淇淋體驗)」。", map: "JUNGLIA OKINAWA", lat: 26.6415, lon: 127.9512 },
+
+        // --- Day 4 移動日景點 ---
+        "fishing_kingdom": { title: "沖繩釣魚尋寶冒險王國", tags: ["100%全室內", "釣魚+室內沙道挖寶"], image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000", desc: "晴雨皆宜 100% 全室內冷氣房！無鉤釣竿釣熱帶魚、撈小魚、釣螯蝦；在室內尋寶沙道拿鏟子刷子挖掘恐龍化石與水晶寶石帶回家（完美解決雨天不能去海灘挖沙的遺憾）！", tips: "💡 攻略重點：玩到 13:15 離開，精準避開 13:30~14:00 的清場維護時間！", map: "釣って見つけるぼうけんの国 沖縄", lat: 26.4258, lon: 127.8256 },
+        "sunset_beach": { title: "北谷美國村 / AEON北谷店", tags: ["美式街景", "雨備直奔王子飯店"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "☀️晴/陰：美國村吃午餐、拍美式街景與日落海灘。\n☔雨天：直接停進「AEON 北谷店」室內吃午餐逛街，並在 14:00 準時直奔「宜野灣王子大飯店」提早 Check-in！", tips: "💡 從美國村開往宜野灣王子飯店車程只要 10 分鐘！", map: "Chatan Sunset Beach", lat: 26.3144, lon: 127.7531 },
+        "sana_ginowan": { title: "San-A 宜野灣商場 / Jinon 百匯", tags: ["室內立體停車", "超市/藥妝/晚餐"], image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1000", desc: "就在宜野灣王子飯店隔壁（開車2分鐘停室內立體停車場，或步行5分鐘）！內有大型超市、松本清藥妝、電器與多間餐廳；也可在飯店 1F Jinon 吃自助百匯。", tips: "💡 泡完溫泉過去吃晚餐買水果回房間超愜意！", map: "San-A Ginowan Convention City", lat: 26.2801, lon: 127.7335 },
+
+        // --- 宜野灣 A / B 方案與雨備景點 ---
+        "araha_park": { title: "安良波公園 & 海灘", tags: ["1:1海盜船", "離飯店8分"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "從宜野灣王子往北開車僅 8~10 分鐘！沙灘上停著 1:1 超巨大海盜船溜滑梯與攀爬網，腳下就是大沙坑，旁有沖洗水龍頭！", tips: "💡 ☔雨備：若下雨海灘濕滑，直接改去「AEON Mall Rycom 來客夢(15分，看大水族箱與寶可夢中心)」或「兒童王國 Wonder Museum」！", map: "アラハビーチ", lat: 26.3039, lon: 127.7583 },
+        "rycom": { title: "永旺夢樂城 AEON Mall Rycom", tags: ["神級室內雨備", "寶可夢/大水族箱"], image: "https://images.unsplash.com/photo-1595995567786-8f3b25e16548?q=80&w=1000", desc: "離宜野灣車程僅 15 分鐘！全室內超好逛，1F 有巨大熱帶魚水族箱、4F 有寶可夢中心與超多奧特曼/恐龍玩具店。", tips: "💡 下雨天取代戶外海灘與公園的頭號王牌！", map: "Aeon Mall Okinawa Rycom", lat: 26.3138, lon: 127.7967 },
+        "tropical_beach": { title: "宜野灣熱帶海灘 / 飯店室內溫水池", tags: ["過馬路3分", "內建溫泉泳池雨備"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000", desc: "☀️晴天：過馬路步行 3 分鐘去「宜野灣熱帶海灘」挖沙或玩飯店 2F 戶外無邊際泳池。\n☔雨天：回房吹冷氣睡午覺＋玩飯店 2F「室內恆溫泳池」與「天然溫泉大浴場」！", tips: "💡 住五星級飯店最爽的就是不管晴雨都有頂級設施可玩！", map: "Ginowan Tropical Beach", lat: 26.2797, lon: 127.7289 },
+        "parco": { title: "浦添西海岸 PARCO CITY", tags: ["100%全室內", "3F室內高科技白沙坑"], image: "https://images.unsplash.com/photo-1595995567786-8f3b25e16548?q=80&w=1000", desc: "離宜野灣王子車程僅 4 分鐘，停室內立體停車場完全不淋雨！\n👩媽媽主場：2F 阿卡將、Uniqlo、GU、松本清、日系女裝\n🦸‍♂️父子主場：3F 玩具區挑奧特曼、Asobi Park Plus（內有「室內高科技互動白沙坑」，連下三天雨也能乾乾淨淨玩沙）！", tips: "💡 晚餐直接在館內吃敘敘苑燒肉或迴轉壽司，吃飽開 4 分鐘秒回飯店！", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934 },
+        "naminoue": { title: "波上宮 & 波之上海灘", tags: ["懸崖神社", "雨備:縣立博物館"], image: "https://images.unsplash.com/photo-1599464440263-6c2438883e1c?q=80&w=1000", desc: "☀️晴/陰：參拜買交通安全書包御守，沙灘拍懸崖神社與踏浪。\n☔雨天：車直接停神社旁，撐傘 1 分鐘快速買完書包御守即上車；多出時間改去新都心「沖繩縣立博物館(1F免費兒童科學互動體驗室)」或「Naha Main Place＋玩具反斗城」！", tips: "💡 拍懸崖神社的最佳角度在旁邊的跨海高架橋人行步道上！", map: "波上宮", lat: 26.2206, lon: 127.6713 },
+        "okimu": { title: "沖繩縣立博物館・美術館 & Main Place", tags: ["那霸室內雨備", "免費兒童體驗室"], image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1000", desc: "位於那霸新都心！博物館建築像白色城堡，1F 有免費的兒童科學文化互動體驗室「ふれあい体験室」可以拼圖、穿傳統服飾、玩樂器；過馬路就是 Naha Main Place 商場與玩具反斗城！", tips: "💡 波上宮遇到下雨時的完美室內延伸行程！", map: "Okinawa Prefectural Museum & Art Museum", lat: 26.2275, lon: 127.6939 },
+        "minatogawa": { title: "浦添・港川外人住宅街", tags: ["離飯店僅6分", "oHacorte水果塔"], image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1000", desc: "☀️晴/陰：平地散步拍美式彩色平房、買 oHacorte 水果塔、吃雞湯拉麵當午餐。\n☔雨天：開車直接停在 oHacorte 店門口外帶水果塔回飯店吃，午餐改在 San-A 宜野灣商場或 PARCO 室內解決。", tips: "💡 離宜野灣王子飯店車程僅 6 分鐘！", map: "港川ステイツサイドタウン", lat: 26.2625, lon: 127.7147 },
+        "manga_souko": { title: "漫畫倉庫 浦添店 & A&W 牧港店", tags: ["100%全室內", "挖寶超便宜奧特曼"], image: "https://images.unsplash.com/photo-1552895638-f7fe08d2f7d5?q=80&w=1000", desc: "100% 全室內尋寶基地！有整面牆的超便宜二手/全新奧特曼軟膠公仔與變身器，隔壁就是復古美式 A&W 牧港店！", tips: "💡 離宜野灣王子飯店車程僅 5 分鐘，逛完直接回飯店吹冷氣睡午覺！", map: "マンガ倉庫 浦添店", lat: 26.2662, lon: 127.7185 },
+        "futenma_cave": { title: "普天滿宮 (地底鐘乳洞探險)", tags: ["宜野灣B", "免費神秘鐘乳洞"], image: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000", desc: "位於宜野灣市的古老神社，跟巫女登記即可免費進入地底神秘鐘乳洞探險！小雨可照常進入洞內。", tips: "💡 ☔大暴雨備案：若遇暴雨關閉則改去「浦添市美術館」或提早去漫畫倉庫與商場。", map: "普天満宮", lat: 26.2922, lon: 127.7775 },
+        "urasoe_park": { title: "伊祖公園 / 浦添大公園 C區(幼兒區)", tags: ["宜野灣B", "幼兒專用溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "浦添大公園 C 區是專為 1~6 歲幼兒設計的軟墊遊具區與沙坑，安全好停車！", tips: "💡 ☔雨備：若下雨直接取消戶外公園，提早進「PARCO 3F Asobi Park Plus 室內兒童樂園」玩室內沙坑與氣墊！", map: "浦添大公園 憩いの広場Cゾーン", lat: 26.2536, lon: 127.7214 },
+        
+        // --- 🦕 隱藏版神級放電公園備用庫 ---
+        "park_ocean": { title: "海洋博公園 兒童樂園", tags: ["公園", "巨型網"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "海豚劇場旁邊！有超大的藍色攀爬網跟溜滑梯，地板是軟墊超安全。", tips: "💡 看完海豚秀如果時間充裕，可以順路走過去玩 20 分鐘！", map: "海洋博公園 ちびっことりで", lat: 26.6943, lon: 127.8779 },
+        "park_nakagusuku": { title: "中城公園", tags: ["公園", "超大跳床"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "沖繩最強親子公園之一！有巨型白色彈跳床和滾輪溜滑梯，離宜野灣約 15 分鐘。", tips: "💡 導航記得設「西區停車場」離溜滑梯最近。", map: "中城公園", lat: 26.2806, lon: 127.8016 },
+        "park_comprehensive": { title: "綜合運動公園", tags: ["公園", "溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "遊具色彩繽紛，有大型紅藍溜滑梯，旁邊還有大草皮可以奔跑。", tips: "💡 位於泡瀨附近，空間非常寬敞。", map: "沖縄県総合運動公園 大型遊具", lat: 26.3089, lon: 127.8286 },
+        "park_ginoza": { title: "宜野座 道の駅", tags: ["公園", "水陸雙拼"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "超大型溜滑梯+免費兒童戲水池，6月夏天玩水超消暑！", tips: "💡 玩水池水深只到小腿肚，非常適合 4 歲小孩放電！", map: "道の駅 ぎのざ", lat: 26.4746, lon: 127.9782 },
+        "park_yaedake": { title: "八重岳櫻之森公園", tags: ["公園", "森林溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "就在岸本食堂八重岳店旁邊！森林裡有豐富的彩色溜滑梯與攀爬網，地板是軟墊！", tips: "💡 Day 3 吃完岸本食堂如果還有時間，開車 3 分鐘就能上去溜滑梯！", map: "八重岳桜の森公園", lat: 26.6348, lon: 127.9224 },
+        "park_nago_central": { title: "名護中央公園", tags: ["公園", "滾輪溜滑梯"], image: "https://images.unsplash.com/photo-1563507577884-3c87f2771239?q=80&w=1000", desc: "離 Yugaf Inn 超近，有經典的長長滾輪溜滑梯，還能俯瞰絕美海景！", tips: "💡 去 AEON 的大創買個滑草墊墊著屁股溜，才不會痛喔！", map: "名護中央公園", lat: 26.5912, lon: 127.9868 }
+    };
+
+    const bgImages = {
+        D1: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1000&fit=crop",
+        D2: "https://images.unsplash.com/photo-1560275619-4662e36fa65c?q=80&w=1000&fit=crop",
+        D3: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000&fit=crop",
+        D4: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=1000&fit=crop",
+        D5: "https://images.unsplash.com/photo-1534234828569-2f2249520468?q=80&w=1000&fit=crop",
+        D6: "https://images.unsplash.com/photo-1570533412033-662309e3df4e?q=80&w=1000&fit=crop",
+        D7: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=1000&fit=crop",
+        SHOP: "https://images.unsplash.com/photo-1472851294608-415522f96319?q=80&w=1000&fit=crop",
+        TOOL: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?q=80&w=1000&fit=crop",
+        MISSION: "https://images.unsplash.com/photo-1533227297464-9429738d1964?q=80&w=1000&fit=crop",
+        CALC: "https://images.unsplash.com/photo-1563986768603-41fef5d00369?q=80&w=1000&fit=crop",
+        SYNC: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&fit=crop",
+        SOS: "https://images.unsplash.com/photo-1588611910679-22a9009952a9?q=80&w=1000&fit=crop"
+    };
+
+    // A/B 方案記憶狀態 (nago: Day2~3, ginowan: Day5~6)
+    let planSelection = JSON.parse(localStorage.getItem('trip_plan_ab_2027')) || { nago: 'A', ginowan: 'A' };
+    window.switchPlanAB = (region, plan) => {
+        planSelection[region] = plan;
+        localStorage.setItem('trip_plan_ab_2027', JSON.stringify(planSelection));
+        if(navigator.vibrate) navigator.vibrate(40);
+        showToast(`🔀 已切換為【${region === 'nago' ? '名護' : '宜野灣'} ${plan} 方案】`);
+        renderContent();
+    };
+    window.getActiveDayEvents = (d) => {
+        if (d.planGroup && d.plans && d.plans[planSelection[d.planGroup]]) {
+            return d.plans[planSelection[d.planGroup]].events;
+        }
+        return d.events || [];
+    };
+
+    // 2. 行程資料庫 (2027 A/B 雙方案 ＋ ☔ 終極雨備旗艦版)
     let itineraryDB = [
         { 
-            day: "D1", date: "6/05 (六)", title: "啟程北上 & 採買補給", highlights: "星宇JX302 / iias買泡澡球 / 住名護 Yugaf Inn", bg: bgImages.D1, 
+            day: "D1", date: "6/05 (六)", title: "啟程北上 & 採買補給", highlights: "全程室內不受天氣影響 / iias立體停車免淋雨 / 住名護 Yugaf Inn", bg: bgImages.D1, 
             weather: {
                 icon: "fa-cloud-sun", temp: "25°C - 29°C", rain: "30%", uv: "高",
                 wear: "透氣短袖套裝 + 薄棉外套 (機上與商場冷氣用)",
-                tips: "⚠️ 6月沖繩已進入初夏，下飛機體感溫熱；起降時記得準備果汁或軟糖幫奎奎平衡耳壓！"
+                tips: "⚠️ 第一天全程室內與車內移動，完全不受天氣影響！iias 豐崎有立體停車場免淋雨。"
             },
             events: [
                 { time: "09:00", title: "從溫暖的家出發", icon: "fa-house", note: "預留充裕車程前往台中機場。檢查全家3本護照、台灣駕照正本+日文譯本！", duration: "1h", travel: "🚗 60分" },
@@ -906,107 +995,226 @@ function initChecklistSync() {
                 { time: "13:15", title: "搭乘星宇航空 JX302 起飛", icon: "fa-plane-departure", note: "準備果汁/軟糖平衡耳壓，機上畫畫看卡通。", duration: "1.5h", travel: "🛬 降落" },
                 { time: "15:45", title: "抵達那霸機場 (OKA)", spotId: "oka_airport", icon: "fa-plane-arrival", note: "入境領行李後，直接至 1F 大廳外 10-A 月台搭 OTS 免費接駁車。", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "1h", travel: "🚌 接駁 20分" },
                 { time: "17:00", title: "OTS 臨空豐崎營業所取車", spotId: "ots_rent", icon: "fa-car", note: "檢查車況、安裝兒童汽座、確認 ETC 卡已插入。", map: "OTS 臨空豐崎營業所", mapcode: "232 543 532*25", lat: 26.1558, lon: 127.6534, duration: "45m", travel: "🚗 2分" },
-                { time: "17:45", title: "iias 沖繩豐崎 (晚餐+補給)", spotId: "iias", icon: "fa-bag-shopping", note: "美食街吃沖繩麵/白飯；1F AEON 超市買水、零食、水果與恐龍/奧特曼泡澡球！", map: "iias Okinawa Toyosaki", mapcode: "232 543 400*25", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚗 高速北上 85分" },
+                { time: "17:45", title: "iias 沖繩豐崎 (晚餐+補給)", spotId: "iias", icon: "fa-bag-shopping", note: "全室內商場，有立體停車場免淋雨！美食街吃沖繩麵/白飯，1F AEON 超市買水、零食與恐龍/奧特曼泡澡球！", map: "iias Okinawa Toyosaki", mapcode: "232 543 400*25", lat: 26.1557, lon: 127.6533, duration: "2h", travel: "🚗 高速北上 85分" },
                 { time: "19:45", title: "上高速公路直奔名護市區", icon: "fa-road", note: "吃飽喝足，讓奎奎在車上舒服休息，爸爸開往許田 IC。", duration: "1.5h", travel: "🚗 抵達" },
                 { time: "21:15", title: "Yugaf Inn 飯店沖繩 Check-in", spotId: "hotel_nago", icon: "fa-hotel", note: "訂單：1788180243 (已付款｜含早餐｜海景行政3床房)。連住三晚免收行李，免費平面停車！", map: "Hotel Yugaf Inn Okinawa", mapcode: "206 626 528*55", lat: 26.5947, lon: 127.9681, duration: "連住3晚" }
             ]
         },
         { 
-            day: "D2", date: "6/06 (日)", title: "小火車餵動物 & 古宇利藍絕景", highlights: "8分鐘到Neo Park / 蝦蝦飯 / 21世紀之森海灘", bg: bgImages.D2, 
+            day: "D2", date: "6/06 (日)", planGroup: "nago",
+            title: "小火車餵動物 & 古宇利藍絕景", highlights: "8分鐘到Neo Park / 蝦蝦飯 / 海洋塔 / 21世紀之森海灘", bg: bgImages.D2, 
             weather: {
                 icon: "fa-sun", temp: "26°C - 30°C", rain: "20%", uv: "極高",
                 wear: "涼爽短袖短褲 + 遮陽帽 + 防蚊液",
-                tips: "⚠️ 從 Yugaf Inn 去 Neo Park 開車只要 8 分鐘！過馬路就是 21世紀之森海灘，隨時能回房睡午覺。"
+                tips: "💡 可在上方自由切換【🅰️經典動物版】或【🅱️鯨魚玻璃船版】！右上角開啟「雨天」即可查看專屬室內雨備。"
             },
-            events: [
-                { time: "08:30", title: "飯店享用海景早餐", spotId: "hotel_nago", icon: "fa-mug-hot", note: "悠閒吃早餐，幫奎奎水壺裝滿水。", lat: 26.5947, lon: 127.9681, duration: "1h", travel: "🚗 8分" },
-                { time: "09:30", title: "Neo Park 名護自然動植物公園", spotId: "neopark", icon: "fa-train", note: "離飯店僅 8 分鐘！搭「沖繩輕便鐵道」復古小火車環園免走路，近距離餵食水豚、狐猴與大嘴鳥。", map: "Neo Park Okinawa", mapcode: "206 689 670*28", lat: 26.6056, lon: 127.9997, duration: "2h", travel: "🚗 25分",
-                  rainy: { title: "御菓子御殿 / 古宇利海洋塔室內", icon: "fa-cookie-bite", note: "若遇大雨改逛名護御菓子御殿看紅芋塔生產線，或去海洋塔室內吹冷氣看海！" }
+            plans: {
+                A: {
+                    label: "🅰️ 名護A：經典動物 & 秘境海景",
+                    title: "小火車餵動物 & 古宇利藍絕景",
+                    highlights: "Neo Park小火車 / 古宇利蝦蝦飯 / 海洋塔 / 對面海灘挖沙",
+                    events: [
+                        { time: "08:30", title: "飯店享用海景早餐", spotId: "hotel_nago", icon: "fa-mug-hot", note: "悠閒吃早餐，幫奎奎水壺裝滿水。", lat: 26.5947, lon: 127.9681, duration: "1h", travel: "🚗 8分" },
+                        { time: "09:30", title: "Neo Park 名護自然動植物公園", spotId: "neopark", icon: "fa-train", note: "☀️晴/陰：搭「沖繩輕便鐵道」復古小火車環園免走路，近距離餵食水豚、狐猴與大嘴鳥！", map: "Neo Park Okinawa", mapcode: "206 689 670*28", lat: 26.6056, lon: 127.9997, duration: "2h", travel: "🚗 25分",
+                          rainy: { title: "名護鳳梨園 (遮雨棚車) 或 Orion啤酒廠", spotId: "pineapple", icon: "fa-wine-bottle", note: "☔雨天備案：改去 5 分鐘車程的「名護鳳梨園」（搭有遮雨棚的自動鳳梨車＋室內酒莊/恐龍區）或「Orion 啤酒名護觀光工廠」（全室內參觀＋試飲果汁/啤酒）！", map: "Nago Pineapple Park", mapcode: "206 716 467*82" }
+                        },
+                        { time: "12:00", title: "午餐：古宇利島蝦蝦飯", spotId: "kouri_shrimp", icon: "fa-shrimp", note: "1F 點餐後有室內冷氣座位區可避雨！12點前抵達避開尖峰。", map: "Kouri Shrimp", mapcode: "485 692 168*22", lat: 26.7032, lon: 128.0255, duration: "1.5h", travel: "🚗 3分" },
+                        { time: "13:30", title: "古宇利海洋塔", spotId: "kouri_tower", icon: "fa-tower-observation", note: "☀️晴/小雨照常可玩：無人高爾夫球車有遮頂，塔內為全室內貝殼博物館與冷氣展望台！", map: "古宇利海洋塔", mapcode: "485 693 485*14", lat: 26.7042, lon: 128.0286, duration: "1.5h", travel: "🚗 25分",
+                          rainy: { title: "海洋文化館 (海洋博內) 或 海洋塔室內", spotId: "kouri_tower", icon: "fa-compass", note: "☔暴雨備案：小雨可照常玩海洋塔室內貝殼館；若風雨過大不過橋，改去本部町「海洋文化館」（全室內大船模型與星空天文館，門票僅¥190、兒童免費）！", map: "海洋文化館" }
+                        },
+                        { time: "15:30", title: "飯店對面 21世紀之森海灘挖沙", spotId: "aeon_nago", icon: "fa-umbrella-beach", note: "☀️晴天：Yugaf Inn 過馬路就是海灘與公園，累了隨時回房睡午覺！", map: "21世紀之森海灘", lat: 26.5960, lon: 127.9690, duration: "2h", travel: "🚗 5分",
+                          rainy: { title: "AEON 名護店 ＋ 大創 ＋ 西松屋", spotId: "aeon_nago", icon: "fa-bag-shopping", note: "☔雨天備案：室內逛街買玩具、童裝與恐龍/奧特曼泡澡球！", map: "AEON Nago", mapcode: "206 688 642*33" }
+                        },
+                        { time: "18:00", title: "晚餐：名護市區美食", icon: "fa-utensils", note: "飯店周邊有暖暮拉麵、燒肉乃我那霸、Dining Yukino 或玉家沖繩麵。", map: "Hotel Yugaf Inn Okinawa", lat: 26.5947, lon: 127.9681, duration: "2h" }
+                    ]
                 },
-                { time: "12:00", title: "午餐：古宇利島蝦蝦飯", spotId: "kouri_shrimp", icon: "fa-shrimp", note: "開車跨越古宇利大橋！12點前抵達避開排隊尖峰，大啖蒜香奶油蝦。", map: "Kouri Shrimp", mapcode: "485 692 168*22", lat: 26.7032, lon: 128.0255, duration: "1.5h", travel: "🚗 3分" },
-                { time: "13:30", title: "古宇利海洋塔", spotId: "kouri_tower", icon: "fa-tower-observation", note: "搭無人自動高爾夫球車上山，逛貝殼館、吹冷氣拍 180 度古宇利藍海景！", map: "古宇利海洋塔", mapcode: "485 693 485*14", lat: 26.7042, lon: 128.0286, duration: "1.5h", travel: "🚗 25分" },
-                { time: "15:30", title: "AEON 名護店大創 或 對面海灘挖沙", spotId: "aeon_nago", icon: "fa-umbrella-beach", note: "去 AEON 買玩具、逛大創與藥妝；或回 Yugaf Inn 過馬路到「21世紀之森海灘」挖沙，累了隨時回房午睡！", map: "AEON Nago", mapcode: "206 688 642*33", lat: 26.6010, lon: 127.9940, duration: "2h", travel: "🚗 5分" },
-                { time: "18:00", title: "晚餐：名護市區美食", icon: "fa-utensils", note: "飯店周邊有暖暮拉麵、燒肉乃我那霸、Dining Yukino 或玉家沖繩麵。", map: "Hotel Yugaf Inn Okinawa", lat: 26.5947, lon: 127.9681, duration: "2h" }
-            ]
+                B: {
+                    label: "🅱️ 名護B：鯨魚玻璃船 & 百年古家",
+                    title: "鯨魚玻璃底船 & 古宇利大橋兜風",
+                    highlights: "部瀨名鯨魚船+海底展望塔 / 百年古家大家 / 古宇利海灘",
+                    events: [
+                        { time: "08:30", title: "飯店享用海景早餐", spotId: "hotel_nago", icon: "fa-mug-hot", note: "吃飽出發前往部瀨名海中公園。", lat: 26.5947, lon: 127.9681, duration: "1h", travel: "🚗 15分" },
+                        { time: "09:30", title: "部瀨名海中公園 (玻璃船+展望塔)", spotId: "busena", icon: "fa-ship", note: "☀️晴/陰：搭免費接駁車、鯨魚玻璃底船餵魚、走進海底 5 公尺「海中展望塔」看小丑魚！", map: "ブセナ海中公園", mapcode: "206 442 075*77", lat: 26.5303, lon: 127.9250, duration: "2h", travel: "🚗 25分",
+                          rainy: { title: "海中展望塔 或 恩納之驛 / 菓子工坊", spotId: "busena", icon: "fa-mug-saucer", note: "☔雨天備案：若玻璃船停駛，展望塔通常仍開放；大雨則改去「道之驛 恩納之驛」吃美食或「菓子工坊 恩納店」看海景喝咖啡！", map: "おんなの駅 なかゆくい市場" }
+                        },
+                        { time: "12:00", title: "午餐：百年古家 大家 (Ufuya)", spotId: "ufuya", icon: "fa-bowl-rice", note: "有室內古民家座位，就算下雨看著窗外森林瀑布吃阿咕豬麵也超有氣氛！", map: "百年古家 大家", mapcode: "206 745 056*82", lat: 26.6214, lon: 127.9653, duration: "1.5h", travel: "🚗 25分" },
+                        { time: "14:00", title: "古宇利大橋兜風 & 古宇利海灘玩沙", spotId: "kouri_tower", icon: "fa-umbrella-beach", note: "☀️晴天：跨越古宇利大橋兜風，在橋下海灘踏浪玩沙！", map: "古宇利ビーチ", mapcode: "485 662 804*11", lat: 26.6961, lon: 128.0236, duration: "3h", travel: "🚗 25分",
+                          rainy: { title: "古宇利海洋塔室內 或 AEON/西松屋名護店", spotId: "kouri_tower", icon: "fa-building", note: "☔雨天備案：直接上「古宇利海洋塔」室內貝殼館與景觀餐廳躲雨看海，或回名護逛「宜得利 / 西松屋 / AEON 名護店」！", map: "古宇利海洋塔" }
+                        },
+                        { time: "18:00", title: "晚餐：名護市區 (燒肉乃我那霸或居酒屋)", icon: "fa-fire-burner", note: "回名護市區享用豐盛晚餐。", map: "燒肉乃我那霸 新館", lat: 26.5947, lon: 127.9681, duration: "2h" }
+                    ]
+                }
+            }
         },
         { 
-            day: "D3", date: "6/07 (一)", title: "免費海豚秀 & 瀨底島透明船挖沙", highlights: "25分到海洋博餵海豚 / 岸本食堂 / 瀨底島透明船", bg: bgImages.D3, 
+            day: "D3", date: "6/07 (一)", planGroup: "nago",
+            title: "免費海豚秀 & 瀨底島透明船挖沙", highlights: "P7免費看海豚餵海豚 / 岸本食堂 / 瀨底島透明船", bg: bgImages.D3, 
             weather: {
                 icon: "fa-sun", temp: "26°C - 31°C", rain: "10%", uv: "極高",
                 wear: "快乾短袖 + 兒童防曬泳衣/水母衣 + 護趾水鞋",
-                tips: "⚠️ 瀨底島玩完水開回 Yugaf Inn 只要 18 分鐘！記得帶大毛巾、挖沙工具組放車上。"
+                tips: "💡 海豚劇場上方有超大遮雨棚，小雨照常表演！若遇大暴雨，車已停在 P7 可直接轉進美麗海水族館主館！"
             },
-            events: [
-                { time: "08:30", title: "飯店享用早餐", spotId: "hotel_nago", icon: "fa-mug-hot", note: "吃飽準備出發前往本部町 (車程僅 25 分鐘)。", lat: 26.5947, lon: 127.9681, duration: "1h", travel: "🚗 25分" },
-                { time: "09:45", title: "海洋博公園 (停 P7 免費停車場)", spotId: "okichan_dolphin", icon: "fa-square-parking", note: "不進水族館主館！直接停 P7 立體停車場 (完全免費)，散步去戶外免費的海龜館、海牛館。", map: "海洋博公園 P7駐車場", mapcode: "553 075 797*77", lat: 26.6943, lon: 127.8779, duration: "45m", travel: "🚶 步行 3分" },
-                { time: "10:30", title: "海豚劇場 (Okichan Theater)", spotId: "okichan_dolphin", icon: "fa-water", note: "看 10:30 免費海豚秀 (睡晚可改看 11:30 場)；再去隔壁海豚潟湖花 ¥500 體驗餵海豚！", map: "オキちゃん劇場", lat: 26.6931, lon: 127.8767, duration: "1h", travel: "🚗 8分" },
-                { time: "11:45", title: "午餐：岸本食堂 (本部町或八重岳店)", spotId: "kishimoto_soba", icon: "fa-bowl-rice", note: "手工柴魚高湯沖繩麵＋限量炊飯，離園區僅 8~15 分鐘。", map: "きしもと食堂 八重岳店", mapcode: "206 812 396*55", lat: 26.6472, lon: 127.9094, duration: "1.5h", travel: "🚗 15分" },
-                { time: "13:30", title: "瀨底島 (瀨底海灘 / 橋下 Anti 濱)", spotId: "sesoko_beach", icon: "fa-sailboat", note: "13:30 櫃台報到 ➔ 14:00~15:00 體驗「全透明獨木舟/玻璃底船」看珊瑚礁與熱帶魚 ➔ 15:00~16:30 白沙灘瘋狂挖沙踏浪！", map: "瀬底ビーチ", mapcode: "206 822 265*25", lat: 26.6492, lon: 127.8556, duration: "3h", travel: "🚗 18分",
-                  rainy: { title: "美麗海水族館主館 (雨備方案)", spotId: "okichan_dolphin", icon: "fa-fish", note: "若遇風雨船班取消，直接轉進美麗海水族館室內看巨大黑潮之海鯨鯊！" }
+            plans: {
+                A: {
+                    label: "🅰️ 名護A：海豚秀 & 瀨底透明船",
+                    title: "免費海豚秀 & 瀨底島透明船挖沙",
+                    highlights: "P7遮雨棚看海豚 / 岸本食堂 / 瀨底島透明船挖沙",
+                    events: [
+                        { time: "08:30", title: "飯店享用早餐", spotId: "hotel_nago", icon: "fa-mug-hot", note: "吃飽出發前往海洋博公園 (車程僅 25 分鐘)。", lat: 26.5947, lon: 127.9681, duration: "1h", travel: "🚗 25分" },
+                        { time: "09:45", title: "海洋博公園 (停 P7 立體停車場) & 海豚秀", spotId: "okichan_dolphin", icon: "fa-water", note: "☀️晴/小雨：看免費海龜館(有室內地下室)、海牛館與 10:30 海豚劇場(有超大擋雨棚，下雨照常表演！)，再去隔壁花 ¥500 體驗餵海豚！", map: "海洋博公園 P7駐車場", mapcode: "553 075 797*77", lat: 26.6931, lon: 127.8767, duration: "2h", travel: "🚗 8分",
+                          rainy: { title: "沖繩美麗海水族館 主館室內 (大暴雨備案)", spotId: "okichan_dolphin", icon: "fa-fish", note: "☔大暴雨備案：既然車已停在 P7 立體停車場，若遇狂風暴雨直接買票進「美麗海水族館」主館室內吹冷氣看黑潮之海與鯨鯊！", map: "沖繩美麗海水族館" }
+                        },
+                        { time: "11:45", title: "午餐：岸本食堂 (本部町或八重岳店)", spotId: "kishimoto_soba", icon: "fa-bowl-rice", note: "手工柴魚高湯沖繩麵＋炊飯，離園區僅 8 分鐘。", map: "きしもと食堂 八重岳店", mapcode: "206 812 396*55", lat: 26.6472, lon: 127.9094, duration: "1.5h", travel: "🚗 15分" },
+                        { time: "13:30", title: "瀨底島 (瀨底海灘 / 橋下 Anti 濱)", spotId: "sesoko_beach", icon: "fa-sailboat", note: "☀️晴/陰：13:30 報到 ➔ 14:00 體驗「全透明獨木舟/玻璃船」看熱帶魚 ➔ 15:00 白沙灘瘋狂挖沙踏浪！", map: "瀬底ビーチ", mapcode: "206 822 265*25", lat: 26.6492, lon: 127.8556, duration: "3h", travel: "🚗 18分",
+                          rainy: { title: "御菓子御殿名護店 ＋ MEGA唐吉軻德名護店", spotId: "donki_nago", icon: "fa-basket-shopping", note: "☔雨天/停航備案：改去「御菓子御殿 名護店」(室內看紅芋塔產線、吃下午茶) ＋「MEGA 唐吉軻德 名護店」(室內超大玩具區買奧特曼與零食)！", map: "MEGA Don Quijote Nago", mapcode: "206 598 712*44" }
+                        },
+                        { time: "17:00", title: "返回 Yugaf Inn 休息 & Hama 壽司晚餐", spotId: "hamazushi", icon: "fa-bath", note: "返回飯店休息，晚餐吃 Hama 壽司名護店 (離飯店 3 分鐘，平板點火車送餐)。", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830, duration: "2.5h" }
+                    ]
                 },
-                { time: "17:00", title: "返回 Yugaf Inn 沖澡 & Hama 壽司晚餐", spotId: "hamazushi", icon: "fa-bath", note: "車程僅 18 分鐘回飯店沖澡休息！晚餐去吃 Hama 壽司名護店 (離飯店僅 3 分鐘)。", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830, duration: "2.5h" }
-            ]
+                B: {
+                    label: "🅱️ 名護B：JUNGLIA 恐龍冒險",
+                    title: "最新 JUNGLIA 恐龍冒險 (或備瀨水牛車)",
+                    highlights: "JUNGLIA裝甲車看恐龍 / 花人逢或岸本食堂 / 瀨底海灘",
+                    events: [
+                        { time: "08:30", title: "飯店享用早餐", spotId: "hotel_nago", icon: "fa-mug-hot", note: "吃飽準備開啟熱血恐龍冒險！", lat: 26.5947, lon: 127.9681, duration: "1h", travel: "🚗 15分" },
+                        { time: "09:30", title: "JUNGLIA OKINAWA 恐龍樂園 (或備瀨水牛車)", spotId: "junglia", icon: "fa-dragon", note: "☀️晴/陰：搭裝甲車看巨型恐龍！或選「海洋博免費海豚秀＋備瀨福木林道水牛車」。", map: "JUNGLIA OKINAWA", lat: 26.6415, lon: 127.9512, duration: "3.5h", travel: "🚗 15分",
+                          rainy: { title: "沖繩美麗海水族館 或 讀谷村 Gala 青海", spotId: "okichan_dolphin", icon: "fa-fish", note: "☔雨天備案：若下大雨不適合戶外叢林，直接改去全室內的「沖繩美麗海水族館」或往南去讀谷村「Gala 青海(室內體驗海鹽冰淇淋、珊瑚農場)」！", map: "沖繩美麗海水族館" }
+                        },
+                        { time: "13:00", title: "午餐：本部町海景餐廳 (花人逢或岸本食堂)", spotId: "kishimoto_soba", icon: "fa-pizza-slice", note: "享用海景披薩或百年手工沖繩麵。", map: "花人逢", lat: 26.6661, lon: 127.8897, duration: "1.5h", travel: "🚗 10分" },
+                        { time: "14:30", title: "瀨底海灘悠閒挖沙", spotId: "sesoko_beach", icon: "fa-umbrella-beach", note: "☀️晴天：在潔白沙灘挖沙踏浪。", map: "瀬底ビーチ", lat: 26.6492, lon: 127.8556, duration: "2.5h", travel: "🚗 18分",
+                          rainy: { title: "名護室內商場巡禮 (MEGA唐吉軻德＋大創)", spotId: "donki_nago", icon: "fa-bag-shopping", note: "☔雨天備案：逛 MEGA 唐吉軻德名護店＋大創百貨買齊玩具，提早回飯店休息！", map: "MEGA Don Quijote Nago" }
+                        },
+                        { time: "17:30", title: "返回 Yugaf Inn 休息 & 晚餐", spotId: "hamazushi", icon: "fa-utensils", note: "晚餐吃 Hama 壽司或暖暮拉麵。", map: "はま寿司 名護店", lat: 26.5960, lon: 127.9830, duration: "2h" }
+                    ]
+                }
+            }
         },
         { 
-            day: "D4", date: "6/08 (二)", title: "釣魚挖寶石 ➔ 美國村 ➔ 進駐浦添", highlights: "冷氣房釣魚挖化石 / 順遊美國村 / 漫畫倉庫挖寶奧特曼", bg: bgImages.D4, 
+            day: "D4", date: "6/08 (二)", title: "室內釣魚挖寶石 ➔ 美國村 ➔ 宜野灣王子", highlights: "100%室內釣魚挖化石 / 宜野灣王子14:00提早入住 / 內建室內泳池&溫泉", bg: bgImages.D4, 
             weather: {
                 icon: "fa-cloud-sun", temp: "26°C - 30°C", rain: "30%", uv: "高",
-                wear: "輕便舒適親子裝 + 好走休閒鞋",
-                tips: "⚠️ 釣魚王國玩到 13:15 準時離開避開清場！晚上飯店旁就有 A&W 牧港店跟「漫畫倉庫」可以挖寶超便宜奧特曼公仔！"
+                wear: "輕便舒適親子裝 + 準備泳衣泡湯玩水",
+                tips: "🌟 今天自帶完美雨備！釣魚尋寶王國 100% 全室內冷氣房，王子飯店停立體停車場走 2F 連通道進房完全不淋雨！"
             },
             events: [
                 { time: "10:00", title: "Yugaf Inn 退房南下", spotId: "hotel_nago", icon: "fa-suitcase-rolling", note: "行李上車，告別名護往南至宇流麻市石川 (車程約 35 分鐘)。", lat: 26.5947, lon: 127.9681, duration: "40m", travel: "🚗 南下 35分" },
-                { time: "10:45", title: "沖繩釣魚尋寶冒險王國", spotId: "fishing_kingdom", icon: "fa-gem", note: "全室內冷氣房！無鉤釣竿釣熱帶魚、撈小魚、釣螯蝦；去尋寶挖沙道拿鏟子與刷子挖掘恐龍化石與寶石帶回家！(⚠️玩到13:15離開，避開13:30清場)", map: "釣って見つけるぼうけんの国 沖縄", mapcode: "33 892 496*55", lat: 26.4258, lon: 127.8256, duration: "2.5h", travel: "🚗 25分" },
-                { time: "13:45", title: "北谷美國村 & 日落海灘", spotId: "sunset_beach", icon: "fa-sun", note: "午餐於美國村內享用，下午媽媽逛美國村特色服飾與 AEON 北谷店，爸爸推車拍美式街景與海灘。", map: "Chatan Sunset Beach", mapcode: "33 526 360*03", lat: 26.3144, lon: 127.7531, duration: "3.5h", travel: "🚗 南下 15分" },
-                { time: "17:30", title: "沖繩阿拉科喬飯店 (Ala COOJU) Check-in", spotId: "hotel_urasoe", icon: "fa-hotel", note: "訂單：1788173221 (含早餐｜豪華海景榻榻米房)。停室內立體停車場，上 9F 大廳辦理入住，連住三晚！", map: "HOTEL Ala COOJU OKINAWA", mapcode: "33 341 780*30", lat: 26.2655, lon: 127.7176, duration: "1h", travel: "🚶 飯店旁" },
-                { time: "18:30", title: "晚餐：A&W 牧港店 & 逛漫畫倉庫", spotId: "aw_makiminato", icon: "fa-burger", note: "吃飯店旁 A&W 牧港店 (有戶外遊戲區) 或走路吃拉麵/七輪安安燒肉，順便逛旁邊「漫畫倉庫 浦添店」挖寶超便宜奧特曼公仔！", map: "マンガ倉庫 浦添店", lat: 26.2662, lon: 127.7185, duration: "2.5h" }
+                { time: "10:45", title: "🌟【100%全室內】沖繩釣魚尋寶冒險王國", spotId: "fishing_kingdom", icon: "fa-gem", note: "晴雨皆宜全室內冷氣房！無鉤釣竿釣熱帶魚、撈小魚、釣螯蝦；室內沙道拿鏟子刷子挖掘恐龍化石與水晶寶石帶回家！(⚠️玩到13:15離開，避開13:30清場)", map: "釣って見つけるぼうけんの国 沖縄", mapcode: "33 892 496*55", lat: 26.4258, lon: 127.8256, duration: "2.5h", travel: "🚗 25分" },
+                { time: "13:45", title: "北谷美國村 & 日落海灘", spotId: "sunset_beach", icon: "fa-sun", note: "☀️晴/陰：吃午餐、拍美式街景。", map: "Chatan Sunset Beach", mapcode: "33 526 360*03", lat: 26.3144, lon: 127.7531, duration: "2h", travel: "🚗 南下 10分",
+                  rainy: { title: "AEON 北谷店室內午餐 ➔ 14:00 直奔王子飯店", spotId: "sunset_beach", icon: "fa-hotel", note: "☔雨天備案：直接停進「AEON 北谷店」室內吃午餐逛街，並在 14:00 準時直奔「宜野灣王子大飯店」提早 Check-in 享受五星設施！", map: "AEON Chatan" }
+                },
+                { time: "16:00", title: "沖繩王子宜野灣海景大飯店 Check-in", spotId: "hotel_prince", icon: "fa-hotel", note: "訂單：2062367465 (含早餐｜14:00可提早入住)。停室內立體停車場，走 2F 連通道進飯店完全不淋雨！", map: "Okinawa Prince Hotel Ocean View Ginowan", mapcode: "33 403 331*41", lat: 26.2778, lon: 127.7314, duration: "30m", travel: "🏊 2F 設施" },
+                { time: "16:30", title: "🌟【飯店內建雨備】2F 無邊際泳池 / 室內溫水池 & 溫泉", spotId: "hotel_prince", icon: "fa-water-ladder", note: "☀️晴天：玩 2F 戶外海景無邊際泳池\n☔雨天：玩 2F「室內恆溫游泳池」＋「天然溫泉大浴場 / 岩盤浴」＋ 1F 室內兒童遊戲室！", lat: 26.2778, lon: 127.7314, duration: "2h", travel: "🚗 2分" },
+                { time: "18:30", title: "晚餐：飯店 1F 百匯 或 San-A 宜野灣商場", spotId: "sana_ginowan", icon: "fa-utensils", note: "吃飯店 1F Jinon 自助百匯，或開車 2 分鐘停進隔壁 San-A 宜野灣商場 (有室內立體停車場) 吃飯＋逛超市與松本清藥妝！", map: "San-A Ginowan Convention City", lat: 26.2801, lon: 127.7335, duration: "2h" }
             ]
         },
         { 
-            day: "D5", date: "6/09 (三·端午)", title: "海盜船沙坑 & 無邊際泳池 & PARCO首刷", highlights: "安良波1:1海盜船 / 9F無邊際泳池 / 5分鐘到PARCO", bg: bgImages.D5, 
+            day: "D5", date: "6/09 (三·端午)", planGroup: "ginowan",
+            title: "海盜船沙坑 & 飯店泳池 & PARCO首刷", highlights: "安良波1:1海盜船 / 熱帶海灘或無邊際泳池 / 4分鐘到PARCO", bg: bgImages.D5, 
             weather: {
                 icon: "fa-sun", temp: "27°C - 31°C", rain: "20%", uv: "極高",
                 wear: "早上海灘防曬裝 + 泳衣 / 下午輕鬆逛街裝",
-                tips: "⚠️ 阿拉科喬飯店開去 PARCO CITY 只要 5 分鐘！下午先在飯店 9F 無邊際泳池玩水午睡，16:00 再去逛街超優雅。"
+                tips: "💡 PARCO CITY 100% 全室內且有立體停車場！早上若遇下雨，A方案可改逛來客夢 Rycom，B方案可改玩兒童王國神奇博物館。"
             },
-            events: [
-                { time: "08:30", title: "阿拉科喬飯店 9F 海景早餐", spotId: "hotel_urasoe", icon: "fa-mug-hot", note: "在 9F 餐廳邊看海邊吃早餐。", lat: 26.2655, lon: 127.7176, duration: "1h", travel: "🚗 北上 12分" },
-                { time: "09:30", title: "安良波公園 & 海灘 (Araha Beach)", spotId: "araha_park", icon: "fa-ship", note: "從飯店往北開車僅 12 分鐘！玩沙灘上的 1:1 超巨大海盜船溜滑梯＋大沙坑，旁有沖洗水龍頭。", map: "アラハビーチ", mapcode: "33 496 196*11", lat: 26.3039, lon: 127.7583, duration: "2.5h", travel: "🚗 12分",
-                  rainy: { title: "提早前進 PARCO CITY 室內樂園", spotId: "parco", icon: "fa-bag-shopping", note: "若遇下雨海盜船濕滑，直接開 5 分鐘去 PARCO CITY 室內吹冷氣逛街放電！" }
+            plans: {
+                A: {
+                    label: "🅰️ 宜野灣A：渡假慢活 & 專注購物",
+                    title: "海盜船沙坑 & 飯店熱帶海灘 & PARCO首刷",
+                    highlights: "安良波海盜船(雨備:Rycom) / 熱帶海灘 / PARCO首刷",
+                    events: [
+                        { time: "08:30", title: "宜野灣王子 1F 海景自助早餐", spotId: "hotel_prince", icon: "fa-mug-hot", note: "享用超豐盛五星級海景自助早餐。", lat: 26.2778, lon: 127.7314, duration: "1h", travel: "🚗 北上 8分" },
+                        { time: "09:30", title: "安良波公園 & 海灘 (Araha Beach)", spotId: "araha_park", icon: "fa-ship", note: "☀️晴/陰：玩 1:1 超巨大海盜船溜滑梯＋大沙坑，旁有沖洗水龍頭！", map: "アラハビーチ", mapcode: "33 496 196*11", lat: 26.3039, lon: 127.7583, duration: "2.5h", travel: "🚗 8分",
+                          rainy: { title: "永旺夢樂城 AEON Mall Rycom (來客夢)", spotId: "rycom", icon: "fa-dragon", note: "☔雨天備案：離宜野灣車程僅 15 分鐘！全室內超好逛，1F 有巨大水族箱、4F 有寶可夢中心與超多奧特曼/恐龍玩具店！", map: "Aeon Mall Okinawa Rycom", mapcode: "33 530 406*45" }
+                        },
+                        { time: "12:00", title: "回飯店沖洗換衣 & 午餐", spotId: "manga_souko", icon: "fa-burger", note: "返回飯店沖洗換衣服，午餐去附近 A&W 牧港店或商場解決。", map: "A&W 牧港店", lat: 26.2662, lon: 127.7185, duration: "2h", travel: "🚶 過馬路 3分" },
+                        { time: "14:00", title: "宜野灣熱帶海灘挖沙 或 戶外無邊際泳池", spotId: "tropical_beach", icon: "fa-umbrella-beach", note: "☀️晴天：過馬路去「宜野灣熱帶海灘 (Tropical Beach)」挖沙或玩戶外無邊際泳池！", map: "Ginowan Tropical Beach", lat: 26.2797, lon: 127.7289, duration: "2h", travel: "🚗 4分",
+                          rainy: { title: "回房冷氣午睡 ＋ 飯店 2F 室內溫水泳池 & 溫泉", spotId: "hotel_prince", icon: "fa-hot-tub-person", note: "☔雨天備案：回房間吹冷氣睡午覺 ＋ 飯店 2F 室內恆溫泳池玩水與泡溫泉！", map: "Okinawa Prince Hotel Ocean View Ginowan" }
+                        },
+                        { time: "16:00", title: "🌟【100%全室內】浦添西海岸 PARCO CITY 首刷", spotId: "parco", icon: "fa-bag-shopping", note: "車程僅 4 分鐘！停室內立體停車場免淋雨。媽媽逛 2F 阿卡將、Uniqlo、藥妝；父子逛 3F 玩具區挑奧特曼！", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 276*41", lat: 26.2642, lon: 127.6934, duration: "2.5h", travel: "🍽️ 館內晚餐" },
+                        { time: "18:30", title: "晚餐：PARCO CITY 海景餐廳", spotId: "parco", icon: "fa-utensils", note: "吃敘敘苑燒肉、迴轉壽司或美食街，吃飽開 4 分鐘秒回飯店泡溫泉！", lat: 26.2642, lon: 127.6934, duration: "2h" }
+                    ]
                 },
-                { time: "12:00", title: "回浦添飯店沖澡 & 午餐", spotId: "hotel_urasoe", icon: "fa-shower", note: "返回飯店沖澡換乾淨衣服，午餐可於途經餐廳或 PARCO CITY 解決。", lat: 26.2655, lon: 127.7176, duration: "2h", travel: "🏊 9F 泳池" },
-                { time: "14:00", title: "飯店午睡 & 9F 海景無邊際泳池", spotId: "hotel_urasoe", icon: "fa-water-ladder", note: "享受飯店 9F 無邊際泳池（附專屬兒童淺水池，可免費借手臂圈）與房內榻榻米午睡充電！", lat: 26.2655, lon: 127.7176, duration: "2h", travel: "🚗 5分" },
-                { time: "16:00", title: "浦添西海岸 PARCO CITY 首刷", spotId: "parco", icon: "fa-bag-shopping", note: "離飯店車程僅 5 分鐘！\n👩媽媽主場：2F 阿卡將本舖、Uniqlo、GU、松本清藥妝\n🦸‍♂️父子主場：3F 玩具區挑奧特曼變身器與軟膠、轉扭蛋！", map: "SAN-A 浦添西海岸 PARCO CITY", mapcode: "33 339 276*41", lat: 26.2642, lon: 127.6934, duration: "2.5h", travel: "🍽️ 館內晚餐" },
-                { time: "18:30", title: "晚餐：PARCO CITY 海景餐廳", spotId: "parco", icon: "fa-utensils", note: "吃敘敘苑燒肉、迴轉壽司或美食街，吃飽開 5 分鐘秒回飯店休息！", lat: 26.2642, lon: 127.6934, duration: "2h" }
-            ]
+                B: {
+                    label: "🅱️ 宜野灣B：秘境探險 & 公園放電",
+                    title: "巨型海盜船沙坑 & 無邊際泳池 & PARCO首刷",
+                    highlights: "安良波海盜船(雨備:神奇博物館) / 飯店泳池 / PARCO首刷",
+                    events: [
+                        { time: "08:30", title: "宜野灣王子 1F 海景自助早餐", spotId: "hotel_prince", icon: "fa-mug-hot", note: "享用海景自助早餐。", lat: 26.2778, lon: 127.7314, duration: "1h", travel: "🚗 北上 8分" },
+                        { time: "09:30", title: "安良波公園 & 海灘 (Araha Beach)", spotId: "araha_park", icon: "fa-ship", note: "☀️晴/陰：玩 1:1 超巨大海盜船溜滑梯＋大沙坑！", map: "アラハビーチ", lat: 26.3039, lon: 127.7583, duration: "2.5h", travel: "🚗 8分",
+                          rainy: { title: "沖繩兒童王國 (Wonder Museum 室內神奇博物館)", spotId: "rycom", icon: "fa-flask", note: "☔雨天備案：改去兒童王國的「Wonder Museum 室內神奇博物館」玩科學互動設施，或逛「永旺夢樂城來客夢 (AEON Rycom)」室內放電！", map: "Okinawa Zoo & Museum" }
+                        },
+                        { time: "12:00", title: "返回宜野灣王子午餐 & 回房午睡", spotId: "hotel_prince", icon: "fa-bed", note: "回飯店附近午餐並回房午睡休息。", lat: 26.2778, lon: 127.7314, duration: "2h", travel: "🏊 2F 泳池" },
+                        { time: "14:00", title: "飯店 2F 無邊際泳池 或 宜野灣熱帶海灘", spotId: "tropical_beach", icon: "fa-water-ladder", note: "☀️晴天：享受 2F 戶外無邊際泳池或去熱帶海灘踩沙。", lat: 26.2778, lon: 127.7314, duration: "2h", travel: "🚗 4分",
+                          rainy: { title: "飯店 2F 室內溫水泳池 ＋ 海景溫泉大浴場", spotId: "hotel_prince", icon: "fa-hot-tub-person", note: "☔雨天備案：在飯店 2F 室內恆溫泳池玩水與泡海景溫泉！", map: "Okinawa Prince Hotel Ocean View Ginowan" }
+                        },
+                        { time: "16:00", title: "🌟【100%全室內】浦添西海岸 PARCO CITY 首刷", spotId: "parco", icon: "fa-bag-shopping", note: "車程 4 分鐘！媽媽專攻 2F 阿卡將、藥妝，父子逛 3F 玩具區。", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934, duration: "2.5h", travel: "🍽️ 館內晚餐" },
+                        { time: "18:30", title: "晚餐：PARCO CITY 海景餐廳", spotId: "parco", icon: "fa-utensils", note: "吃飽開 4 分鐘回飯店泡溫泉。", lat: 26.2642, lon: 127.6934, duration: "2h" }
+                    ]
+                }
+            }
         },
         { 
-            day: "D6", date: "6/10 (四)", title: "波上宮神社 & 外人住宅 & PARCO二刷", highlights: "波上宮買書包御守 / 港川水果塔 / Asobi室內樂園", bg: bgImages.D6, 
+            day: "D6", date: "6/10 (四)", planGroup: "ginowan",
+            title: "波上宮 & 外人住宅 & 漫畫倉庫 & PARCO二刷", highlights: "波上宮買御守 / 港川水果塔 / 漫畫倉庫 & Asobi室內白沙坑", bg: bgImages.D6, 
             weather: {
                 icon: "fa-cloud-sun", temp: "26°C - 30°C", rain: "20%", uv: "高",
                 wear: "好穿脫休閒鞋 + 拍照好看的親子穿搭",
-                tips: "⚠️ 港川外人住宅離我們飯店只有 3 分鐘！⚠️特別注意：飯店 1F Lawson 約 20:00 打烊，宵夜飲料記得先買好！"
+                tips: "🌟 PARCO 3F Asobi Park Plus 裡面有「室內高科技互動白沙坑」，就算連下三天雨，奎奎也能在冷氣房裡乾乾淨淨玩沙！"
             },
-            events: [
-                { time: "08:30", title: "飯店享用早餐", spotId: "hotel_urasoe", icon: "fa-mug-hot", note: "吃飽往南出發前往那霸波上宮 (車程僅 15 分鐘)。", lat: 26.2655, lon: 127.7176, duration: "1h", travel: "🚗 南下 15分" },
-                { time: "09:30", title: "波上宮 & 波之上海灘", spotId: "naminoue", icon: "fa-torii-gate", note: "參拜買交通安全書包御守，走下沙灘拍懸崖神社美景與踏浪玩沙。", map: "波上宮", mapcode: "33 185 023*00", lat: 26.2206, lon: 127.6713, duration: "1.5h", travel: "🚗 北上 15分" },
-                { time: "11:30", title: "港川外人住宅街 (午餐+甜點)", spotId: "minatogawa", icon: "fa-store", note: "回飯店路上順遊 (離飯店僅 3 分鐘)！平地散步拍美式彩色平房、買 oHacorte 水果塔、吃雞湯拉麵當午餐。", map: "港川ステイツサイドタウン", mapcode: "33 341 002*28", lat: 26.2625, lon: 127.7147, duration: "2h", travel: "🚗 3分" },
-                { time: "14:00", title: "回阿拉科喬飯店吹冷氣睡午覺", spotId: "hotel_urasoe", icon: "fa-bed", note: "避開正中午烈日，回房午睡補眠。", lat: 26.2655, lon: 127.7176, duration: "2h", travel: "🚗 5分" },
-                { time: "16:00", title: "PARCO CITY 二刷補貨 & 室內樂園", spotId: "parco", icon: "fa-robot", note: "媽媽把日系女裝與伴手禮買齊；爸爸帶奎奎在 3F Asobi Park Plus 室內樂園玩沙坑放電！晚餐於館內享用。", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934, duration: "4h", travel: "🚗 5分" },
-                { time: "20:00", title: "返回飯店最後打包整理戰利品", spotId: "hotel_urasoe", icon: "fa-box-open", note: "⚠️ 提醒：飯店 1F Lawson 約 20:00 打烊，宵夜飲料記得先買好！果凍、剪刀與免稅袋務必放托運。", lat: 26.2655, lon: 127.7176, duration: "一晚" }
-            ]
+            plans: {
+                A: {
+                    label: "🅰️ 宜野灣A：外人住宅 & 漫畫倉庫尋寶",
+                    title: "波上宮 & 外人住宅 & 漫畫倉庫 & PARCO二刷",
+                    highlights: "波上宮(雨備:縣立博物館) / 港川水果塔 / 漫畫倉庫 / Asobi室內沙坑",
+                    events: [
+                        { time: "08:30", title: "飯店享用早餐", spotId: "hotel_prince", icon: "fa-mug-hot", note: "吃飽往南出發前往波上宮 (約 18 分鐘)。", lat: 26.2778, lon: 127.7314, duration: "1h", travel: "🚗 南下 18分" },
+                        { time: "09:30", title: "波上宮 & 波之上海灘", spotId: "naminoue", icon: "fa-torii-gate", note: "☀️晴/陰：參拜買書包御守，沙灘拍懸崖神社與踏浪。", map: "波上宮", mapcode: "33 185 023*00", lat: 26.2206, lon: 127.6713, duration: "1.5h", travel: "🚗 北上 12分",
+                          rainy: { title: "波上宮1分鐘買御守 ➔ 沖繩縣立博物館(免費兒童室) / Main Place", spotId: "okimu", icon: "fa-building-columns", note: "☔雨天備案：車直接停神社旁，撐傘1分鐘買完書包御守即上車；改去新都心「沖繩縣立博物館(1F有免費兒童科學互動體驗室！)」或隔壁「Naha Main Place＋玩具反斗城」！", map: "Okinawa Prefectural Museum & Art Museum", mapcode: "33 188 558*14" }
+                        },
+                        { time: "11:30", title: "浦添・港川外人住宅街 (午餐+甜點)", spotId: "minatogawa", icon: "fa-store", note: "☀️晴/陰：平地散步拍彩色平房、買 oHacorte 水果塔、吃雞湯拉麵當午餐。", map: "港川ステイツサイドタウン", mapcode: "33 341 002*28", lat: 26.2625, lon: 127.7147, duration: "2h", travel: "🚗 3分",
+                          rainy: { title: "oHacorte 門口外帶水果塔 ➔ San-A 或 PARCO 室內午餐", spotId: "minatogawa", icon: "fa-cake-candles", note: "☔雨天備案：開車直接停在 oHacorte 店門口外帶水果塔回飯店吃，午餐改在 San-A 宜野灣商場或 PARCO CITY 室內解決！", map: "oHacorte 港川本店" }
+                        },
+                        { time: "13:30", title: "🌟【100%全室內】漫畫倉庫 浦添店 ➔ 回飯店午睡", spotId: "manga_souko", icon: "fa-robot", note: "室內挖寶超便宜二手/全新奧特曼軟膠公仔與變身器 ➔ 回宜野灣王子飯店吹冷氣睡午覺！", map: "マンガ倉庫 浦添店", lat: 26.2662, lon: 127.7185, duration: "2.5h", travel: "🚗 4分" },
+                        { time: "16:00", title: "🌟【100%全室內】PARCO CITY 二刷 & 3F Asobi 室內樂園", spotId: "parco", icon: "fa-child-reaching", note: "媽媽把日系女裝與伴手禮買齊；爸爸帶奎奎在 3F Asobi Park Plus 玩「室內高科技互動白沙坑」放電！", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934, duration: "4h", travel: "🚗 4分" },
+                        { time: "20:00", title: "返回飯店最後打包 & 泡海景溫泉", spotId: "hotel_prince", icon: "fa-box-open", note: "最後打包整理戰利品，享受最後一晚的海景溫泉！", lat: 26.2778, lon: 127.7314, duration: "一晚" }
+                    ]
+                },
+                B: {
+                    label: "🅱️ 宜野灣B：普天滿宮鐘乳洞 & 特色公園",
+                    title: "波上宮 ➔ 普天滿宮鐘乳洞 ➔ 外人住宅 ➔ 公園",
+                    highlights: "波上宮 / 地底鐘乳洞探險 / 外人住宅 / 浦添大公園C區 / PARCO",
+                    events: [
+                        { time: "08:30", title: "飯店享用早餐", spotId: "hotel_prince", icon: "fa-mug-hot", note: "吃飽出發前往波上宮。", lat: 26.2778, lon: 127.7314, duration: "1h", travel: "🚗 18分" },
+                        { time: "09:30", title: "波上宮 & 波之上海灘", spotId: "naminoue", icon: "fa-torii-gate", note: "☀️晴/陰：參拜買交通安全御守、沙灘拍懸崖神社。", map: "波上宮", lat: 26.2206, lon: 127.6713, duration: "1.5h", travel: "🚗 20分",
+                          rainy: { title: "波上宮快速買御守 (不去沙灘)", spotId: "naminoue", icon: "fa-torii-gate", note: "☔雨天備案：車停神社旁快速參拜買完御守即上車，不去沙灘。", map: "波上宮" }
+                        },
+                        { time: "11:00", title: "普天滿宮 (地底鐘乳洞探險！)", spotId: "futenma_cave", icon: "fa-mountain", note: "☀️晴/小雨：免費進入地下神秘鐘乳洞探險，洞內不受微雨影響！", map: "普天満宮", mapcode: "33 438 625*25", lat: 26.2922, lon: 127.7775, duration: "1.5h", travel: "🚗 15分",
+                          rainy: { title: "浦添市美術館 或 提早去商場 (大暴雨備案)", spotId: "futenma_cave", icon: "fa-palette", note: "☔大暴雨備案：若遇大暴雨鐘乳洞關閉，改去「浦添市美術館」或提早去漫畫倉庫與商場！", map: "浦添市美術館" }
+                        },
+                        { time: "12:30", title: "浦添・港川外人住宅街 (午餐+甜點)", spotId: "minatogawa", icon: "fa-store", note: "☀️晴/陰：吃 oHacorte 水果塔與雞湯拉麵午餐。", map: "港川ステイツサイドタウン", lat: 26.2625, lon: 127.7147, duration: "1.5h", travel: "🚗 8分",
+                          rainy: { title: "漫畫倉庫 浦添店 挖寶奧特曼 ＋ 室內吃拉麵", spotId: "manga_souko", icon: "fa-robot", note: "☔雨天備案：改去旁邊全室內的「漫畫倉庫 浦添店」挖寶奧特曼玩具 ＋ 室內餐廳吃拉麵！", map: "マンガ倉庫 浦添店" }
+                        },
+                        { time: "14:00", title: "伊祖公園 或 浦添大公園 C區 (幼兒專用區)", spotId: "urasoe_park", icon: "fa-child-reaching", note: "☀️晴/陰：在幼兒專用軟墊遊具區溜滑梯與玩沙放電！", map: "浦添大公園 憩いの広場Cゾーン", mapcode: "33 312 045*11", lat: 26.2536, lon: 127.7214, duration: "2h", travel: "🚗 10分",
+                          rainy: { title: "提早進 PARCO 3F Asobi Park Plus 室內兒童樂園", spotId: "parco", icon: "fa-gamepad", note: "☔雨天備案：取消戶外公園，提早進入「PARCO CITY 3F Asobi Park Plus」在室內白沙坑與氣墊區吹冷氣放電！", map: "SAN-A 浦添西海岸 PARCO CITY" }
+                        },
+                        { time: "16:30", title: "🌟【100%全室內】PARCO CITY 二刷補貨", spotId: "parco", icon: "fa-bag-shopping", note: "最後補貨衝刺與館內晚餐。", map: "SAN-A 浦添西海岸 PARCO CITY", lat: 26.2642, lon: 127.6934, duration: "3.5h", travel: "🚗 4分" },
+                        { time: "20:00", title: "返回飯店最後打包 & 泡海景溫泉", spotId: "hotel_prince", icon: "fa-box-open", note: "整理戰利品，享受最後一晚海景溫泉。", lat: 26.2778, lon: 127.7314, duration: "一晚" }
+                    ]
+                }
+            }
         },
         { 
-            day: "D7", date: "6/11 (五)", title: "超近距離南下 & 滿載而歸", highlights: "20分鐘直達豐崎Outlet / 紅槍加油還車 / 平安返台", bg: bgImages.D7, 
+            day: "D7", date: "6/11 (五)", title: "西海岸順暢南下 & 滿載而歸", highlights: "遊艇港拍全家福 / 25分直達豐崎 / Outlet或iias室內雨備", bg: bgImages.D7, 
             weather: {
                 icon: "fa-plane-departure", temp: "26°C - 30°C", rain: "10%", uv: "中",
                 wear: "寬鬆舒適搭機服 + 隨身小外套",
-                tips: "⚠️ 從浦添走西海岸道路南下豐崎只要 20~25 分鐘，完全不用趕早！還車前務必拔下 ETC 卡。"
+                tips: "⚠️ 還車前若遇下雨，不去半露天的 Outlet，直接停進隔壁 100% 全室內的 iias 豐崎逛街吃早午餐！"
             },
             events: [
-                { time: "09:00", title: "飯店悠閒早餐 & 9F 泳池畔看海拍照", spotId: "hotel_urasoe", icon: "fa-camera-retro", note: "在 Ala COOJU 享受最後一個悠閒早晨。", lat: 26.2655, lon: 127.7176, duration: "1.5h", travel: "🚗 南下 22分" },
-                { time: "10:30", title: "退房出發南下豐崎", icon: "fa-suitcase-rolling", note: "從浦添走西海岸道路，車程僅約 20～25 分鐘！", duration: "30m", travel: "🚗 抵達豐崎" },
-                { time: "11:00", title: "ASHIBINAA Outlet 或 iias 豐崎", spotId: "ashibinaa", icon: "fa-shoe-prints", note: "還車前最後採買球鞋精品與吃早午餐！", map: "Okinawa Outlet Mall Ashibinaa", mapcode: "232 544 452*22", lat: 26.1583, lon: 127.6569, duration: "1.5h", travel: "🚗 3分" },
+                { time: "09:00", title: "飯店悠閒早餐 & 陽台拍遊艇港全家福", spotId: "hotel_prince", icon: "fa-camera-retro", note: "在宜野灣王子海景陽台看著遊艇港拍全家福，享受最後一個早晨。", lat: 26.2778, lon: 127.7314, duration: "1.5h", travel: "🚗 西海岸 25分" },
+                { time: "10:30", title: "退房出發南下豐崎", icon: "fa-suitcase-rolling", note: "走西海岸道路接那霸西道路，車程約 25 分鐘！", duration: "30m", travel: "🚗 抵達豐崎" },
+                { time: "11:00", title: "ASHIBINAA Outlet (半露天商場最後採買)", spotId: "ashibinaa", icon: "fa-shoe-prints", note: "☀️晴/陰：還車前最後採買運動球鞋與精品！", map: "Okinawa Outlet Mall Ashibinaa", mapcode: "232 544 452*22", lat: 26.1583, lon: 127.6569, duration: "1.5h", travel: "🚗 3分",
+                  rainy: { title: "iias 沖繩豐崎 (100%全室內商場 / DMM水族館)", spotId: "iias", icon: "fa-store", note: "☔雨天備案：直接停進隔壁「iias 沖繩豐崎」全室內商場，逛西松屋、Bic Camera、大創與美食街，還可二刷 DMM 水族館摸樹懶！", map: "iias Okinawa Toyosaki" }
+                },
                 { time: "12:30", title: "ENEOS 加滿油 ➔ OTS 還車", spotId: "gas_station", icon: "fa-gas-pump", note: "加滿紅槍 (Regular) 留收據 ➔ OTS 臨空豐崎營業所還車 (拔ETC卡) ➔ 搭免費接駁車往機場。", map: "ENEOS Dr.Drive Self Toyosaki SS", mapcode: "232 543 500*11", lat: 26.1550, lon: 127.6530, duration: "1h", travel: "🚌 接駁 15分" },
                 { time: "13:30", title: "抵達那霸機場 (逛國內線 2F)", spotId: "oka_airport", icon: "fa-gift", note: "國際線報到托運後，逛國內線 2F 買伴手禮、寶可夢中心、豬肉蛋飯糰！", map: "那霸機場", lat: 26.2048, lon: 127.6458, duration: "3h", travel: "✈️ 飛行" },
                 { time: "16:45", title: "搭乘星宇航空 JX303 起飛返台", icon: "fa-paper-plane", note: "再見沖繩！我們三刷見！", duration: "1.5h", travel: "🏠 返家" },
@@ -1015,12 +1223,12 @@ function initChecklistSync() {
         }
     ];
 
-    // 嘗試讀取自訂行程 (使用 2027 專屬 key 避免被舊版覆蓋)
-    const savedItin = localStorage.getItem('custom_itinerary_2027');
+    // 嘗試讀取自訂行程 (升級為 v2 避免舊快取蓋掉雙方案結構)
+    const savedItin = localStorage.getItem('custom_itinerary_2027_v2');
     if (savedItin) {
         try {
             itineraryDB = JSON.parse(savedItin);
-            console.log("已載入 2027 修改版行程");
+            console.log("已載入 2027 v2 修改版行程");
         } catch(e) { console.error("行程讀取失敗"); }
     }
 
@@ -1391,9 +1599,15 @@ function initChecklistSync() {
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
-        // 1. 行程 (Itinerary)
+        // 1. 行程 (Itinerary - 支援 A/B 雙方案與終極雨備切換)
         if (activeTab === 'itinerary') {
             const d = itineraryDB[currentDayIdx];
+            const activePlanKey = d.planGroup ? (planSelection[d.planGroup] || 'A') : null;
+            const activePlanObj = (d.planGroup && d.plans) ? d.plans[activePlanKey] : null;
+            const currentTitle = activePlanObj ? activePlanObj.title : d.title;
+            const currentHighlights = activePlanObj ? activePlanObj.highlights : d.highlights;
+            const currentEvents = getActiveDayEvents(d);
+
             const diaryKey = `diary27_${d.day}`;
             const savedDiary = localStorage.getItem(diaryKey) || "";
             const tideInfo = tideDB[d.day] || { sun: "19:21" };
@@ -1406,6 +1620,18 @@ function initChecklistSync() {
             const curHomeJpy = parseFloat(homeFxInputVal) || 0;
             const curHomeTwd = Math.round(curHomeJpy * CURRENT_RATE);
             const curHomeTaxFreeTwd = Math.round((curHomeJpy / 1.1) * CURRENT_RATE);
+
+            // 若當天有 A/B 雙方案 (Day 2, 3, 5, 6)，渲染方案切換膠囊
+            const planSwitchHTML = d.planGroup ? `
+                <div class="bg-indigo-50/90 p-1.5 rounded-2xl mb-3 border border-indigo-200 flex gap-1.5 shadow-inner">
+                    <button onclick="switchPlanAB('${d.planGroup}', 'A')" class="flex-1 py-2 px-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1 ${activePlanKey === 'A' ? 'bg-blue-600 text-white shadow-md scale-[1.01]' : 'text-indigo-700 hover:bg-indigo-100/60'}">
+                        <span>${d.plans.A.label}</span>
+                    </button>
+                    <button onclick="switchPlanAB('${d.planGroup}', 'B')" class="flex-1 py-2 px-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1 ${activePlanKey === 'B' ? 'bg-purple-600 text-white shadow-md scale-[1.01]' : 'text-indigo-700 hover:bg-indigo-100/60'}">
+                        <span>${d.plans.B.label}</span>
+                    </button>
+                </div>
+            ` : '';
 
             main.innerHTML = `
             <div class="animate-slide-up">
@@ -1440,14 +1666,15 @@ function initChecklistSync() {
                 </div>
 
                 <!-- 每日行程主卡 -->
-                <div class="glass-card rounded-3xl p-5 mb-4 relative overflow-hidden border-l-4 border-blue-500 shadow-lg">
+                <div class="glass-card rounded-3xl p-5 mb-4 relative overflow-hidden border-l-4 ${activePlanKey === 'B' ? 'border-purple-500' : 'border-blue-500'} shadow-lg">
+                    ${planSwitchHTML}
                     <div class="flex justify-between items-start mb-3">
                         <div class="flex flex-col">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">Day ${currentDayIdx + 1}</span>
+                                <span class="${activePlanKey === 'B' ? 'bg-purple-600' : 'bg-blue-600'} text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">Day ${currentDayIdx + 1}${activePlanKey ? ` · ${activePlanKey}版` : ''}</span>
                                 <h2 class="text-2xl font-black text-gray-800 tracking-tight">${d.date}</h2>
                             </div>
-                            <div class="text-sm font-bold text-gray-500">${d.title}</div>
+                            <div class="text-sm font-bold text-gray-500">${currentTitle}</div>
                         </div>
                         <div class="flex flex-col items-end">
                              ${d.weather ? `<div class="flex items-center gap-1"><i class="fas ${d.weather.icon} ${weatherColor} text-2xl drop-shadow-sm"></i><span class="text-lg font-black text-gray-700">${d.weather.temp.split(' ')[0]}</span></div><div class="text-[10px] font-bold text-gray-400 mt-1">降雨 ${d.weather.rain}</div>` : ''}
@@ -1463,13 +1690,13 @@ function initChecklistSync() {
                         </div>
                         <div id="dino-status-text" class="text-[10px] font-bold text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-sm tracking-wider">旅程準備中...</div>
                     </div>
-                    <div class="text-sm bg-white p-3 rounded-xl border border-slate-100 text-gray-700 flex items-start gap-2 shadow-sm"><i class="fas fa-star text-yellow-400 mt-0.5 text-lg"></i><span class="font-bold pt-0.5">${d.highlights}</span></div>
+                    <div class="text-sm bg-white p-3 rounded-xl border border-slate-100 text-gray-700 flex items-start gap-2 shadow-sm"><i class="fas fa-star text-yellow-400 mt-0.5 text-lg"></i><span class="font-bold pt-0.5">${currentHighlights}</span></div>
                 </div>
                 <div class="space-y-4">
-                 ${d.events.map((e, idx) => {
+                 ${currentEvents.map((e, idx) => {
                         const isRainyItem = isRainyMode && e.rainy;
                         const current = isRainyItem ? { ...e, ...e.rainy } : e;
-                        const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-500 text-white text-[9px] px-2 py-0.5 rounded-full"><i class="fas fa-umbrella mr-1"></i>雨天備案</span>` : "";
+                        const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow"><i class="fas fa-umbrella mr-1"></i>雨天備案啟動</span>` : (e.rainy ? `<span onclick="toggleRainMode()" class="cursor-pointer text-[10px] bg-sky-50 text-sky-600 border border-sky-200 px-1.5 py-0.5 rounded ml-1 font-bold" title="點右上角晴天按鈕可切換雨備">☔有雨備</span>` : "");
                         const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
                         const spotData = current.spotId ? spotInfoDB[current.spotId] : null;
                         const voiceBtn = spotData ? `<button onclick="playSpotGuide('${current.spotId}', this); event.stopPropagation();" class="glass px-3 py-1.5 rounded-full text-xs text-pink-600 font-bold border border-pink-100 active:bg-pink-50 mr-1"><i class="fas fa-headphones mr-1"></i>聽介紹</button>` : '';
@@ -1477,7 +1704,7 @@ function initChecklistSync() {
                         const durationTag = current.duration ? `<span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-md ml-2 font-bold shadow-sm"><i class="fas fa-clock mr-1"></i>停留 ${current.duration}</span>` : '';
                         const titleHtml = current.spotId ? `<div onclick="openSpotModal('${current.spotId}')" class="font-bold text-blue-600 text-lg cursor-pointer hover:underline decoration-blue-300 underline-offset-4 decoration-2 flex items-center gap-1">${current.title} <i class="fas fa-circle-info text-xs opacity-50"></i></div>` : `<h3 class="font-bold text-gray-800 text-lg ${current.action ? 'cursor-pointer text-pink-600 underline' : ''}" ${current.action ? `onclick="${current.action}"` : ''}>${current.title}</h3>`;
 
-                        return `<div class="relative group event-card-container"><div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-400 bg-blue-50/50" : ""}">${badge}<div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white z-10 relative"><i class="fas ${current.icon}"></i></div></div><div class="flex-1 py-1 min-w-0"><div class="flex justify-between items-start mb-1"><div class="flex items-center"><h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3></div><div class="flex gap-1 shrink-0">${voiceBtn}${shareBtn}${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}</div></div><div class="flex items-center flex-wrap mb-2 gap-y-1">${titleHtml}${durationTag}</div>${current.note ? `<p class="text-xs text-gray-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed whitespace-pre-line"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}${current.mapcode ? `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100 font-mono font-bold"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}</div></div>${current.travel ? `<div class="timeline-connector"><div class="travel-pill">${current.travel}</div></div>` : '<div class="timeline-connector" style="border:none"></div>'}</div>`;
+                        return `<div class="relative group event-card-container"><div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-500 bg-blue-50/60" : ""}">${isRainyItem ? badge : ''}<div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white z-10 relative"><i class="fas ${current.icon}"></i></div></div><div class="flex-1 py-1 min-w-0"><div class="flex justify-between items-start mb-1"><div class="flex items-center flex-wrap"><h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3>${!isRainyItem ? badge : ''}</div><div class="flex gap-1 shrink-0">${voiceBtn}${shareBtn}${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}</div></div><div class="flex items-center flex-wrap mb-2 gap-y-1">${titleHtml}${durationTag}</div>${current.note ? `<p class="text-xs text-gray-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed whitespace-pre-line"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}${current.mapcode ? `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100 font-mono font-bold"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}</div></div>${current.travel ? `<div class="timeline-connector"><div class="travel-pill">${current.travel}</div></div>` : '<div class="timeline-connector" style="border:none"></div>'}</div>`;
                 }).join('')}
                 </div>
                 <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative mb-6">
@@ -2300,12 +2527,13 @@ function initChecklistSync() {
         input.click();
     }
 
-    // --- 小恐龍 GPS (Dino Tracker) ---
+    // --- 小恐龍 GPS (支援 A/B 方案) ---
     function updateDinoGPS(lat, lon) {
         const d = itineraryDB[currentDayIdx];
-        if (!d.events || d.events.length < 2) return;
+        const evts = getActiveDayEvents(d);
+        if (!evts || evts.length < 2) return;
         
-        const points = d.events.filter(e => e.lat);
+        const points = evts.filter(e => e.lat);
         if (points.length < 2) return;
         
         const start = points[0];
@@ -2752,7 +2980,7 @@ function initChecklistSync() {
     window.restoreData = () => { const c=document.getElementById('importDataInput').value.trim(); if(!c)return; if(confirm("確定覆蓋目前資料？")){try{const d=JSON.parse(decodeURIComponent(atob(c))); if(d.user_rate)localStorage.setItem('user_rate',d.user_rate); if(d.trip_budget)localStorage.setItem('trip_budget',d.trip_budget); if(d.trip_expenses)localStorage.setItem('trip_expenses',d.trip_expenses); if(d.trip_gifts)localStorage.setItem('trip_gifts',d.trip_gifts); if(d.medical_data)localStorage.setItem('medical_data',d.medical_data); if(d.parking_data)localStorage.setItem('parking_data',d.parking_data); if(d.gasha_coins_used)localStorage.setItem('gasha_coins_used',d.gasha_coins_used); if(d.gasha_rewards)localStorage.setItem('gasha_rewards',d.gasha_rewards); if(d.items){for(let k in d.items)localStorage.setItem(k,d.items[k]);} alert("還原成功！"); location.reload();}catch(e){alert("代碼格式錯誤");}} }
     function showToast(m) { const t=document.getElementById('toast'); document.getElementById('toast-msg').innerText=m; t.className="show"; setTimeout(()=>t.className="",3000); }
     
-    // --- GPS 偵測 (任務 + 自動語音導覽) ---
+    // --- GPS 偵測 (任務 + 自動語音導覽，支援 A/B 方案) ---
     function checkGeofence(userLat, userLon) {
         missionsDB.forEach(m => {
             if (localStorage.getItem(m.id) !== '1' && localStorage.getItem(m.id + '_notified') !== '1') {
@@ -2766,6 +2994,21 @@ function initChecklistSync() {
             }
         });
 
+        const todayEvents = getActiveDayEvents(itineraryDB[currentDayIdx]);
+        todayEvents.forEach(e => {
+            if (e.spotId && e.lat) {
+                const playedKey = `played27_${currentDayIdx}_${e.spotId}`;
+                if (localStorage.getItem(playedKey) !== '1') {
+                    const dist = getDistanceFromLatLonInKm(userLat, userLon, e.lat, e.lon);
+                    if (dist < 0.8) {
+                        showToast(`🎧 即將抵達：${e.title}，開始語音導覽...`);
+                        playSpotGuide(e.spotId);
+                        localStorage.setItem(playedKey, '1');
+                    }
+                }
+            }
+        });
+    }
         const todayEvents = itineraryDB[currentDayIdx].events;
         todayEvents.forEach(e => {
             if (e.spotId && e.lat) {
@@ -2844,7 +3087,7 @@ function initChecklistSync() {
     // --- Driver HUD ---
     let hudWatchId = null, wakeLock = null, hudCurrentEventIdx = 0, hudAllEvents = [];
     let roadType = 'city'; let currentSpeedLimit = 50; 
-    function flattenEvents() { let l=[]; itineraryDB.forEach(d=>{d.events.forEach(e=>{l.push({...((isRainyMode&&e.rainy)?{...e,...e.rainy}:e), dayTitle:d.day, fullTitle:e.title});});}); return l; }
+    function flattenEvents() { let l=[]; itineraryDB.forEach(d=>{getActiveDayEvents(d).forEach(e=>{l.push({...((isRainyMode&&e.rainy)?{...e,...e.rainy}:e), dayTitle:d.day, fullTitle:e.title});});}); return l; }
     async function openDriverMode() { document.getElementById('driver-hud').classList.remove('hidden'); document.getElementById('driver-hud').classList.add('flex'); hudAllEvents=flattenEvents(); hudCurrentEventIdx=0; updateHUDUI(); if(navigator.geolocation) hudWatchId=navigator.geolocation.watchPosition(updateHudSpeed,console.log,{enableHighAccuracy:true}); try{if('wakeLock' in navigator) wakeLock=await navigator.wakeLock.request('screen');}catch(e){} startHudClock(); }
     function closeDriverMode() { document.getElementById('driver-hud').classList.add('hidden'); document.getElementById('driver-hud').classList.remove('flex'); if(hudWatchId)navigator.geolocation.clearWatch(hudWatchId); if(wakeLock)wakeLock.release(); }
     function updateHUDUI() { const e=hudAllEvents[hudCurrentEventIdx]; if(!e)return; document.getElementById('hud-title').innerText=e.title; const mc=document.getElementById('hud-mapcode'); if(e.mapcode){mc.innerText=e.mapcode; mc.classList.replace('text-gray-600','text-yellow-400');}else{mc.innerText="NO MAPCODE"; mc.classList.replace('text-yellow-400','text-gray-600');} const btn=document.getElementById('hud-nav-btn'); if(e.map){btn.href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(e.map)}`; btn.classList.remove('opacity-50','pointer-events-none'); btn.innerHTML=`<i class="fas fa-location-arrow animate-pulse"></i> <span>GO 導航</span>`;}else{btn.href="#"; btn.classList.add('opacity-50','pointer-events-none'); btn.innerHTML=`<span>無導航點</span>`;} }
@@ -2879,7 +3122,7 @@ function initChecklistSync() {
 
     function initDayMap() {
         const d = itineraryDB[currentDayIdx];
-        const points = d.events.filter(e => e.lat && e.lon);
+        const points = getActiveDayEvents(d).map(e => (isRainyMode && e.rainy) ? {...e, ...e.rainy} : e).filter(e => e.lat && e.lon);
         
         const mapEl = document.getElementById('day-map-container');
         if (!mapEl) return;
@@ -3039,10 +3282,10 @@ function initChecklistSync() {
     async function generatePDF() {
         showToast("🖨️ 正在產生中文旅遊日誌 PDF...");
         const d = itineraryDB[currentDayIdx];
+        const evts = getActiveDayEvents(d);
         const diary = localStorage.getItem(`diary27_${d.day}`) || "今天玩得超開心，但太忙還沒有寫下文字日記 XD";
         const tempStr = document.getElementById('weather-temp')?.innerText || "28°C";
 
-        // 動態建立高解析度中文日誌排版容器
         const printBox = document.createElement('div');
         printBox.style.cssText = "position:fixed; left:-9999px; top:0; width:600px; padding:40px; background:#ffffff; font-family:'Noto Sans TC',sans-serif; color:#1e293b;";
         printBox.innerHTML = `
@@ -3061,7 +3304,7 @@ function initChecklistSync() {
             </div>
             <h3 style="font-size:18px; font-weight:900; margin-bottom:12px; color:#334155;">🗓️ 行程足跡</h3>
             <div style="margin-bottom:28px;">
-                ${d.events.map(e => `<div style="padding:8px 0; border-bottom:1px dashed #e2e8f0; font-size:14px;"><b>${e.time}</b> — <span style="color:#1d4ed8; font-weight:700;">${e.title}</span> <span style="color:#64748b; font-size:12px;">(${e.note || ''})</span></div>`).join('')}
+                ${evts.map(e => `<div style="padding:8px 0; border-bottom:1px dashed #e2e8f0; font-size:14px;"><b>${e.time}</b> — <span style="color:#1d4ed8; font-weight:700;">${e.title}</span> <span style="color:#64748b; font-size:12px;">(${e.note || ''})</span></div>`).join('')}
             </div>
             <div style="background:#fefce8; border:2px solid #fde047; border-radius:12px; padding:20px;">
                 <h3 style="font-size:16px; font-weight:900; color:#a16207; margin:0 0 8px 0;">✍️ 今日隨筆日記</h3>
