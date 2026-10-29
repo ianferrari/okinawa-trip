@@ -1535,7 +1535,7 @@ function initChecklistSync() {
     function renderContent() {
         const main = document.getElementById('main-scroll');
         
-        // 1. 行程 (Itinerary - 支援 A/B 雙方案與終極雨備切換)
+        // 1. 行程 (Itinerary - 支援置頂匯率、A/B 雙方案、自動高亮與一鍵微調)
         if (activeTab === 'itinerary') {
             const d = itineraryDB[currentDayIdx];
             const activePlanKey = d.planGroup ? (planSelection[d.planGroup] || 'A') : null;
@@ -1557,7 +1557,10 @@ function initChecklistSync() {
             const curHomeTwd = Math.round(curHomeJpy * CURRENT_RATE);
             const curHomeTaxFreeTwd = Math.round((curHomeJpy / 1.1) * CURRENT_RATE);
 
-            // 若當天有 A/B 雙方案 (Day 2, 3, 5, 6)，渲染方案切換膠囊
+            // 計算當下時間 (分鐘數)，用於高亮正在進行的行程
+            const now = new Date();
+            const nowMins = now.getHours() * 60 + now.getMinutes();
+
             const planSwitchHTML = d.planGroup ? `
                 <div class="bg-indigo-50/90 p-1.5 rounded-2xl mb-3 border border-indigo-200 flex gap-1.5 shadow-inner">
                     <button onclick="switchPlanAB('${d.planGroup}', 'A')" class="flex-1 py-2 px-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1 ${activePlanKey === 'A' ? 'bg-blue-600 text-white shadow-md scale-[1.01]' : 'text-indigo-700 hover:bg-indigo-100/60'}">
@@ -1570,39 +1573,39 @@ function initChecklistSync() {
             ` : '';
 
             main.innerHTML = `
-            <div class="animate-slide-up">
-                <!-- 方案 A：首頁置頂「秒算匯率膠囊」(Sticky 永遠固定置頂版) -->
-                <div class="sticky -top-4 z-30 pt-2 pb-2 -mx-1 px-1 bg-gradient-to-b from-slate-50 via-slate-50/95 to-transparent">
-                    <div id="home-fx-bar" class="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 rounded-3xl p-3.5 border-2 border-yellow-300 shadow-lg relative overflow-hidden">
-                        <div class="flex justify-between items-center mb-2">
-                            <div class="flex items-center gap-1.5">
-                                <span class="bg-yellow-400 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm"><i class="fas fa-bolt mr-0.5"></i>秒算匯率</span>
-                                <span class="text-[11px] font-bold text-gray-500">1¥ =</span>
-                                <input type="number" id="homeRateInput" step="0.0001" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="w-14 bg-white border border-yellow-300 rounded-md px-1 py-0.5 text-center text-xs font-black text-amber-700 focus:outline-yellow-500">
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="fetchExchangeRate()" id="homeFetchRateBtn" class="bg-white border border-yellow-300 text-amber-700 px-2 py-1 rounded-lg text-[10px] font-bold active:scale-90 transition-transform shadow-sm">
-                                    <i class="fas fa-sync-alt mr-0.5"></i>更新匯率
-                                </button>
-                                <button onclick="transferHomeFxToExpense()" class="bg-pink-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold active:scale-90 transition-transform shadow-sm">
-                                    <i class="fas fa-plus mr-0.5"></i>記這筆
-                                </button>
-                            </div>
+            <!-- 頂部永遠固定：秒算匯率膠囊 (Sticky 不隨畫面捲走) -->
+            <div class="sticky -top-4 z-30 pt-2 pb-2 -mx-1 px-1 bg-gradient-to-b from-slate-50 via-slate-50/95 to-transparent">
+                <div id="home-fx-bar" class="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 rounded-3xl p-3.5 border-2 border-yellow-300 shadow-lg relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="bg-yellow-400 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm"><i class="fas fa-bolt mr-0.5"></i>秒算匯率</span>
+                            <span class="text-[11px] font-bold text-gray-500">1¥ =</span>
+                            <input type="number" id="homeRateInput" step="0.0001" value="${CURRENT_RATE}" onchange="updateRate(this.value)" class="w-14 bg-white border border-yellow-300 rounded-md px-1 py-0.5 text-center text-xs font-black text-amber-700 focus:outline-yellow-500">
                         </div>
-                        <div class="flex items-center gap-2">
-                            <div class="relative flex-1">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-black text-base">¥</span>
-                                <input type="number" id="homeJpyInput" value="${homeFxInputVal}" oninput="convertHomeCurrency(this.value)" placeholder="輸入日幣標價..." class="w-full bg-white border-2 border-yellow-200 rounded-2xl pl-7 pr-7 py-2 text-lg font-black text-gray-800 focus:outline-yellow-500 shadow-inner">
-                                <button onclick="clearHomeFx()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 text-xs"><i class="fas fa-times-circle"></i></button>
-                            </div>
-                            <div class="flex flex-col justify-center bg-white border border-green-200 rounded-2xl px-3 py-1.5 min-w-[130px] text-right shadow-sm">
-                                <div class="text-xs font-bold text-gray-400 leading-none mb-0.5">折合台幣 <span class="text-[9px] text-pink-500 font-black" id="homeTaxFreeHint">${curHomeJpy > 0 ? `(免稅$${curHomeTaxFreeTwd.toLocaleString()})` : ''}</span></div>
-                                <div class="text-xl font-black text-green-600 leading-tight font-mono">NT$ <span id="homeTwdOutput">${curHomeTwd.toLocaleString()}</span></div>
-                            </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="fetchExchangeRate()" id="homeFetchRateBtn" class="bg-white border border-yellow-300 text-amber-700 px-2 py-1 rounded-lg text-[10px] font-bold active:scale-90 transition-transform shadow-sm">
+                                <i class="fas fa-sync-alt mr-0.5"></i>更新匯率
+                            </button>
+                            <button onclick="transferHomeFxToExpense()" class="bg-pink-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold active:scale-90 transition-transform shadow-sm">
+                                <i class="fas fa-plus mr-0.5"></i>記這筆
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="relative flex-1">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 font-black text-base">¥</span>
+                            <input type="number" id="homeJpyInput" value="${homeFxInputVal}" oninput="convertHomeCurrency(this.value)" placeholder="輸入日幣標價..." class="w-full bg-white border-2 border-yellow-200 rounded-2xl pl-7 pr-7 py-2 text-lg font-black text-gray-800 focus:outline-yellow-500 shadow-inner">
+                            <button onclick="clearHomeFx()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 text-xs"><i class="fas fa-times-circle"></i></button>
+                        </div>
+                        <div class="flex flex-col justify-center bg-white border border-green-200 rounded-2xl px-3 py-1.5 min-w-[130px] text-right shadow-sm">
+                            <div class="text-xs font-bold text-gray-400 leading-none mb-0.5">折合台幣 <span class="text-[9px] text-pink-500 font-black" id="homeTaxFreeHint">${curHomeJpy > 0 ? `(免稅$${curHomeTaxFreeTwd.toLocaleString()})` : ''}</span></div>
+                            <div class="text-xl font-black text-green-600 leading-tight font-mono">NT$ <span id="homeTwdOutput">${curHomeTwd.toLocaleString()}</span></div>
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div>
                 <!-- 每日行程主卡 -->
                 <div class="glass-card rounded-3xl p-5 mb-4 relative overflow-hidden border-l-4 ${activePlanKey === 'B' ? 'border-purple-500' : 'border-blue-500'} shadow-lg">
                     ${planSwitchHTML}
@@ -1634,15 +1637,31 @@ function initChecklistSync() {
                  ${currentEvents.map((e, idx) => {
                         const isRainyItem = isRainyMode && e.rainy;
                         const current = isRainyItem ? { ...e, ...e.rainy } : e;
+                        
+                        // 判斷是否為「當下正在進行中」的行程
+                        const parseTimeMins = (tStr) => {
+                            if(!tStr || !tStr.includes(':')) return -1;
+                            const [hh, mm] = tStr.split(':').map(Number);
+                            return hh * 60 + mm;
+                        };
+                        const startM = parseTimeMins(current.time);
+                        const nextM = (idx + 1 < currentEvents.length) ? parseTimeMins(currentEvents[idx + 1].time) : (startM + 120);
+                        const isCurrentNow = (startM !== -1 && nowMins >= startM && nowMins < nextM);
+                        const isPast = (startM !== -1 && nowMins >= nextM);
+
+                        const nowBadge = isCurrentNow ? `<span class="bg-gradient-to-r from-orange-500 to-pink-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full ml-1.5 shadow-sm animate-pulse"><i class="fas fa-fire mr-0.5"></i>進行中</span>` : '';
                         const badge = isRainyItem ? `<span class="absolute top-2 right-2 bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow"><i class="fas fa-umbrella mr-1"></i>雨天備案啟動</span>` : (e.rainy ? `<span onclick="toggleRainMode()" class="cursor-pointer text-[10px] bg-sky-50 text-sky-600 border border-sky-200 px-1.5 py-0.5 rounded ml-1 font-bold" title="點右上角晴天按鈕可切換雨備">☔有雨備</span>` : "");
                         const mapLink = current.map ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.map)}` : null;
                         const spotData = current.spotId ? spotInfoDB[current.spotId] : null;
-                        const voiceBtn = spotData ? `<button onclick="playSpotGuide('${current.spotId}', this); event.stopPropagation();" class="glass px-3 py-1.5 rounded-full text-xs text-pink-600 font-bold border border-pink-100 active:bg-pink-50 mr-1"><i class="fas fa-headphones mr-1"></i>聽介紹</button>` : '';
-                        const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${(current.note || '').replace(/\n/g, ' ')}')" class="glass px-3 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes mr-1"></i>分享</button>`;
+                        const voiceBtn = spotData ? `<button onclick="playSpotGuide('${current.spotId}', this); event.stopPropagation();" class="glass px-2.5 py-1.5 rounded-full text-xs text-pink-600 font-bold border border-pink-100 active:bg-pink-50"><i class="fas fa-headphones"></i></button>` : '';
+                        const editBtn = `<button onclick="openQuickEditEvent(${idx}); event.stopPropagation();" class="glass px-2.5 py-1.5 rounded-full text-xs text-amber-600 font-bold border border-amber-200 active:bg-amber-50" title="快速微調此行程"><i class="fas fa-pen"></i></button>`;
+                        const shareBtn = `<button onclick="shareEvent('${current.title}', '${current.mapcode || ''}', '${(current.note || '').replace(/\n/g, ' ')}')" class="glass px-2.5 py-1.5 rounded-full text-xs text-green-600 font-bold border border-green-100 active:bg-green-50"><i class="fas fa-share-nodes"></i></button>`;
                         const durationTag = current.duration ? `<span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded-md ml-2 font-bold shadow-sm"><i class="fas fa-clock mr-1"></i>停留 ${current.duration}</span>` : '';
                         const titleHtml = current.spotId ? `<div onclick="openSpotModal('${current.spotId}')" class="font-bold text-blue-600 text-lg cursor-pointer hover:underline decoration-blue-300 underline-offset-4 decoration-2 flex items-center gap-1">${current.title} <i class="fas fa-circle-info text-xs opacity-50"></i></div>` : `<h3 class="font-bold text-gray-800 text-lg ${current.action ? 'cursor-pointer text-pink-600 underline' : ''}" ${current.action ? `onclick="${current.action}"` : ''}>${current.title}</h3>`;
 
-                        return `<div class="relative group event-card-container"><div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-500 bg-blue-50/60" : ""}">${isRainyItem ? badge : ''}<div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]"><div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center text-xl shadow-inner border border-white z-10 relative"><i class="fas ${current.icon}"></i></div></div><div class="flex-1 py-1 min-w-0"><div class="flex justify-between items-start mb-1"><div class="flex items-center flex-wrap"><h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3>${!isRainyItem ? badge : ''}</div><div class="flex gap-1 shrink-0">${voiceBtn}${shareBtn}${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}</div></div><div class="flex items-center flex-wrap mb-2 gap-y-1">${titleHtml}${durationTag}</div>${current.note ? `<p class="text-xs text-gray-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed whitespace-pre-line"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}${current.mapcode ? `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100 font-mono font-bold"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}</div></div>${current.travel ? `<div class="timeline-connector"><div class="travel-pill">${current.travel}</div></div>` : '<div class="timeline-connector" style="border:none"></div>'}</div>`;
+                        const cardHighlightClass = isCurrentNow ? "ring-2 ring-blue-500 bg-gradient-to-br from-blue-50/40 to-white shadow-md" : (isPast ? "opacity-75" : "");
+
+                        return `<div class="relative group event-card-container"><div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex gap-4 relative z-10 overflow-hidden transition-all active:scale-[0.98] ${isRainyItem ? "border-l-4 border-blue-500 bg-blue-50/60" : ""} ${cardHighlightClass}">${isRainyItem ? badge : ''}<div class="flex flex-col items-center gap-2 mt-1 min-w-[3.5rem]"><div class="w-14 h-14 rounded-2xl ${isCurrentNow ? 'bg-blue-600 text-white pulse-dot' : 'bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600'} flex items-center justify-center text-xl shadow-inner border border-white z-10 relative"><i class="fas ${current.icon}"></i></div></div><div class="flex-1 py-1 min-w-0"><div class="flex justify-between items-start mb-1"><div class="flex items-center flex-wrap"><h3 class="font-bold text-gray-800 text-lg mr-1">${current.time}</h3>${nowBadge}${!isRainyItem ? badge : ''}</div><div class="flex gap-1 shrink-0">${editBtn}${voiceBtn}${shareBtn}${mapLink ? `<a href="${mapLink}" target="_blank" class="glass px-3 py-1.5 rounded-full text-xs text-blue-600 font-bold border border-blue-100 active:bg-blue-50"><i class="fas fa-location-arrow mr-1"></i> GO</a>` : ''}</div></div><div class="flex items-center flex-wrap mb-2 gap-y-1">${titleHtml}${durationTag}</div>${current.note ? `<p class="text-xs text-gray-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed whitespace-pre-line"><i class="fas fa-info-circle mr-1 text-blue-400"></i>${current.note}</p>` : ''}${current.mapcode ? `<div onclick="copyMapCode('${current.mapcode}')" class="mt-2 text-[10px] inline-block bg-yellow-50 text-yellow-700 px-2 py-1 rounded border border-yellow-200 cursor-pointer active:bg-yellow-100 font-mono font-bold"><i class="fas fa-hashtag mr-1"></i>MapCode: ${current.mapcode}</div>` : ''}</div></div>${current.travel ? `<div class="timeline-connector"><div class="travel-pill">${current.travel}</div></div>` : '<div class="timeline-connector" style="border:none"></div>'}</div>`;
                 }).join('')}
                 </div>
                 <div class="mt-4 bg-yellow-50 p-4 rounded-2xl border border-yellow-200 relative mb-6">
@@ -1654,18 +1673,36 @@ function initChecklistSync() {
             </div>`;
             setTimeout(initDayMap, 100);
 
-        // 2. 清單 (Checklist)
+        // 2. 清單 (Checklist - 升級圖片許願池 & 店員詢問卡 & 打勾連動記帳)
         } else if (activeTab === 'checklist') {
             const list = checklistDB.find(c => c.id === currentChecklistFilter);
             main.innerHTML = `
             <div class="animate-slide-up glass-card rounded-3xl p-6 min-h-[60vh]">
-                <h3 class="font-bold text-xl mb-6 text-gray-800 border-b pb-4 border-gray-100 flex items-center gap-2"><span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>${list.title}</h3>
+                <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-100">
+                    <h3 class="font-bold text-xl text-gray-800 flex items-center gap-2"><span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>${list.title}</h3>
+                    ${currentChecklistFilter === 'shop' ? `<span class="text-[10px] bg-pink-50 text-pink-600 border border-pink-200 px-2 py-1 rounded-full font-bold"><i class="fas fa-camera mr-1"></i>可加商品圖問店員</span>` : ''}
+                </div>
                 <div class="space-y-3">
                     ${list.items.map((item, i) => { 
                         const key = `chk27_${currentChecklistFilter}_${item.text}`; 
                         const isChecked = localStorage.getItem(key) === '1'; 
                         const textStyle = isChecked ? 'text-gray-400 line-through' : 'text-gray-700'; 
-                        return `<div class="flex items-start gap-2 group"><label class="flex-1 flex items-start gap-3 p-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50 cursor-pointer select-none border-slate-100 shadow-sm bg-white"><div class="relative flex items-center mt-0.5"><input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ? 'checked' : ''} onchange="toggleCheck('${key.replace(/'/g, "\\'")}')"><i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i></div><div class="flex-1"><div class="font-bold transition-colors text-[15px] ${textStyle}">${item.text}</div>${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}</div></label><button onclick="deleteChecklistItem(${i})" class="mt-3 w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-500 active:scale-90 transition-all rounded-full hover:bg-red-50"><i class="fas fa-trash-alt"></i></button></div>`;
+                        const hasImg = item.img ? true : false;
+                        return `<div class="flex items-center gap-2 group bg-white p-3 rounded-2xl border border-slate-100 shadow-sm hover:bg-slate-50 transition-all">
+                            <label class="flex-1 flex items-start gap-3 cursor-pointer select-none min-w-0">
+                                <div class="relative flex items-center mt-0.5 shrink-0">
+                                    <input type="checkbox" class="custom-checkbox peer appearance-none w-6 h-6 border-2 border-slate-300 rounded-lg transition-all checked:bg-blue-500 checked:border-blue-500" ${isChecked ? 'checked' : ''} onchange="toggleCheckWithExpense('${key.replace(/'/g, "\\'")}', '${item.text.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-check text-white absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 peer-checked:opacity-100 text-xs pointer-events-none"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-bold transition-colors text-[15px] ${textStyle} break-words">${item.text}</div>
+                                    ${item.sub ? `<div class="text-xs text-gray-400 mt-0.5">${item.sub}</div>` : ''}
+                                </div>
+                            </label>
+                            ${hasImg ? `<img src="${item.img}" onclick="showShopItemCard(${i})" class="w-12 h-12 rounded-xl object-cover border-2 border-pink-300 shadow-sm cursor-pointer shrink-0 active:scale-95" title="點擊放大給店員看">` : ''}
+                            <button onclick="uploadChecklistPhoto(${i})" class="w-8 h-8 shrink-0 flex items-center justify-center ${hasImg ? 'text-pink-500 bg-pink-50' : 'text-gray-300 hover:text-blue-500'} active:scale-90 transition-all rounded-full" title="上傳/更換商品圖片"><i class="fas fa-camera text-xs"></i></button>
+                            <button onclick="deleteChecklistItem(${i})" class="w-8 h-8 shrink-0 flex items-center justify-center text-gray-300 hover:text-red-500 active:scale-90 transition-all rounded-full hover:bg-red-50"><i class="fas fa-trash-alt text-xs"></i></button>
+                        </div>`;
                     }).join('')}
                 </div>
                 <button onclick="addChecklistItem()" class="w-full mt-4 py-3 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50 transition-all active:scale-[0.98]"><i class="fas fa-plus mr-1"></i> 新增項目</button>
@@ -3059,7 +3096,7 @@ function initChecklistSync() {
         dayMap = L.map('day-map-container', { zoomControl: false, attributionControl: false });
         familyRadarLayer = L.layerGroup().addTo(dayMap);
         
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 19
         }).addTo(dayMap);
 
@@ -3369,5 +3406,229 @@ function initChecklistSync() {
         <div class="p-4 text-center text-sm font-bold text-gray-600">請對準商品條碼</div>
     </div>
 </div>
+
+<!-- ================= v21.5 三大進化外掛模組 (行程微調 + 購物許願池 + 智慧HUD) ================= -->
+
+<!-- 1. 單筆行程視覺化微調 Modal -->
+<div id="quick-edit-event-modal" class="fixed inset-0 z-[260] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4" onclick="closeQuickEditEvent()">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative animate-pop border-t-4 border-amber-400" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-black text-gray-800"><i class="fas fa-pen-to-square text-amber-500 mr-2"></i>微調行程內容</h3>
+            <button onclick="closeQuickEditEvent()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="space-y-3">
+            <div class="flex gap-2">
+                <div class="w-1/3">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">時間</label>
+                    <input id="qe-time" type="text" placeholder="09:30" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-800 focus:outline-amber-500">
+                </div>
+                <div class="flex-1">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">景點 / 行程名稱</label>
+                    <input id="qe-title" type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-800 focus:outline-amber-500">
+                </div>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">貼心提醒 / 備註</label>
+                <textarea id="qe-note" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-700 focus:outline-amber-500"></textarea>
+            </div>
+            <div class="flex gap-2">
+                <div class="flex-1">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">MapCode</label>
+                    <input id="qe-mapcode" type="text" placeholder="選填" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-gray-700 focus:outline-amber-500">
+                </div>
+                <div class="flex-1">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase block mb-1">Google 導航關鍵字</label>
+                    <input id="qe-map" type="text" placeholder="選填" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-gray-700 focus:outline-amber-500">
+                </div>
+            </div>
+            <button onclick="saveQuickEditEvent()" class="w-full bg-amber-500 text-white font-black py-3.5 rounded-xl shadow-lg active:scale-95 transition-transform mt-2">
+                <i class="fas fa-check mr-1"></i> 儲存修改
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. 購物許願池：給店員看大圖 Modal -->
+<div id="shop-item-card-modal" class="fixed inset-0 z-[260] bg-black/90 backdrop-blur-md hidden items-center justify-center p-5" onclick="closeShopItemCard()">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl relative animate-pop" onclick="event.stopPropagation()">
+        <button onclick="closeShopItemCard()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center"><i class="fas fa-times"></i></button>
+        <div class="bg-pink-50 border border-pink-200 rounded-2xl p-3 mb-4">
+            <div class="text-[10px] font-bold text-pink-500 uppercase tracking-widest mb-1">給店員看 (For Staff)</div>
+            <div class="text-xl font-black text-gray-900 leading-snug">すみません、<br>これはありますか？</div>
+            <button onclick="speak('すみません、これはありますか？', this)" class="mt-2 bg-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm active:scale-95">
+                <i class="fas fa-volume-high mr-1"></i> 播放日文語音
+            </button>
+        </div>
+        <img id="shop-card-img" src="" class="w-full max-h-64 object-contain rounded-2xl border border-slate-100 shadow-inner mb-3 mx-auto bg-slate-50">
+        <div id="shop-card-title" class="text-lg font-black text-gray-800"></div>
+        <div id="shop-card-sub" class="text-xs text-gray-400 mt-1"></div>
+    </div>
+</div>
+
+<script>
+    // --- 功能 1：單筆行程視覺化微調 ---
+    let editingEventIdx = null;
+    window.openQuickEditEvent = (idx) => {
+        editingEventIdx = idx;
+        const d = itineraryDB[currentDayIdx];
+        const evts = getActiveDayEvents(d);
+        const target = (isRainyMode && evts[idx].rainy) ? evts[idx].rainy : evts[idx];
+        
+        document.getElementById('qe-time').value = target.time || evts[idx].time || "";
+        document.getElementById('qe-title').value = target.title || "";
+        document.getElementById('qe-note').value = target.note || "";
+        document.getElementById('qe-mapcode').value = target.mapcode || "";
+        document.getElementById('qe-map').value = target.map || "";
+        
+        const modal = document.getElementById('quick-edit-event-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    };
+
+    window.closeQuickEditEvent = () => {
+        const modal = document.getElementById('quick-edit-event-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    };
+
+    window.saveQuickEditEvent = () => {
+        if (editingEventIdx === null) return;
+        const d = itineraryDB[currentDayIdx];
+        const evts = getActiveDayEvents(d);
+        const target = (isRainyMode && evts[editingEventIdx].rainy) ? evts[editingEventIdx].rainy : evts[editingEventIdx];
+
+        const newTime = document.getElementById('qe-time').value.trim();
+        if (newTime) evts[editingEventIdx].time = newTime;
+        target.title = document.getElementById('qe-title').value.trim();
+        target.note = document.getElementById('qe-note').value.trim();
+        target.mapcode = document.getElementById('qe-mapcode').value.trim();
+        target.map = document.getElementById('qe-map').value.trim();
+
+        localStorage.setItem('custom_itinerary_2027_v2', JSON.stringify(itineraryDB));
+        closeQuickEditEvent();
+        renderContent();
+        showToast("✅ 行程已更新！");
+    };
+
+    // --- 功能 2：購物清單進化 (壓縮圖片上傳 + 店員詢問卡 + 打勾順便記帳) ---
+    window.uploadChecklistPhoto = (idx) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            showToast("📸 正在壓縮處理圖片...");
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxSize = 500; // 壓縮至 500px 輕量同步不卡頓
+                    let w = img.width, h = img.height;
+                    if (w > h && w > maxSize) { h *= maxSize / w; w = maxSize; }
+                    else if (h > maxSize) { w *= maxSize / h; h = maxSize; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                    
+                    const list = checklistDB.find(c => c.id === currentChecklistFilter);
+                    list.items[idx].img = compressedDataUrl;
+                    saveChecklistDB();
+                    renderContent();
+                    showToast("✅ 商品圖片已儲存並同步！");
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    };
+
+    window.showShopItemCard = (idx) => {
+        const list = checklistDB.find(c => c.id === currentChecklistFilter);
+        const item = list.items[idx];
+        if (!item || !item.img) return;
+        document.getElementById('shop-card-img').src = item.img;
+        document.getElementById('shop-card-title').innerText = item.text;
+        document.getElementById('shop-card-sub').innerText = item.sub || "";
+        const modal = document.getElementById('shop-item-card-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    };
+
+    window.closeShopItemCard = () => {
+        const modal = document.getElementById('shop-item-card-modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    };
+
+    window.toggleCheckWithExpense = (key, itemName) => {
+        const wasChecked = localStorage.getItem(key) === '1';
+        toggleCheck(key); // 呼叫原本的打勾同步邏輯
+        
+        // 若是在「購物必買 (shop)」清單且從「未買 ➔ 打勾已買」，詢問是否順便記帳
+        if (!wasChecked && currentChecklistFilter === 'shop') {
+            setTimeout(() => {
+                const priceStr = prompt(`🎉 已買到「${itemName}」！\n💰 要順便輸入日幣金額記帳嗎？(不記帳請按取消)`);
+                if (priceStr && !isNaN(priceStr) && parseInt(priceStr) > 0) {
+                    const p = parseInt(priceStr);
+                    const expenseObj = { name: itemName, price: p, cat: 'shopping', synced: false };
+                    expenses.unshift(expenseObj);
+                    localStorage.setItem('trip_expenses', JSON.stringify(expenses));
+                    if (typeof syncSingleExpenseToCloud === 'function') syncSingleExpenseToCloud(expenseObj);
+                    showToast(`✅ 已同步記帳：¥${p.toLocaleString()} (約 NT$${Math.round(p * CURRENT_RATE).toLocaleString()})`);
+                }
+            }, 150);
+        }
+    };
+
+    // --- 功能 3：Driver HUD 智慧定位當天與當下行程 ---
+    function flattenEventsWithMeta() {
+        let l = [];
+        itineraryDB.forEach((d, dIdx) => {
+            getActiveDayEvents(d).forEach(e => {
+                l.push({
+                    ...((isRainyMode && e.rainy) ? { ...e, ...e.rainy } : e),
+                    dayIdx: dIdx,
+                    dayTitle: d.day,
+                    fullTitle: e.title
+                });
+            });
+        });
+        return l;
+    }
+
+    window.openDriverMode = async () => {
+        document.getElementById('driver-hud').classList.remove('hidden');
+        document.getElementById('driver-hud').classList.add('flex');
+        hudAllEvents = flattenEventsWithMeta();
+        
+        // 智慧尋找：優先鎖定「目前所選天數 (currentDayIdx)」且「有導航點/MapCode」的行程
+        const now = new Date();
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+        let targetIdx = hudAllEvents.findIndex(e => {
+            if (e.dayIdx !== currentDayIdx) return false;
+            if (!e.map && !e.mapcode) return false;
+            if (e.time && e.time.includes(':')) {
+                const [hh, mm] = e.time.split(':').map(Number);
+                return (hh * 60 + mm + 90) >= nowMins; // 尚未結束或即將到來的站點
+            }
+            return true;
+        });
+
+        // 若當天都已超過時間，則鎖定當天第一個有導航的點
+        if (targetIdx === -1) {
+            targetIdx = hudAllEvents.findIndex(e => e.dayIdx === currentDayIdx && (e.map || e.mapcode));
+        }
+        hudCurrentEventIdx = targetIdx !== -1 ? targetIdx : 0;
+
+        updateHUDUI();
+        if (navigator.geolocation) hudWatchId = navigator.geolocation.watchPosition(updateHudSpeed, console.log, { enableHighAccuracy: true });
+        try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+        startHudClock();
+        showToast(`🚗 已自動對焦至 Day ${currentDayIdx + 1} 導航點`);
+    };
+</script>
 </body>
 </html>
